@@ -2,7 +2,6 @@
 
 
 #include "PlayerComponents/StatusComponent.h"
-#include "GameSystem/EventSubSystem.h"
 
 // Sets default values for this component's properties
 UStatusComponent::UStatusComponent()
@@ -21,38 +20,20 @@ void UStatusComponent::SetPlayerTemperature(float InTemperatureValue)
 		// 온도 값이 0이 되어 체력이 소모되기 시작
 		SetPlayerHealth(InTemperatureValue);
 	}
-}
 
-void UStatusComponent::SetPlayerHealth(float InHealthValue)
-{
-	if (CurrentHealth > 0)
-	{
-		CurrentHealth = FMath::Clamp(CurrentHealth + InHealthValue, DefaultMinimum, MaxHealth);
-
-		if (UEventSubSystem* EventSystem = UEventSubSystem::GetEventSystem(this))
-		{
-			EventSystem->Status.OnHealthPointChanged.Broadcast(CurrentHealth / MaxHealth);
-		}
-	}
-	else
-	{
-		// TODO : 캐릭터 사망
-	}
+	//UE_LOG(LogTemp, Log, TEXT("Current Temperature : %.2f / %.2f"), CurrentTemperature, MaxTemperature);
+	//UE_LOG(LogTemp, Log, TEXT("Current Health : %.2f / %.2f"), CurrentHealth, MaxHealth);
 }
 
 // Called when the game starts
 void UStatusComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	InitStatus();
 }
 
 void UStatusComponent::InitStatus()
 {
-	// 체력 초기 값 세팅
-	CurrentHealth = MaxHealth;
-	SetPlayerHealth(CurrentHealth);
+	Super::InitStatus();
 
 	// 온도 초기 값 세팅
 	CurrentTemperature = MaxTemperature;
