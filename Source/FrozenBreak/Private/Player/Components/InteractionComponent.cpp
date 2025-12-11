@@ -3,6 +3,7 @@
 
 #include "Player/Components/InteractionComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Interface/Interactable.h"
 
 // Sets default values for this component's properties
 UInteractionComponent::UInteractionComponent()
@@ -65,6 +66,7 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	{
 		if (!bIsInteracting)
 		{
+			IInteractable::Execute_OnInteractionStarted(HitActor);
 			UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
 
 		}
@@ -75,6 +77,7 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	{
 		if (bIsInteracting)
 		{
+			IInteractable::Execute_OnInteractionEnded(LastInteractionActor);
 			UE_LOG(LogTemp, Log, TEXT("Hit Actor End"));
 		}
 

@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interface/Interactable.h"
 #include "TestInteractableActor.generated.h"
 
 UCLASS()
-class ATestInteractableActor : public AActor
+class ATestInteractableActor : public AActor, public IInteractable
 {
 	GENERATED_BODY()
 	
@@ -20,7 +21,18 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	void OnInteractionStarted_Implementation();
+
+	void OnInteractionEnded_Implementation();
+
+private:
+	const ECollisionChannel InteractableChannel = ECC_GameTraceChannel1;
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	TObjectPtr<class UStaticMeshComponent> Mesh = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
+	TObjectPtr<class UWidgetComponent> PopupWidget = nullptr;
 
 };
