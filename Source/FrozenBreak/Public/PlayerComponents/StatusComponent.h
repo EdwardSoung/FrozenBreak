@@ -16,13 +16,45 @@ public:
 	// Sets default values for this component's properties
 	UStatusComponent();
 
+	// 온도 증감 함수
+	void SetPlayerTemperature(float InTemperatureValue);
+
+	// 체력 증감 함수
+	void SetPlayerHealth(float InHealthValue);
+
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+private:
+	// 게임 시작 시 각 Current 값들을 Max 값으로 초기화
+	void InitStatus();
 
-		
+public:
+
+protected:
+	// ------------------------------------------------------------------------------ 플레이어 체력 값
+	// 플레이어 최대 체력 값
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Temperature")
+	float MaxHealth = 100.0f;
+
+	// 플레이어 현재 체력 값
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Temperature")
+	float CurrentHealth = 0.0f;
+	// ------------------------------------------------------------------------------|
+
+	// ------------------------------------------------------------------------------ 플레이어 온도 값
+	// 플레이어 최대 온도 값
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Temperature")
+	float MaxTemperature = 100.0f;
+
+	// 플레이어 현재 온도 값
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Temperature")
+	float CurrentTemperature = 0.0f;
+	// ------------------------------------------------------------------------------|
+
+private:
+	// ------------------------------------------------------------------------------ Default 변수
+	// 각 수치의 최소값
+	float DefaultMinimum = 0.0f;
+	// ------------------------------------------------------------------------------|	
 };
