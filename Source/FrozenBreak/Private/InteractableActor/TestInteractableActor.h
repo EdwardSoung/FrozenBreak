@@ -25,6 +25,8 @@ public:
 
 	void OnInteractionEnded_Implementation();
 
+	void OnPickup_Implementation();
+
 private:
 	const ECollisionChannel InteractableChannel = ECC_GameTraceChannel1;
 
