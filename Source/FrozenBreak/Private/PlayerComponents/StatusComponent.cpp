@@ -2,6 +2,7 @@
 
 
 #include "PlayerComponents/StatusComponent.h"
+#include <GameSystem/EventSubSystem.h>
 
 // Sets default values for this component's properties
 UStatusComponent::UStatusComponent()
@@ -14,6 +15,10 @@ void UStatusComponent::SetPlayerTemperature(float InTemperatureValue)
 	if (CurrentTemperature > 0)
 	{
 		CurrentTemperature = FMath::Clamp(CurrentTemperature + InTemperatureValue, DefaultMinimum, MaxTemperature);
+		if (UEventSubSystem* EventSystem = UEventSubSystem::GetEventSystem(this))
+		{
+			EventSystem->Status.OnTemperaturePointChanged.Broadcast(CurrentTemperature);
+		}
 	}
 	else
 	{
