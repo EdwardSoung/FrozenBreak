@@ -79,7 +79,7 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 		{
 			IInteractable::Execute_OnInteractionEnded(CurrentInteractionActor);
 			UE_LOG(LogTemp, Log, TEXT("Hit Actor End"));
-			CurrentInteractionActor = nullptr;
+			
 		}
 
 		bIsInteracting = false;
@@ -95,7 +95,8 @@ void UInteractionComponent::TryPickup_Implementation(AActor* Instigator)
 	if (CurrentInteractionActor)
 	{
 		// CurrentInteractionActor 가 있다.
-	
+		IInteractable::Execute_OnPickup(CurrentInteractionActor);
+		CurrentInteractionActor = nullptr;
 	}
 	else
 	{

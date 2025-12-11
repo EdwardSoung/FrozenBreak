@@ -29,7 +29,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
-	// 공격 입력 받기
+	// 이동 입력 받기
 	void OnMoveInput(const FInputActionValue& InValue);
 
 	// 상호작용 입력 받기

@@ -39,3 +39,8 @@ void ATestInteractableActor::OnInteractionEnded_Implementation()
 	PopupWidget->SetVisibility(false);
 }
 
+void ATestInteractableActor::OnPickup_Implementation()
+{
+	Destroy();
+}
+
