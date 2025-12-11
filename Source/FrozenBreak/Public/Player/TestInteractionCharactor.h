@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "Interface/Interactable.h"
 #include "TestInteractionCharactor.generated.h"
 
 UCLASS()
@@ -39,6 +40,8 @@ protected:
 	TObjectPtr<class USpringArmComponent> SpringArm = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player|Camera")
 	TObjectPtr<class UCameraComponent> PlayerCamera = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player|Component")
+	TObjectPtr<class UInteractionComponent> InteractionComponent = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<class UInputAction> IA_Move = nullptr;

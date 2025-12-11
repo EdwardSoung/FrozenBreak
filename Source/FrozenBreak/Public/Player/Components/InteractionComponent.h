@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Interface/Interactable.h"
 #include "InteractionComponent.generated.h"
 
 
@@ -24,6 +25,8 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	void TryPickup_Implementation(AActor* Instigator);
+
 private:
 	// 라인 충돌지점에 뭐가 충돌했는지 알려줌
 	FHitResult InteractionHitResult;
@@ -37,7 +40,7 @@ private:
 	const AActor* ComponentOwner = nullptr;
 
 	// 마지막으로 트레이싱 된 액터를 저장
-	AActor* LastInteractionActor = nullptr;
+	AActor* CurrentInteractionActor = nullptr;
 
 	const class UCameraComponent* Camera = nullptr;
 

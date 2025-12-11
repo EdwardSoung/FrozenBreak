@@ -27,4 +27,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interactable")
 	void OnInteractionEnded();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interactable")
+	void TryPickup(AActor* Instigator);
 };

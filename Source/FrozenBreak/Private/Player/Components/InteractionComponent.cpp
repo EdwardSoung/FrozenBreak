@@ -70,19 +70,38 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
 
 		}
-		LastInteractionActor = HitActor;
+		CurrentInteractionActor = HitActor;
 		bIsInteracting = true;
 	}
 	else
 	{
 		if (bIsInteracting)
 		{
-			IInteractable::Execute_OnInteractionEnded(LastInteractionActor);
+			IInteractable::Execute_OnInteractionEnded(CurrentInteractionActor);
 			UE_LOG(LogTemp, Log, TEXT("Hit Actor End"));
+			CurrentInteractionActor = nullptr;
 		}
-
 
 		bIsInteracting = false;
 	}
+}
+
+void UInteractionComponent::TryPickup_Implementation(AActor* Instigator)
+{
+	// 플레이어가 인터렉션을 눌렀음 -> 눌렀다는걸 인터렉션 컴포넌트한테 알려줌 -> 
+	// 인터렉션 컴포넌트는 플레이어가 인터렉션을 눌렀을 때 CurrentInteractionActor가 있는지 확인, 없으면 리턴 ->
+	// 있다면 CurrentInteractionActor, 플레이어(애니메이션, ??), 인벤토리 컴포넌트에게(얘한테는 CurrentInteractionActor를 추가로) 뭔가를 발송 (델리게이트나 인터페이스)
+
+	if (CurrentInteractionActor)
+	{
+		// CurrentInteractionActor 가 있다.
+	
+	}
+	else
+	{
+		// CurrentInteractionActor 가 없다.
+		return;
+	}
+
 }
 
