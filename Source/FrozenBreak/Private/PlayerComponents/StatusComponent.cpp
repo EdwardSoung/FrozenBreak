@@ -12,7 +12,7 @@ UStatusComponent::UStatusComponent()
 
 void UStatusComponent::SetPlayerTemperature(float InTemperatureValue)
 {
-	if (CurrentTemperature > 0)
+	if (CurrentTemperature > 0 || InTemperatureValue > 0)
 	{
 		CurrentTemperature = FMath::Clamp(CurrentTemperature + InTemperatureValue, DefaultMinimum, MaxTemperature);
 		if (UEventSubSystem* EventSystem = UEventSubSystem::GetEventSystem(this))
@@ -32,7 +32,7 @@ void UStatusComponent::SetPlayerTemperature(float InTemperatureValue)
 
 void UStatusComponent::SetPlayerFatigue(float InFatigueValue)
 {
-	if (CurrentFatigue < MaxFatigue)
+	if (CurrentFatigue < MaxFatigue || InFatigueValue <= 0)
 	{
 		CurrentFatigue = FMath::Clamp(CurrentFatigue + InFatigueValue, DefaultMinimum, MaxFatigue);
 	}
@@ -47,7 +47,7 @@ void UStatusComponent::SetPlayerFatigue(float InFatigueValue)
 
 void UStatusComponent::SetPlayerHunger(float InHungerValue)
 {
-	if (CurrentHunger > 0)
+	if (CurrentHunger > 0 || InHungerValue > 0)
 	{
 		CurrentHunger = FMath::Clamp(CurrentHunger + InHungerValue, DefaultMinimum, MaxHunger);
 	}
