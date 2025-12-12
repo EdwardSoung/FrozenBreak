@@ -32,7 +32,7 @@ void UStatusComponent::SetPlayerTemperature(float InTemperatureValue)
 
 void UStatusComponent::SetPlayerFatigue(float InFatigueValue)
 {
-	if (CurrentFatigue < MaxFatigue || InFatigueValue <= 0)
+	if (CurrentFatigue > 0 || InFatigueValue > 0)
 	{
 		CurrentFatigue = FMath::Clamp(CurrentFatigue + InFatigueValue, DefaultMinimum, MaxFatigue);
 		if (UEventSubSystem* EventSystem = UEventSubSystem::GetEventSystem(this))
@@ -42,7 +42,7 @@ void UStatusComponent::SetPlayerFatigue(float InFatigueValue)
 	}
 	else
 	{
-		SetPlayerHealth(-InFatigueValue);
+		SetPlayerHealth(InFatigueValue);
 	}
 
 	//UE_LOG(LogTemp, Log, TEXT("Current Fatigue : %.2f / %.2f"), CurrentFatigue, MaxFatigue);
@@ -82,7 +82,7 @@ void UStatusComponent::InitStatus()
 	CurrentTemperature = MaxTemperature;
 
 	// 피로도 초기 값 세팅
-	CurrentFatigue = DefaultMinimum;
+	CurrentFatigue = MaxFatigue;
 	
 	// 포만감 초기 값 세팅
 	CurrentHunger = MaxHunger;
