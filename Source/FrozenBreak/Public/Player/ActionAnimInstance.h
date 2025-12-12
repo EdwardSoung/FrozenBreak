@@ -41,4 +41,7 @@ protected: // 앉기, 앉아서 걷기 모션 사용
 	UPROPERTY(BlueprintReadOnly, Category = "Anim")
 	bool bIsCrouching = false;
 
+protected: // 달리기 
+	UPROPERTY(BlueprintReadOnly, Category = "Anim")
+	bool bIsSprinting = false;
 };

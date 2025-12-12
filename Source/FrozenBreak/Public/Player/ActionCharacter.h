@@ -58,6 +58,9 @@ protected:
 	TObjectPtr<UInputAction> IA_Crouch_Toggle = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> IA_Sprint = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> IMC_Player = nullptr;
 
 protected:
@@ -69,4 +72,6 @@ protected:
 	void OnCrouchHoldStarted();
 	void OnCrouchHoldCompleted();
 	void OnCrouchToggle();
+	void OnSprintStarted();
+	void OnSprintStopped();
 };
