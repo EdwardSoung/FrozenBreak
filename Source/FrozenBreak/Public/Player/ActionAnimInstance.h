@@ -45,10 +45,18 @@ protected: // 달리기
 	UPROPERTY(BlueprintReadOnly, Category = "Anim")
 	bool bIsSprinting = false;
 
-protected: // 옆으로 걷기
+protected: // 옆으로 걷기(옆으로 달리기도 추가 예정)
 	UPROPERTY(BlueprintReadOnly, Category = "Anim")
 	float RightAmount = 0.0f; // -1 은 왼쪽으로 가고 ~ +1은 오른쪽으로가게 됨
 
 	UPROPERTY(BlueprintReadOnly, Category = "Anim")
 	bool bIsStrafing = false;
+
+protected: // 뒤로 걷기(뒤로 달리기도 추가 예정)
+	UPROPERTY(BlueprintReadOnly, Category = "Anim")
+	float ForwardAmount = 0.0f; // -1은 후진  +1은 전진
+
+	UPROPERTY(BlueprintReadOnly, Category = "Anim")
+	bool bIsMovingBackward = false;
+
 };
