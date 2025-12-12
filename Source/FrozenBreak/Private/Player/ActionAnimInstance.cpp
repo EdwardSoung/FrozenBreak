@@ -67,12 +67,21 @@ void UActionAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			//y 가 오른쪽은 + 왼쪽은 -
 			RightAmount = FMath::Clamp(Local2D.Y / Len, -1.0f, 1.0f);
 			bIsStrafing = (FMath::Abs(RightAmount) >= 0.35f && (Speed >= 10.0f));
+
+			// x가 앞은 + 뒤는 -
+			ForwardAmount = FMath::Clamp(Local2D.X/ Len, -1.0f, 1.0f);
+			bIsMovingBackward = (ForwardAmount <= -0.35f) && (Speed >= 3.0f);
 		}
 		else
 		{
 			RightAmount = 0.0f;
 			bIsStrafing = false;
+
+			ForwardAmount = 0.0f;
+			bIsMovingBackward = false;
+
 		}
 
+		
 	}
 }
