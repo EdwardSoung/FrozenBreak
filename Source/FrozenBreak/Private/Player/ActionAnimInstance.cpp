@@ -37,6 +37,7 @@ void UActionAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 
 	const FVector Velocity = OwnerCharacter->GetVelocity();
+	const FVector2D Vel2D(Velocity.X, Velocity.Y);
 	Speed = FVector(Velocity.X, Velocity.Y, 0.0f).Size();
 
 	bIsFalling = MovementComp->IsFalling(); // 점프 애니메이션 
@@ -44,4 +45,34 @@ void UActionAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bIsCrouching = OwnerCharacter->bIsCrouched;// 앉기 애니메이션
 
 	bIsSprinting = (Speed > 520.0f) && !bIsCrouching;
+
+	if (Vel2D.SizeSquared() < 1.0f)
+	{
+		RightAmount = 0.0f;
+		bIsStrafing = false;
+	}
+	else
+	{
+		//월드 속도를 캐릭터 로컬로 변환시켜둠
+		const FRotator ActorRot = OwnerCharacter->GetActorRotation();
+		const FVector LocalVel = ActorRot.UnrotateVector(Velocity);
+
+
+		// 좌우 성분 정규화
+		const FVector2D Local2D(LocalVel.X, LocalVel.Y);
+		const float Len = Local2D.Size();
+
+		if (Len > 1.0f)
+		{
+			//y 가 오른쪽은 + 왼쪽은 -
+			RightAmount = FMath::Clamp(Local2D.Y / Len, -1.0f, 1.0f);
+			bIsStrafing = (FMath::Abs(RightAmount) >= 0.35f && (Speed >= 10.0f));
+		}
+		else
+		{
+			RightAmount = 0.0f;
+			bIsStrafing = false;
+		}
+
+	}
 }

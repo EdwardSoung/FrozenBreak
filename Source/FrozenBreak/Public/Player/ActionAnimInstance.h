@@ -44,4 +44,11 @@ protected: // 앉기, 앉아서 걷기 모션 사용
 protected: // 달리기 
 	UPROPERTY(BlueprintReadOnly, Category = "Anim")
 	bool bIsSprinting = false;
+
+protected: // 옆으로 걷기
+	UPROPERTY(BlueprintReadOnly, Category = "Anim")
+	float RightAmount = 0.0f; // -1 은 왼쪽으로 가고 ~ +1은 오른쪽으로가게 됨
+
+	UPROPERTY(BlueprintReadOnly, Category = "Anim")
+	bool bIsStrafing = false;
 };
