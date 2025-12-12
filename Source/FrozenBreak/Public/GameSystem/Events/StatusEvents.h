@@ -7,17 +7,27 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthPointChanged, float, InCurrentHealth);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTemperaturePointChanged, float, InCurrentTemperature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFatiguePointChanged, float, InCurrentFatigue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHungerPointChanged, float, InCurrentHunger);
 
 USTRUCT(BlueprintType)
 struct FStatusEvents
 {
 	GENERATED_BODY()
 
-	// 플레이어 체력
+	// 체력
 	UPROPERTY(BlueprintAssignable)
 	FOnHealthPointChanged OnHealthPointChanged;
 
 	// 플레이어 체온
 	UPROPERTY(BlueprintAssignable)
 	FOnTemperaturePointChanged OnTemperaturePointChanged;
+
+	// 플레이어 피로도
+	UPROPERTY(BlueprintAssignable)
+	FOnFatiguePointChanged OnFatiguePointChanged;
+
+	// 플레이어 포만감
+	UPROPERTY(BlueprintAssignable)
+	FOnHungerPointChanged OnHungerPointChanged;
 };
