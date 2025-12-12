@@ -56,7 +56,11 @@ AActionCharacter::AActionCharacter()
 	MoveComp->GetNavAgentPropertiesRef().bCanCrouch = true;
 
 	//앉아 있을때 걸음 속도
-	MoveComp->MaxWalkSpeedCrouched = 200.0f;
+	MoveComp->MaxWalkSpeedCrouched = 150.0f;
+
+	//걷기 세팅
+	MoveComp->MaxWalkSpeed = 200.0f;
+
 }
 
 
@@ -102,8 +106,8 @@ void AActionCharacter::BeginPlay()
 	// 카메라 Pitch 제한
 	if (PC->PlayerCameraManager)
 	{
-		PC->PlayerCameraManager->ViewPitchMin = -60.f;
-		PC->PlayerCameraManager->ViewPitchMax = 60.f;
+		PC->PlayerCameraManager->ViewPitchMin = -45.0f;
+		PC->PlayerCameraManager->ViewPitchMax = 45.0f;
 	}
 }
 
@@ -185,6 +189,25 @@ void AActionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 			&AActionCharacter::OnCrouchToggle
 		);
 	}
+
+	if (IA_Sprint)
+	{
+		EnhancedInput->BindAction(
+			IA_Sprint,
+			ETriggerEvent::Started,
+			this,
+			&AActionCharacter::OnSprintStarted
+		);
+	}
+	if (IA_Sprint)
+	{
+		EnhancedInput->BindAction(
+			IA_Sprint,
+			ETriggerEvent::Completed,
+			this,
+			&AActionCharacter::OnSprintStopped
+		);
+	}
 }
 
 
@@ -245,4 +268,19 @@ void AActionCharacter::OnCrouchToggle()
 	{
 		Crouch();
 	}
+}
+
+void AActionCharacter::OnSprintStarted()
+{
+	if (bIsCrouched) // 앉아있으면 달리기 불가
+	{
+		return;
+	}
+
+	GetCharacterMovement()->MaxWalkSpeed = 650.0f; //달리기 속도
+}
+
+void AActionCharacter::OnSprintStopped()
+{
+	GetCharacterMovement()->MaxWalkSpeed = 200.0f; //기본속도로 복귀 시킴
 }

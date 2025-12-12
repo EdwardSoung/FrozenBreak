@@ -42,4 +42,6 @@ void UActionAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bIsFalling = MovementComp->IsFalling(); // 점프 애니메이션 
 
 	bIsCrouching = OwnerCharacter->bIsCrouched;// 앉기 애니메이션
+
+	bIsSprinting = (Speed > 520.0f) && !bIsCrouching;
 }
