@@ -1,0 +1,40 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Animation/AnimInstance.h"
+#include "ActionAnimInstance.generated.h"
+
+/**
+ * 
+ */
+
+class AActionCharacter;
+class UCharacterMovementComponent;
+
+UCLASS()
+class FROZENBREAK_API UActionAnimInstance : public UAnimInstance
+{
+	GENERATED_BODY()
+	
+
+public:
+	virtual void NativeInitializeAnimation()override;
+	virtual void NativeUpdateAnimation(float DeltaSeconds)override;
+
+protected:
+	//캐릭터 참조
+	UPROPERTY(BlueprintReadOnly, Category = "Anim")
+	TObjectPtr<AActionCharacter> OwnerCharacter = nullptr;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Anim")
+	TObjectPtr<UCharacterMovementComponent> MovementComp = nullptr;
+
+	//애님 bp 에서 사용할 값
+
+	UPROPERTY(BlueprintReadOnly, Category = "Anim")
+	float Speed = 0.0f;
+	UPROPERTY(BlueprintReadOnly, Category = "Anim")
+	bool bIsFalling = false;
+};
