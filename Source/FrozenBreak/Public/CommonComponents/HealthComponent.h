@@ -37,11 +37,11 @@ protected:
 
 	// ------------------------------------------------------------------------------ 플레이어 체력 값
 	// 플레이어 최대 체력 값
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Temperature")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Health")
 	float MaxHealth = 100.0f;
 
 	// 플레이어 현재 체력 값
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Temperature")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Health")
 	float CurrentHealth = 0.0f;
 	// ------------------------------------------------------------------------------|
 
