@@ -43,14 +43,20 @@ AActionCharacter::AActionCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = true;
-
 	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
 	MoveComp->bOrientRotationToMovement = false;
 	MoveComp->bUseControllerDesiredRotation = false;
 	MoveComp->RotationRate = FRotator(0.f, 0.f, 0.f);
 
+	// 점프 높이, 공중에서 캐릭터 제어
 	GetCharacterMovement()->JumpZVelocity = 600.0f;
 	GetCharacterMovement()->AirControl = 0.25f;
+
+	//앉기 세팅
+	MoveComp->GetNavAgentPropertiesRef().bCanCrouch = true;
+
+	//앉아 있을때 걸음 속도
+	MoveComp->MaxWalkSpeedCrouched = 200.0f;
 }
 
 
@@ -155,6 +161,30 @@ void AActionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 			this, 
 			&AActionCharacter::OnJumpStopped);
 	}
+	if (IA_Crouch_Hold)
+	{
+		EnhancedInput->BindAction(
+			IA_Crouch_Hold,
+			ETriggerEvent::Started,
+			this,
+			&AActionCharacter::OnCrouchHoldStarted
+		);
+
+		EnhancedInput->BindAction(
+			IA_Crouch_Hold,
+			ETriggerEvent::Completed,
+			this,
+			&AActionCharacter::OnCrouchHoldCompleted);
+	}
+	if (IA_Crouch_Toggle)
+	{
+		EnhancedInput->BindAction(
+			IA_Crouch_Toggle,
+			ETriggerEvent::Started,
+			this,
+			&AActionCharacter::OnCrouchToggle
+		);
+	}
 }
 
 
@@ -193,4 +223,26 @@ void AActionCharacter::OnJumpStarted()
 void AActionCharacter::OnJumpStopped()
 {
 	StopJumping();
+}
+
+void AActionCharacter::OnCrouchHoldStarted()
+{
+	Crouch();
+}
+
+void AActionCharacter::OnCrouchHoldCompleted()
+{
+	UnCrouch();
+}
+
+void AActionCharacter::OnCrouchToggle()
+{
+	if (bIsCrouched)
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Crouch();
+	}
 }

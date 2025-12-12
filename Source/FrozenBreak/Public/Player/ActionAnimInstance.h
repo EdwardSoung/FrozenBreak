@@ -32,9 +32,13 @@ protected:
 	TObjectPtr<UCharacterMovementComponent> MovementComp = nullptr;
 
 	//애님 bp 에서 사용할 값
-
+protected: // 점프 모션 사용
 	UPROPERTY(BlueprintReadOnly, Category = "Anim")
 	float Speed = 0.0f;
 	UPROPERTY(BlueprintReadOnly, Category = "Anim")
 	bool bIsFalling = false;
+protected: // 앉기, 앉아서 걷기 모션 사용
+	UPROPERTY(BlueprintReadOnly, Category = "Anim")
+	bool bIsCrouching = false;
+
 };

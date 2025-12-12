@@ -23,6 +23,8 @@ void UActionAnimInstance::NativeInitializeAnimation()
 	{
 		MovementComp = OwnerCharacter->GetCharacterMovement();
 	}
+
+
 }
 
 void UActionAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -37,6 +39,7 @@ void UActionAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	const FVector Velocity = OwnerCharacter->GetVelocity();
 	Speed = FVector(Velocity.X, Velocity.Y, 0.0f).Size();
 
-	bIsFalling = MovementComp->IsFalling();
+	bIsFalling = MovementComp->IsFalling(); // 점프 애니메이션 
 
+	bIsCrouching = OwnerCharacter->bIsCrouched;// 앉기 애니메이션
 }
