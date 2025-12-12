@@ -17,7 +17,7 @@ void UStatusComponent::SetPlayerTemperature(float InTemperatureValue)
 		CurrentTemperature = FMath::Clamp(CurrentTemperature + InTemperatureValue, DefaultMinimum, MaxTemperature);
 		if (UEventSubSystem* EventSystem = UEventSubSystem::GetEventSystem(this))
 		{
-			EventSystem->Status.OnTemperaturePointChanged.Broadcast(CurrentTemperature);
+			EventSystem->Status.OnTemperaturePointChanged.Broadcast(CurrentTemperature / MaxTemperature);
 		}
 	}
 	else
@@ -32,17 +32,17 @@ void UStatusComponent::SetPlayerTemperature(float InTemperatureValue)
 
 void UStatusComponent::SetPlayerFatigue(float InFatigueValue)
 {
-	if (CurrentFatigue < MaxFatigue || InFatigueValue <= 0)
+	if (CurrentFatigue > 0 || InFatigueValue > 0)
 	{
 		CurrentFatigue = FMath::Clamp(CurrentFatigue + InFatigueValue, DefaultMinimum, MaxFatigue);
 		if (UEventSubSystem* EventSystem = UEventSubSystem::GetEventSystem(this))
 		{
-			EventSystem->Status.OnFatiguePointChanged.Broadcast(CurrentFatigue);
+			EventSystem->Status.OnFatiguePointChanged.Broadcast(CurrentFatigue / MaxFatigue);
 		}
 	}
 	else
 	{
-		SetPlayerHealth(-InFatigueValue);
+		SetPlayerHealth(InFatigueValue);
 	}
 
 	//UE_LOG(LogTemp, Log, TEXT("Current Fatigue : %.2f / %.2f"), CurrentFatigue, MaxFatigue);
@@ -56,7 +56,7 @@ void UStatusComponent::SetPlayerHunger(float InHungerValue)
 		CurrentHunger = FMath::Clamp(CurrentHunger + InHungerValue, DefaultMinimum, MaxHunger);
 		if (UEventSubSystem* EventSystem = UEventSubSystem::GetEventSystem(this))
 		{
-			EventSystem->Status.OnHungerPointChanged.Broadcast(CurrentHunger);
+			EventSystem->Status.OnHungerPointChanged.Broadcast(CurrentHunger / MaxHunger);
 		}
 	}
 	else
@@ -82,7 +82,7 @@ void UStatusComponent::InitStatus()
 	CurrentTemperature = MaxTemperature;
 
 	// 피로도 초기 값 세팅
-	CurrentFatigue = DefaultMinimum;
+	CurrentFatigue = MaxFatigue;
 	
 	// 포만감 초기 값 세팅
 	CurrentHunger = MaxHunger;
