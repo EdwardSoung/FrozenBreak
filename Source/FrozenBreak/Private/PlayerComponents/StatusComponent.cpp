@@ -30,6 +30,36 @@ void UStatusComponent::SetPlayerTemperature(float InTemperatureValue)
 	//UE_LOG(LogTemp, Log, TEXT("Current Health : %.2f / %.2f"), CurrentHealth, MaxHealth);
 }
 
+void UStatusComponent::SetPlayerFatigue(float InFatigueValue)
+{
+	if (CurrentFatigue < MaxFatigue)
+	{
+		CurrentFatigue = FMath::Clamp(CurrentFatigue + InFatigueValue, DefaultMinimum, MaxFatigue);
+	}
+	else
+	{
+		SetPlayerHealth(-InFatigueValue);
+	}
+
+	//UE_LOG(LogTemp, Log, TEXT("Current Fatigue : %.2f / %.2f"), CurrentFatigue, MaxFatigue);
+	//UE_LOG(LogTemp, Log, TEXT("Current Health : %.2f / %.2f"), CurrentHealth, MaxHealth);
+}
+
+void UStatusComponent::SetPlayerHunger(float InHungerValue)
+{
+	if (CurrentHunger > 0)
+	{
+		CurrentHunger = FMath::Clamp(CurrentHunger + InHungerValue, DefaultMinimum, MaxHunger);
+	}
+	else
+	{
+		SetPlayerHealth(InHungerValue);
+	}
+
+	//UE_LOG(LogTemp, Log, TEXT("Current Hunger : %.2f / %.2f"), CurrentHunger, MaxHunger);
+	//UE_LOG(LogTemp, Log, TEXT("Current Health : %.2f / %.2f"), CurrentHealth, MaxHealth);
+}
+
 // Called when the game starts
 void UStatusComponent::BeginPlay()
 {
@@ -42,4 +72,10 @@ void UStatusComponent::InitStatus()
 
 	// 온도 초기 값 세팅
 	CurrentTemperature = MaxTemperature;
+
+	// 피로도 초기 값 세팅
+	CurrentFatigue = DefaultMinimum;
+	
+	// 포만감 초기 값 세팅
+	CurrentHunger = MaxHunger;
 }
