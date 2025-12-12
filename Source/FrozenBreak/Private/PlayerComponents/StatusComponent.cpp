@@ -35,6 +35,10 @@ void UStatusComponent::SetPlayerFatigue(float InFatigueValue)
 	if (CurrentFatigue < MaxFatigue || InFatigueValue <= 0)
 	{
 		CurrentFatigue = FMath::Clamp(CurrentFatigue + InFatigueValue, DefaultMinimum, MaxFatigue);
+		if (UEventSubSystem* EventSystem = UEventSubSystem::GetEventSystem(this))
+		{
+			EventSystem->Status.OnFatiguePointChanged.Broadcast(CurrentFatigue);
+		}
 	}
 	else
 	{
@@ -50,6 +54,10 @@ void UStatusComponent::SetPlayerHunger(float InHungerValue)
 	if (CurrentHunger > 0 || InHungerValue > 0)
 	{
 		CurrentHunger = FMath::Clamp(CurrentHunger + InHungerValue, DefaultMinimum, MaxHunger);
+		if (UEventSubSystem* EventSystem = UEventSubSystem::GetEventSystem(this))
+		{
+			EventSystem->Status.OnHungerPointChanged.Broadcast(CurrentHunger);
+		}
 	}
 	else
 	{
