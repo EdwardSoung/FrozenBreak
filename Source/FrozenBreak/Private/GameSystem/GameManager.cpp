@@ -2,6 +2,7 @@
 
 
 #include "GameSystem/GameManager.h"
+#include "Data/WidgetDataTable.h"
 
 UGameManager* UGameManager::Get(const UObject* WorldContextObject)
 {
@@ -12,5 +13,20 @@ UGameManager* UGameManager::Get(const UObject* WorldContextObject)
         return Cast<UGameManager>(World->GetGameInstance());
     }
 
+    return nullptr;
+}
+
+TSubclassOf<UUserWidget> UGameManager::GetWidgetClass(EWidgetType InType)
+{
+    TArray<FWidgetDataTable*> Rows;
+    WidgetData->GetAllRows(TEXT("SpawnInit"), Rows);
+
+    for (FWidgetDataTable* row : Rows)
+    {
+        if (row->Type == InType)
+        {
+            return row->WidgetClass;
+        }
+    }
     return nullptr;
 }
