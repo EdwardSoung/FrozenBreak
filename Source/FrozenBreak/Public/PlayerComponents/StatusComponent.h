@@ -21,11 +21,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Status|Temperature")
 	void SetPlayerTemperature(float InTemperatureValue);
 
-	// 온도 증감 함수
+	// 피로도 증감 함수
 	UFUNCTION(BlueprintCallable, Category = "Status|Stamina")
 	void SetPlayerFatigue(float InFatigueValue);
 
-	// 온도 증감 함수
+	// 포만감 증감 함수
 	UFUNCTION(BlueprintCallable, Category = "Status|Hunger")
 	void SetPlayerHunger(float InHungerValue);
 
