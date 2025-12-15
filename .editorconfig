@@ -1,3 +1,6 @@
+[*]
+charset = utf-8
+
 [*.{cpp,h}]
 
 # Naming convention rules (note: currently need to be ordered from more to less specific)
