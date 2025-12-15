@@ -1,67 +1,105 @@
 @echo off
 chcp 65001
 cls
-:: [중요] !변수! 문법을 사용하기 위해 반드시 필요한 설정입니다.
 setlocal enabledelayedexpansion
 
-set "CurrentPath=%~dp0"
+:: ==============================================================================
+:: [중요] 아까 복사한 엔진 경로를 아래에 붙여넣으세요! (따옴표 안에)
+:: 예시: set "EngineRoot=C:\Program Files\Epic Games\UE_5.3"
+:: ==============================================================================
+set "EngineRoot=C:\Program Files\Epic Games\UE_5.5"
 
-echo [현재 작업 경로]
-echo %CurrentPath%
+
+:: ==============================================================================
+:: 1. 경로 검증 (제대로 입력했는지 확인)
+:: ==============================================================================
+if not exist "%EngineRoot%" (
+    echo [오류] 엔진 경로를 찾을 수 없습니다!
+    echo 입력하신 경로: "%EngineRoot%"
+    echo.
+    echo 배치 파일을 우클릭 - 편집 눌러서 'EngineRoot' 변수에 
+    echo 올바른 언리얼 엔진 설치 경로를 넣어주세요.
+    pause
+    exit /b
+)
+
+:: 주요 도구 경로 설정
+set "SelectorExe=C:\Program Files (x86)\Epic Games\Launcher\Engine\Binaries\Win64\UnrealVersionSelector.exe"
+set "BuildBat=%EngineRoot%\Engine\Build\BatchFiles\Build.bat"
+
+:: 도구 파일이 진짜 있는지 2차 확인
+if not exist "%SelectorExe%" (
+    echo [오류] UnrealVersionSelector.exe가 없습니다.
+    echo 엔진 경로가 맞는지 다시 확인해주세요.
+    pause
+    exit /b
+)
+if not exist "%BuildBat%" (
+    echo [오류] Build.bat 파일이 없습니다.
+    pause
+    exit /b
+)
+
+:: ==============================================================================
+:: 2. 현재 프로젝트 경로 설정 및 청소
+:: ==============================================================================
+set "CurrentPath=%~dp0"
+echo [엔진 경로] %EngineRoot%
+echo [현재 경로] %CurrentPath%
 echo.
 
-:: 삭제할 폴더 목록
-set LIST=Binaries Intermediate DerivedDataCache
-
-for %%F in (%LIST%) do (
+echo [1단계: 폴더 청소]
+set DELETE_LIST=Binaries Intermediate DerivedDataCache .vs .vscode
+for %%F in (%DELETE_LIST%) do (
     if exist "%CurrentPath%%%F" (
-        echo [삭제 중...] "%CurrentPath%%%F"
+        echo  - 삭제 중: %%F
         rd /s /q "%CurrentPath%%%F"
-        echo  - 삭제 완료.
-    ) else (
-        echo [없음] "%CurrentPath%%%F" 폴더가 없습니다.
     )
 )
 
-echo.
-echo [2단계: 프로젝트 파일 생성 준비]
-
+:: ==============================================================================
+:: 3. .uproject 파일 찾기
+:: ==============================================================================
 set "UProjectFile="
+set "ProjectName="
 for %%A in ("%CurrentPath%*.uproject") do (
     set "UProjectFile=%%~fA"
+    set "ProjectName=%%~nA"
     goto :FoundProject
 )
 
 :FoundProject
 if not defined UProjectFile (
-    echo [오류] .uproject 파일을 찾을 수 없습니다!
+    echo [오류] .uproject 파일을 찾을 수 없습니다.
     pause
     exit /b
 )
-echo 타겟 프로젝트: !UProjectFile!
+echo [타겟 프로젝트] !ProjectName!
 
-:: [수정됨] 보통 에픽 런처는 Program Files (x86)에 설치됩니다.
-set "SelectorPath=C:\Program Files (x86)\Epic Games\Launcher\Engine\Binaries\Win64\UnrealVersionSelector.exe"
+:: ==============================================================================
+:: 4. 프로젝트 파일 생성 (Generate Project Files)
+:: ==============================================================================
+echo.
+echo [2단계: 솔루션 파일 생성]
+"%SelectorExe%" /projectfiles "!UProjectFile!"
 
-:: 만약 x86에 없다면 그냥 Program Files도 찾아보도록 예외 처리 추가
-if not exist "!SelectorPath!" (
-    set "SelectorPath=C:\Program Files\Epic Games\Launcher\Engine\Binaries\Win64\UnrealVersionSelector.exe"
-)
+:: ==============================================================================
+:: 5. 빌드 실행 (Build)
+:: ==============================================================================
+echo.
+echo [3단계: 소스 코드 빌드 시작]
+echo  - 타겟: !ProjectName!Editor (Win64 / Development)
+echo  - 컴파일 중입니다... (창을 끄지 마세요)
+echo.
 
-if exist "!SelectorPath!" (
+call "%BuildBat%" !ProjectName!Editor Win64 Development "!UProjectFile!" -waitmutex
+
+if %ERRORLEVEL% NEQ 0 (
     echo.
-    echo -------------------------------------------------------
-    echo Generate Visual Studio Project Files 실행 중...
-    echo -------------------------------------------------------
-    
-    "!SelectorPath!" /projectfiles "!UProjectFile!"
-    
-    echo.
-    echo [완료] 프로젝트 파일 생성이 끝났습니다.
+    echo [실패] 빌드 중 오류가 발생했습니다!
 ) else (
     echo.
-    echo [오류] UnrealVersionSelector를 찾을 수 없습니다.
-    echo 에픽 런처 설치 경로를 확인해주세요.
+    echo [성공] 모든 작업이 완료되었습니다!
 )
 
 echo.
