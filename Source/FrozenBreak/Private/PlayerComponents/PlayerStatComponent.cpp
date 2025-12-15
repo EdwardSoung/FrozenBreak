@@ -18,11 +18,31 @@ UPlayerStatComponent::UPlayerStatComponent()
 // Called when the game starts
 void UPlayerStatComponent::BeginPlay()
 {
-	Super::BeginPlay();
-
-	// ...
-	
+	Super::BeginPlay();	
 }
+
+void UPlayerStatComponent::InitStatus()
+{
+	// 온도 초기 값 세팅
+	CurrentTemperature = MaxTemperature;
+
+	// 피로도 초기 값 세팅
+	CurrentFatigue = MaxFatigue;
+
+	// 포만감 초기 값 세팅
+	CurrentHunger = MaxHunger;
+}
+
+void UPlayerStatComponent::BindStatSettingEvents()
+{
+	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+	{
+		EventSystem->Status.OnSetTemperature.AddDynamic(this, &UPlayerStatComponent::SetPlayerTemperature);
+		EventSystem->Status.OnSetFatigue.AddDynamic(this, &UPlayerStatComponent::SetPlayerFatigue);
+		EventSystem->Status.OnSetHunger.AddDynamic(this, &UPlayerStatComponent::SetPlayerHunger);
+	}
+}
+
 void UPlayerStatComponent::SetPlayerTemperature(float InTemperatureValue)
 {
 	if (CurrentTemperature > 0 || InTemperatureValue > 0)

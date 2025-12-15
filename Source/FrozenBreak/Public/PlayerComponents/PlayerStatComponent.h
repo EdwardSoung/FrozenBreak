@@ -30,6 +30,10 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	void InitStatus();
+	void BindStatSettingEvents();
+
+public:
 
 protected:
 	// ------------------------------------------------------------------------------ 플레이어 온도 값
@@ -63,5 +67,4 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Hunger")
 	float CurrentHunger = 0.0f;
 	// ------------------------------------------------------------------------------|
-		
 };
