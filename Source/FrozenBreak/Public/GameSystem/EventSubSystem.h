@@ -16,7 +16,7 @@ class FROZENBREAK_API UEventSubSystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 public:
-	static UEventSubSystem* GetEventSystem(const UObject* WorldContextObject);
+	static UEventSubSystem* Get(const UObject* WorldContextObject);
 
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "Events")

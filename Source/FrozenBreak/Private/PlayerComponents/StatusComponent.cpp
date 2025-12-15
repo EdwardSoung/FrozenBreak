@@ -15,7 +15,7 @@ void UStatusComponent::SetPlayerTemperature(float InTemperatureValue)
 	if (CurrentTemperature > 0 || InTemperatureValue > 0)
 	{
 		CurrentTemperature = FMath::Clamp(CurrentTemperature + InTemperatureValue, DefaultMinimum, MaxTemperature);
-		if (UEventSubSystem* EventSystem = UEventSubSystem::GetEventSystem(this))
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
 			EventSystem->Status.OnTemperaturePointChanged.Broadcast(CurrentTemperature / MaxTemperature);
 		}
@@ -35,7 +35,7 @@ void UStatusComponent::SetPlayerFatigue(float InFatigueValue)
 	if (CurrentFatigue > 0 || InFatigueValue > 0)
 	{
 		CurrentFatigue = FMath::Clamp(CurrentFatigue + InFatigueValue, DefaultMinimum, MaxFatigue);
-		if (UEventSubSystem* EventSystem = UEventSubSystem::GetEventSystem(this))
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
 			EventSystem->Status.OnFatiguePointChanged.Broadcast(CurrentFatigue / MaxFatigue);
 		}
@@ -54,7 +54,7 @@ void UStatusComponent::SetPlayerHunger(float InHungerValue)
 	if (CurrentHunger > 0 || InHungerValue > 0)
 	{
 		CurrentHunger = FMath::Clamp(CurrentHunger + InHungerValue, DefaultMinimum, MaxHunger);
-		if (UEventSubSystem* EventSystem = UEventSubSystem::GetEventSystem(this))
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
 			EventSystem->Status.OnHungerPointChanged.Broadcast(CurrentHunger / MaxHunger);
 		}

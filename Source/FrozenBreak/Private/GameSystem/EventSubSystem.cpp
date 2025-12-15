@@ -3,7 +3,7 @@
 
 #include "GameSystem/EventSubSystem.h"
 
-UEventSubSystem* UEventSubSystem::GetEventSystem(const UObject* WorldContextObject)
+UEventSubSystem* UEventSubSystem::Get(const UObject* WorldContextObject)
 {
     if (WorldContextObject)
     {

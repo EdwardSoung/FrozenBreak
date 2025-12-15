@@ -11,7 +11,7 @@ void UTemperatureBarWidget::NativeConstruct()
 
 	SetTemperatureProgress(InitValue);
 
-	if (UEventSubSystem* statusEvent = UEventSubSystem::GetEventSystem(this))
+	if (UEventSubSystem* statusEvent = UEventSubSystem::Get(this))
 	{
 		statusEvent->Status.OnTemperaturePointChanged.AddDynamic(this, &UTemperatureBarWidget::SetTemperatureProgress);
 	}

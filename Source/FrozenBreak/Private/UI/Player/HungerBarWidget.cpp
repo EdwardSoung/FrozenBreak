@@ -11,7 +11,7 @@ void UHungerBarWidget::NativeConstruct()
 
 	SetHungerProgress(InitValue);
 
-	if (UEventSubSystem* statusEvent = UEventSubSystem::GetEventSystem(this))
+	if (UEventSubSystem* statusEvent = UEventSubSystem::Get(this))
 	{
 		statusEvent->Status.OnHungerPointChanged.AddDynamic(this, &UHungerBarWidget::SetHungerProgress);
 	}

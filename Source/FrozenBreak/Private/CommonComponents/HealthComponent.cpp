@@ -16,7 +16,7 @@ void UHealthComponent::SetPlayerHealth(float InHealthValue)
 	{
 		CurrentHealth = FMath::Clamp(CurrentHealth + InHealthValue, DefaultMinimum, MaxHealth);
 
-		if (UEventSubSystem* EventSystem = UEventSubSystem::GetEventSystem(this))
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
 			EventSystem->Status.OnHealthPointChanged.Broadcast(CurrentHealth / MaxHealth);
 		}

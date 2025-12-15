@@ -11,7 +11,7 @@ void UPlayerStatusWidget::NativeConstruct()
 	SetInGameTime(DefaultGameTime);
 	SetTemperatureDefence(DefaultTemperatureDefence);
 
-	if (UEventSubSystem* statusEvent = UEventSubSystem::GetEventSystem(this))
+	if (UEventSubSystem* statusEvent = UEventSubSystem::Get(this))
 	{
 		statusEvent->Status.OnInGameTimeChanged.AddDynamic(this, &UPlayerStatusWidget::SetInGameTime);
 		statusEvent->Status.OnTemperatureDefenceChanged.AddDynamic(this, &UPlayerStatusWidget::SetTemperatureDefence);
