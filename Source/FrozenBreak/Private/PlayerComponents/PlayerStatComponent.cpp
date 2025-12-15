@@ -25,13 +25,13 @@ void UPlayerStatComponent::BeginPlay()
 
 void UPlayerStatComponent::InitStatus()
 {
-	// 온도 초기 값 세팅
+	// 온도
 	CurrentTemperature = MaxTemperature;
 
-	// 피로도 초기 값 세팅
+	// 행동력
 	CurrentFatigue = MaxFatigue;
 
-	// 포만감 초기 값 세팅
+	//현재 배고픔
 	CurrentHunger = MaxHunger;
 }
 

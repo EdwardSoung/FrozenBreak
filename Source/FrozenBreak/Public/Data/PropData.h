@@ -19,11 +19,14 @@ public:
 	EPropType PropType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop")
-	FText DisplayName;		//Ȥ�� ��ü �̸� ǥ������ �;� ����
+	FText DisplayName;		//혹시 물체 이름 표기할지 싶어 세팅
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop")
 	EItemType GenerateItemType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop")
-	int32 GenerateItemCount;		//�����̸� ���������� �����ʿ�
+	int32 GenerateItemCount;		//랜덤이면 범위값으로 수정필요
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop")
+	float Health;
 };

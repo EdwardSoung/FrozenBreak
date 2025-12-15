@@ -2,6 +2,7 @@
 
 
 #include "Objects/PickupItem.h"
+#include "Data/ItemData.h"
 #include "CommonComponents/StatComponent.h"
 
 // Sets default values
@@ -17,6 +18,13 @@ APickupItem::APickupItem()
 void APickupItem::BeginPlay()
 {
 	Super::BeginPlay();
-	
+		
+	if (StatComponent)
+	{
+		if (Data)
+		{
+			StatComponent->InitStat(Data->Health, Data->Attack);
+		}
+	}
 }
 
