@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interface/Interactable.h"
+#include "Data/ItemDataTable.h"
 #include "TestInteractableActor.generated.h"
 
 UCLASS()
@@ -21,23 +22,27 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	UFUNCTION(BlueprintCallable)
-	void OnInteractionStarted_Implementation();
-
-	UFUNCTION(BlueprintCallable)
-	void OnInteractionEnded_Implementation();
-
-	UFUNCTION(BlueprintCallable)
-	void OnPickup_Implementation();
+	//UFUNCTION(BlueprintCallable)
+	//void OnInteractionStarted_Implementation();
+	//
+	//UFUNCTION(BlueprintCallable)
+	//void OnInteractionEnded_Implementation();
+	//
+	//UFUNCTION(BlueprintCallable)
+	//void OnPickup_Implementation();
 
 private:
-	const ECollisionChannel InteractableChannel = ECC_GameTraceChannel1;
+	//const ECollisionChannel InteractableChannel = ECC_GameTraceChannel1;
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
-	TObjectPtr<class UStaticMeshComponent> Mesh = nullptr;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	//TObjectPtr<class UStaticMeshComponent> Mesh = nullptr;
+	//
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
+	//TObjectPtr<class UWidgetComponent> PopupWidget = nullptr;
+	//
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemData")
+	//FDataTableRowHandle ItemRowHandle;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
-	TObjectPtr<class UWidgetComponent> PopupWidget = nullptr;
 
 };
