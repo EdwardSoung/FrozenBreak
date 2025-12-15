@@ -4,6 +4,7 @@
 #include "Items/ItemBase.h"
 #include "Components/WidgetComponent.h"
 #include "Player/Components/InteractionComponent.h"
+#include "Data/ItemDataAssetBase.h"
 
 // Sets default values
 AItemBase::AItemBase()
@@ -47,8 +48,26 @@ void AItemBase::OnSelect_Implementation(bool bIsStart)
 
 void AItemBase::DoAction_Implementation()
 {
-	SetActorHiddenInGame(true);
-	SetActorTickEnabled(false);
-	SetLifeSpan(0.001f);
+	if (ItemDataAsset.IsValid())
+	{
+		SetActorHiddenInGame(true);
+		SetActorTickEnabled(false);
+		SetLifeSpan(0.001f);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("아이템 데이터가 세팅되어 있지 않습니다."));
+	}
+
+	if (PropDataAsset.IsValid())
+	{
+		UE_LOG(LogTemp, Log, TEXT("뭔가 상호작용이 일어나야 한다."));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("프롭 데이터가 세팅되어 있지 않습니다."));
+	}
+
+	
 }
 

@@ -5,8 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interface/Interactable.h"
-#include "Data/ItemDataTable.h"
+#include "Data/Enums.h"
 #include "ItemBase.generated.h"
+
+
 
 UCLASS()
 class FROZENBREAK_API AItemBase : public AActor, public IInteractable
@@ -39,6 +41,9 @@ protected:
 	TObjectPtr<class UWidgetComponent> PopupWidget = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemData")
-	TObjectPtr<class UItemDataAssetBase> ItemDataAsset;
+	TSoftObjectPtr<class UItemDataAssetBase> ItemDataAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PropData")
+	TSoftObjectPtr<class UPropData> PropDataAsset;
 
 };

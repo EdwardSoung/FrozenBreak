@@ -18,25 +18,28 @@ UENUM(BlueprintType)
 enum class EItemType : uint8
 {
 	None,
-	Wood,
-	Stone,
-	Vine,		//µ¢Äğ
-	Axe,		//µµ³¢
-	Pickaxe,	//°î±ªÀÌ
-	Knife,
-	Meat,
-	Fruit,
-	//..Ãß°¡ ÇÊ¿ä
+	Timber,		// ëª©ì¬
+	Stone,		// ëŒë©©ì´
+	Vine,		// ë©ì¿¨
+	Axe,		// ë„ë¼
+	Pickaxe,	// ê³¡ê´­ì´
+	Knife,		// ì¹¼
+	RawMeat,	// ìƒê³ ê¸°
+	CookedMeat,	// êµ¬ìš´ ê³ ê¸°
+	Fruit,		// ê³¼ì¼?
+	Lether,		// ë™ë¬¼ ê°€ì£½
+	Jaket		// ìì¼“
 };
 
 UENUM(BlueprintType)
 enum class EPropType : uint8
 {
 	None,
-	Tree,
-	Rock,
-	//..Å»Ãâ±¸ µ¹¹«´õ±â¶û
-	//ÀÛ¾÷´ë È­·Î µîµî..
+	Tree,				// ë‚˜ë¬´
+	Rock,				// ëŒë©ì´ (ê¸¸ì„ ë§‰ëŠ” ëŒë©ì´ë‘ ì°¨ë³„ì ì„ ë‘˜ì§€ ê³ ë¯¼)
+	CraftingTable,		// ì œì‘ëŒ€
+	
+
 };
 
 UENUM(BlueprintType)

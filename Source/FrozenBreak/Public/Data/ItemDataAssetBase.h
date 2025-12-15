@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "Data/Enums.h"
 #include "ItemDataAssetBase.generated.h"
 
 /**
@@ -18,6 +19,10 @@ class FROZENBREAK_API UItemDataAssetBase : public UDataAsset
 	GENERATED_BODY()
 
 public:
+	// 아이템 Enum
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
+	EItemType ItemType;
+
 	// 아이템 이름
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
 	FText DisplayName;
@@ -25,7 +30,6 @@ public:
 	// 아이템 설명
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (MultiLine = true))
 	FText Description;
-
 
 	// 아이템 무게
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (ClampMin = "0"))
