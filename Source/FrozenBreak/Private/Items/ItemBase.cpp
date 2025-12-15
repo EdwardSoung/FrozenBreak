@@ -42,7 +42,7 @@ void AItemBase::OnInteractionEnded_Implementation()
 	PopupWidget->SetVisibility(false);
 }
 
-void AItemBase::OnPickup_Implementation()
+void AItemBase::OnPickup_Implementation(AActor* InstigatorActor)
 {
 	SetActorHiddenInGame(true);
 	SetActorTickEnabled(false);

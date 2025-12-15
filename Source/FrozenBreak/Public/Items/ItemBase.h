@@ -29,7 +29,7 @@ public:
 	void OnInteractionEnded_Implementation();
 
 	UFUNCTION(BlueprintCallable)
-	void OnPickup_Implementation();
+	void OnPickup_Implementation(AActor* InstigatorActor);
 
 private:
 	const ECollisionChannel InteractableActorChannel = ECollisionChannel::ECC_GameTraceChannel1;

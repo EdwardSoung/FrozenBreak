@@ -50,6 +50,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wearable")
 	int32 ColdResistance = 0;
 
+	// 허기 회복량 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eatable")
+	int32 HealAmount = 0;
+
 	// 아이템 공격력 (공격, 나무나 돌 채집시)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Carryable")
 	int32 AttackPower = 0;
@@ -57,8 +61,4 @@ public:
 	// 아이템 내구도
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Carryable")
 	int32 Durability = 0;
-
-	// 허기 회복량 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eatable")
-	int32 HealAmount = 0;
 };

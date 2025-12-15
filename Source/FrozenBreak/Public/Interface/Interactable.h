@@ -32,7 +32,7 @@ public:
 	void TryPickup(AActor* Instigator);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interact")
-	void OnPickup();
+	void OnPickup(AActor* Instigator);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interact")
 	void TryChop(AActor* Instigator);
