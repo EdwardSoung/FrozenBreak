@@ -41,7 +41,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	TObjectPtr<class UWidgetComponent> PopupWidget = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemData")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemData")
 	TObjectPtr<class UItemDataAssetBase> ItemDataAsset;
 
 };
