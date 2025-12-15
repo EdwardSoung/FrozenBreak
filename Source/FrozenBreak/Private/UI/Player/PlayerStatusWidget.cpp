@@ -38,11 +38,17 @@ void UPlayerStatusWidget::SetTemperatureDefence(FText InDefenceValue)
 
 void UPlayerStatusWidget::SetHandEquipment(FText InHandItem)
 {
-	HandEquipment->RefreshSlot(DefaultItemIcon, InHandItem);
+	if (HandEquipment)
+	{
+		HandEquipment->RefreshSlot(DefaultItemIcon, InHandItem);
+	}
 }
 
 void UPlayerStatusWidget::SetBodyEquipment(FText InBodyItem)
 {
-	BodyEquipment->RefreshSlot(DefaultItemIcon, InBodyItem);
+	if (BodyEquipment)
+	{
+		BodyEquipment->RefreshSlot(DefaultItemIcon, InBodyItem);
+	}
 }
 

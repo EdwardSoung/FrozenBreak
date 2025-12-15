@@ -8,8 +8,14 @@
 
 void UEquipmentSlotWidget::RefreshSlot(UTexture2D* InIcon, FText InName)
 {
-	ItemIcon->SetBrushFromTexture(InIcon);
-	ItemName->SetText(InName);
+	if (ItemIcon)
+	{
+		ItemIcon->SetBrushFromTexture(InIcon);
+	}
+	if (!InName.IsEmpty())
+	{
+		ItemName->SetText(InName);
+	}
 }
 
 void UEquipmentSlotWidget::NativeConstruct()
