@@ -38,7 +38,7 @@ enum class EPropType : uint8
 	Tree,				// 나무
 	Rock,				// 돌덩이 (길을 막는 돌덩이랑 차별점을 둘지 고민)
 	CraftingTable,		// 제작대
-	
+	Bed					// 침대
 
 };
 
