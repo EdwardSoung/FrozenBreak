@@ -19,6 +19,8 @@ class FROZENBREAK_API UUISubSystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	static UUISubSystem* Get(const UObject* WorldContextObject);
+
 	UFUNCTION(BlueprintCallable)
 	UUserWidget* ShowWidget(EWidgetType InWidgetType);
 
