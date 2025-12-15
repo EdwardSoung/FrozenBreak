@@ -10,7 +10,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTemperaturePointChanged, float, I
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFatiguePointChanged, float, InCurrentFatigue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHungerPointChanged, float, InCurrentHunger);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInGameTimeChanged, FText, InTime);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOTemperatureDefenceChanged, FText, InDefenceValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTemperatureDefenceChanged, FText, InDefenceValue);
 
 USTRUCT(BlueprintType)
 struct FStatusEvents
@@ -37,5 +37,5 @@ struct FStatusEvents
 	FOnInGameTimeChanged OnInGameTimeChanged;
 	
 	UPROPERTY(BlueprintAssignable)
-	FOTemperatureDefenceChanged OTemperatureDefenceChanged;
+	FOnTemperatureDefenceChanged OnTemperatureDefenceChanged;
 };

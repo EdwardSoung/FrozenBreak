@@ -14,7 +14,7 @@ void UPlayerStatusWidget::NativeConstruct()
 	if (UEventSubSystem* statusEvent = UEventSubSystem::GetEventSystem(this))
 	{
 		statusEvent->Status.OnInGameTimeChanged.AddDynamic(this, &UPlayerStatusWidget::SetInGameTime);
-		statusEvent->Status.OTemperatureDefenceChanged.AddDynamic(this, &UPlayerStatusWidget::SetTemperatureDefence);
+		statusEvent->Status.OnTemperatureDefenceChanged.AddDynamic(this, &UPlayerStatusWidget::SetTemperatureDefence);
 	}
 
 	if (HandEquipment)
