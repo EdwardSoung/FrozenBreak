@@ -94,7 +94,7 @@ void UInteractionComponent::TryPickup_Implementation(AActor* Instigator)
 	if (LastInteractionActor)
 	{
 		// LastInteractionActor 가 있다.
-		IInteractable::Execute_OnPickup(LastInteractionActor);
+		IInteractable::Execute_OnPickup(LastInteractionActor, GetOwner());
 		CurrentInteractionActor = nullptr;
 		LastInteractionActor = nullptr;
 		bIsInteracting = false;
