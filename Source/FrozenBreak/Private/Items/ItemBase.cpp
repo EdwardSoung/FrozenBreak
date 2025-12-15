@@ -33,17 +33,19 @@ void AItemBase::BeginPlay()
 	
 }
 
-void AItemBase::OnInteractionStarted_Implementation()
+void AItemBase::OnSelect_Implementation(bool bIsStart)
 {
-	PopupWidget->SetVisibility(true);
+	if (bIsStart)
+	{
+		PopupWidget->SetVisibility(true);
+	}
+	else
+	{
+		PopupWidget->SetVisibility(false);
+	}
 }
 
-void AItemBase::OnInteractionEnded_Implementation()
-{
-	PopupWidget->SetVisibility(false);
-}
-
-void AItemBase::OnPickup_Implementation(AActor* InstigatorActor)
+void AItemBase::DoAction_Implementation()
 {
 	SetActorHiddenInGame(true);
 	SetActorTickEnabled(false);
