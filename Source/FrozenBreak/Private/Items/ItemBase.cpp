@@ -1,0 +1,47 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Items/ItemBase.h"
+#include "Components/WidgetComponent.h"
+#include "Player/Components/InteractionComponent.h"
+
+// Sets default values
+AItemBase::AItemBase()
+{
+	PrimaryActorTick.bCanEverTick = false;
+
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	SetRootComponent(Mesh);
+	Mesh->SetCollisionResponseToChannel(InteractableChannel, ECR_Block);
+
+	PopupWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("TextWidget"));
+	PopupWidget->SetupAttachment(RootComponent);
+	PopupWidget->SetRelativeLocation(FVector(0, 0, 100.f));
+	PopupWidget->SetWidgetSpace(EWidgetSpace::Screen);
+	PopupWidget->SetVisibility(false);
+}
+
+// Called when the game starts or when spawned
+void AItemBase::BeginPlay()
+{
+	Super::BeginPlay();
+	
+}
+
+void AItemBase::OnInteractionStarted_Implementation()
+{
+	PopupWidget->SetVisibility(true);
+}
+
+void AItemBase::OnInteractionEnded_Implementation()
+{
+	PopupWidget->SetVisibility(false);
+}
+
+void AItemBase::OnPickup_Implementation()
+{
+	SetActorHiddenInGame(true);
+	SetActorTickEnabled(false);
+	SetLifeSpan(0.001f);
+}
+
