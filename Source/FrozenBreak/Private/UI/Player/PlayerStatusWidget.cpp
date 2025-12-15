@@ -15,16 +15,8 @@ void UPlayerStatusWidget::NativeConstruct()
 	{
 		statusEvent->Status.OnInGameTimeChanged.AddDynamic(this, &UPlayerStatusWidget::SetInGameTime);
 		statusEvent->Status.OnTemperatureDefenceChanged.AddDynamic(this, &UPlayerStatusWidget::SetTemperatureDefence);
-	}
-
-	if (HandEquipment)
-	{
-		HandEquipment->RefreshSlot(DefaultItemIcon, FText::FromString(TEXT("장비 1")));
-
-	}
-	if (BodyEquipment)
-	{
-		BodyEquipment->RefreshSlot(DefaultItemIcon, FText::FromString(TEXT("장비 2")));
+		statusEvent->Status.OnHandEquipmentChanged.AddDynamic(this, &UPlayerStatusWidget::SetHandEquipment);
+		statusEvent->Status.OnBodyEquipmentChanged.AddDynamic(this, &UPlayerStatusWidget::SetBodyEquipment);
 	}
 }
 
@@ -42,5 +34,15 @@ void UPlayerStatusWidget::SetTemperatureDefence(FText InDefenceValue)
 	{
 		TemperatureDefence->SetText(InDefenceValue);
 	}
+}
+
+void UPlayerStatusWidget::SetHandEquipment(FText InHandItem)
+{
+	HandEquipment->RefreshSlot(DefaultItemIcon, InHandItem);
+}
+
+void UPlayerStatusWidget::SetBodyEquipment(FText InBodyItem)
+{
+	BodyEquipment->RefreshSlot(DefaultItemIcon, InBodyItem);
 }
 

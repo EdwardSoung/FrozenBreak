@@ -23,6 +23,12 @@ protected:
 	UFUNCTION()
 	void SetTemperatureDefence(FText InDefenceValue);
 
+	UFUNCTION()
+	void SetHandEquipment(FText InHandItem); // 현재 Item type이 정해지지 않아 Text로 임시 구현
+
+	UFUNCTION()
+	void SetBodyEquipment(FText InBodyItem); // 현재 Item type이 정해지지 않아 Text로 임시 구현
+
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UEquipmentSlotWidget> HandEquipment = nullptr;
