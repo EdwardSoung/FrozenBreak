@@ -7,8 +7,9 @@
 AWorldProp::AWorldProp()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
+	StatComponent = CreateDefaultSubobject<UStatComponent>(TEXT("Stat Component"));
 }
 
 // Called when the game starts or when spawned
@@ -18,10 +19,8 @@ void AWorldProp::BeginPlay()
 	
 }
 
-// Called every frame
-void AWorldProp::Tick(float DeltaTime)
+void AWorldProp::DoAction_Implementation()
 {
-	Super::Tick(DeltaTime);
-
+	//UI ¶ç¿öÁÖ±â
+	//
 }
-
