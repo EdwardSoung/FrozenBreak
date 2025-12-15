@@ -38,7 +38,8 @@ void UHealthComponent::BeginPlay()
 void UHealthComponent::InitStatus()
 {
 	// 체력 초기 값 세팅
-	CurrentHealth = DefaultMaxHealth;
+	MaxHealth = DefaultMaxHealth;
+	CurrentHealth = MaxHealth;
 
 	/*
 	플레이 시작 시 체력 UI 값을 초기화 하기 위한 코드. 타이밍 상 아래 코드가 실행되는 시점에 Widget의 바인딩이 안된 상태라

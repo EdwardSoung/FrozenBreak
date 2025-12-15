@@ -18,7 +18,6 @@ void UStatusCalculationSubSystem::Deinitialize()
 void UStatusCalculationSubSystem::SetTemperature()
 {
 	if (EventSystem) EventSystem->Status.OnSetTemperature.Broadcast(StatusDataAsset->Temperature);
-	
 }
 
 void UStatusCalculationSubSystem::SetFatigue()

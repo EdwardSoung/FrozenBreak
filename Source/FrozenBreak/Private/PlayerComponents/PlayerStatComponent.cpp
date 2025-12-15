@@ -19,6 +19,8 @@ UPlayerStatComponent::UPlayerStatComponent()
 void UPlayerStatComponent::BeginPlay()
 {
 	Super::BeginPlay();	
+	InitStatus();
+	BindStatSettingEvents();
 }
 
 void UPlayerStatComponent::InitStatus()
@@ -55,11 +57,9 @@ void UPlayerStatComponent::SetPlayerTemperature(float InTemperatureValue)
 	}
 	else
 	{
-		// 온도 값이 0이 되어 체력이 소모되기 시작
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			//TODO : Damage 호출로 수정필요
-			EventSystem->Status.OnTemperaturePointChanged.Broadcast(CurrentTemperature / MaxTemperature);
+			EventSystem->Status.OnSetHealth.Broadcast(InTemperatureValue);
 		}
 	}
 }
@@ -78,8 +78,7 @@ void UPlayerStatComponent::SetPlayerFatigue(float InFatigueValue)
 	{
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			//TODO : Damage 호출로 수정필요
-			EventSystem->Status.OnFatiguePointChanged.Broadcast(CurrentTemperature / MaxTemperature);
+			EventSystem->Status.OnSetHealth.Broadcast(InFatigueValue);
 		}
 	}
 
@@ -100,9 +99,7 @@ void UPlayerStatComponent::SetPlayerHunger(float InHungerValue)
 
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			//TODO : Damage 호출로 수정필요
-			EventSystem->Status.OnHungerPointChanged.Broadcast(CurrentHunger / MaxHunger);
+			EventSystem->Status.OnSetHealth.Broadcast(InHungerValue);
 		}
 	}
-
 }
