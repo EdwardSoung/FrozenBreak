@@ -69,6 +69,6 @@ void ATestInteractionCharactor::OnMoveInput(const FInputActionValue& InValue)
 
 void ATestInteractionCharactor::OnInteractionInput(const FInputActionValue& Invale)
 {
-	IInteractable::Execute_TryPickup(InteractionComponent, this);
+	IInteractable::Execute_DoAction(InteractionComponent);
 }
 

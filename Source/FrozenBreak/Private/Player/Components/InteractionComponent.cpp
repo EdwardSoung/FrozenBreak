@@ -64,7 +64,7 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	{
 		if (!bIsInteracting)
 		{
-			IInteractable::Execute_OnSelect(LastInteractionActor, true);
+			IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
 			UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
 
 		}
@@ -86,7 +86,7 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	}
 }
 
-void UInteractionComponent::TryPickup_Implementation(AActor* Instigator)
+void UInteractionComponent::DoAction_Implementation()
 {
 	// 플레이어가 인터렉션을 눌렀음 -> 눌렀다는걸 인터렉션 컴포넌트한테 알려줌 -> 
 	// 인터렉션 컴포넌트는 플레이어가 인터렉션을 눌렀을 때 CurrentInteractionActor가 있는지 확인, 없으면 리턴 ->

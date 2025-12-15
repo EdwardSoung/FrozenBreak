@@ -23,13 +23,10 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void OnInteractionStarted_Implementation();
+	void OnSelect_Implementation(bool bIsStart);
 
 	UFUNCTION(BlueprintCallable)
-	void OnInteractionEnded_Implementation();
-
-	UFUNCTION(BlueprintCallable)
-	void OnPickup_Implementation(AActor* InstigatorActor);
+	void DoAction_Implementation();
 
 private:
 	const ECollisionChannel InteractableActorChannel = ECollisionChannel::ECC_GameTraceChannel1;
