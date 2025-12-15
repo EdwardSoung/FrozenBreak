@@ -21,10 +21,13 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+	UFUNCTION(BlueprintCallable)
 	void OnInteractionStarted_Implementation();
 
+	UFUNCTION(BlueprintCallable)
 	void OnInteractionEnded_Implementation();
 
+	UFUNCTION(BlueprintCallable)
 	void OnPickup_Implementation();
 
 private:

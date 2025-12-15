@@ -41,6 +41,8 @@ void ATestInteractableActor::OnInteractionEnded_Implementation()
 
 void ATestInteractableActor::OnPickup_Implementation()
 {
-	Destroy();
+	SetActorHiddenInGame(true);
+	SetActorTickEnabled(false);
+	SetLifeSpan(0.001f);
 }
 

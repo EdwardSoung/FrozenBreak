@@ -9,7 +9,7 @@
 
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class FROZENBREAK_API UInteractionComponent : public UActorComponent
+class FROZENBREAK_API UInteractionComponent : public UActorComponent, public IInteractable
 {
 	GENERATED_BODY()
 
@@ -39,8 +39,11 @@ private:
 
 	const AActor* ComponentOwner = nullptr;
 
-	// 마지막으로 트레이싱 된 액터를 저장
+	// 현재 트레이싱 되고있는 액터
 	AActor* CurrentInteractionActor = nullptr;
+
+	// 마지막으로 트레이싱 된 액터를 저장
+	AActor* LastInteractionActor = nullptr;
 
 	const class UCameraComponent* Camera = nullptr;
 
