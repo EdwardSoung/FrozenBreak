@@ -9,7 +9,7 @@
 #include "TestInteractionCharactor.generated.h"
 
 UCLASS()
-class FROZENBREAK_API ATestInteractionCharactor : public ACharacter
+class FROZENBREAK_API ATestInteractionCharactor : public ACharacter, public IInteractable
 {
 	GENERATED_BODY()
 

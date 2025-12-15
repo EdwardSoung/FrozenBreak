@@ -60,28 +60,28 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	DrawDebugLine(GetWorld(), CameraLocation, TargetLocation, FColor::Green, false, -1.f, 0, 0.25f);
 #endif
 
-	AActor* HitActor = InteractionHitResult.GetActor();
+	CurrentInteractionActor = InteractionHitResult.GetActor();
 
 	if (bHit)
 	{
 		if (!bIsInteracting)
 		{
-			IInteractable::Execute_OnInteractionStarted(HitActor);
+			IInteractable::Execute_OnInteractionStarted(CurrentInteractionActor);
 			UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
 
 		}
-		CurrentInteractionActor = HitActor;
+		LastInteractionActor = CurrentInteractionActor;
 		bIsInteracting = true;
 	}
 	else
 	{
 		if (bIsInteracting)
 		{
-			IInteractable::Execute_OnInteractionEnded(CurrentInteractionActor);
+			IInteractable::Execute_OnInteractionEnded(LastInteractionActor);
 			UE_LOG(LogTemp, Log, TEXT("Hit Actor End"));
 			
 		}
-
+		CurrentInteractionActor = nullptr;
 		bIsInteracting = false;
 	}
 }
@@ -90,17 +90,20 @@ void UInteractionComponent::TryPickup_Implementation(AActor* Instigator)
 {
 	// 플레이어가 인터렉션을 눌렀음 -> 눌렀다는걸 인터렉션 컴포넌트한테 알려줌 -> 
 	// 인터렉션 컴포넌트는 플레이어가 인터렉션을 눌렀을 때 CurrentInteractionActor가 있는지 확인, 없으면 리턴 ->
-	// 있다면 CurrentInteractionActor, 플레이어(애니메이션, ??), 인벤토리 컴포넌트에게(얘한테는 CurrentInteractionActor를 추가로) 뭔가를 발송 (델리게이트나 인터페이스)
+	// 있다면 LastInteractionActor, 플레이어(애니메이션, ??), 인벤토리 컴포넌트에게(얘한테는 CurrentInteractionActor를 추가로) 뭔가를 발송 (델리게이트나 인터페이스)
 
-	if (CurrentInteractionActor)
+	if (LastInteractionActor)
 	{
-		// CurrentInteractionActor 가 있다.
-		IInteractable::Execute_OnPickup(CurrentInteractionActor);
+		// LastInteractionActor 가 있다.
+		IInteractable::Execute_OnPickup(LastInteractionActor);
 		CurrentInteractionActor = nullptr;
+		LastInteractionActor = nullptr;
+		bIsInteracting = false;
+
 	}
 	else
 	{
-		// CurrentInteractionActor 가 없다.
+		// LastInteractionActor 가 없다.
 		return;
 	}
 
