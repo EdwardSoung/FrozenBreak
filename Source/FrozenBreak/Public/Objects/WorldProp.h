@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interface/Interactable.h"
 #include "WorldProp.generated.h"
 
 UCLASS()
-class FROZENBREAK_API AWorldProp : public AActor
+class FROZENBREAK_API AWorldProp : public AActor, public IInteractable
 {
 	GENERATED_BODY()
 	
@@ -20,7 +21,12 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	virtual void DoAction_Implementation(/*동작 타입을 입력받아도 좋을 것 같음...*/) override;
+	//예시 : 공격인지(벌목등 포함), 획득인지, 작업인지..
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Data")
+	TObjectPtr<class UStatComponent> StatComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Data")
+	TObjectPtr<class UPropData> Data;
 };
