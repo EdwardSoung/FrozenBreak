@@ -19,11 +19,14 @@ public:
 	EPropType PropType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop")
-	FText DisplayName;		//È¤½Ã ¹°Ã¼ ÀÌ¸§ Ç¥±âÇÒÁö ½Í¾î ¼¼ÆÃ
+	FText DisplayName;		//í˜¹ì‹œ ë¬¼ì²´ ì´ë¦„ í‘œê¸°í• ì§€ ì‹¶ì–´ ì„¸íŒ…
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop")
 	EItemType GenerateItemType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop")
-	int32 GenerateItemCount;		//·£´ıÀÌ¸é ¹üÀ§°ªÀ¸·Î ¼öÁ¤ÇÊ¿ä
+	int32 GenerateItemCount;		//ëœë¤ì´ë©´ ë²”ìœ„ê°’ìœ¼ë¡œ ìˆ˜ì •í•„ìš”
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop")
+	float Health;
 };

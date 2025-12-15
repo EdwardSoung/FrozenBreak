@@ -2,6 +2,8 @@
 
 
 #include "Objects/WorldProp.h"
+#include "CommonComponents/StatComponent.h"
+#include "Data/PropData.h"
 
 // Sets default values
 AWorldProp::AWorldProp()
@@ -17,15 +19,22 @@ void AWorldProp::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (StatComponent)
+	{
+		if (Data)
+		{
+			StatComponent->InitStat(Data->Health);
+		}
+	}
 }
 
 void AWorldProp::DoAction_Implementation()
 {
-	//¸¶¿ì½º Å° ´©¸£´Â µîÀÇ ¾×¼ÇÀÌ ÃëÇØÁü
+	//ë§ˆìš°ìŠ¤ í‚¤ ëˆ„ë¥´ëŠ” ë“±ì˜ ì•¡ì…˜ì´ ì·¨í•´ì§
 	//
 }
 
 void AWorldProp::OnSelect_Implementation(bool bIsStarted)
 {
-	//MouseOverµÇ¾î ¼±ÅÃµÊ
+	//MouseOverë˜ì–´ ì„ íƒë¨
 }

@@ -23,11 +23,18 @@ void UStatComponent::BeginPlay()
 	
 }
 
+void UStatComponent::InitStat(float InHealth, float InAttack)
+{
+	Attack = InAttack;
+	MaxHealth = InHealth;
+	CurrentHealth = InHealth;
+}
+
 void UStatComponent::OnDamaged(float InDamage)
 {
 	if (MaxHealth < 0)
 	{
-		//Ã¼·Â -1ÀÌ¸é ¹«Àû
+		//ì²´ë ¥ -1ì´ë©´ ë¬´ì 
 		return;
 	}
 
@@ -38,7 +45,7 @@ void UStatComponent::OnDamaged(float InDamage)
 	}
 	else
 	{
-		// TODO : Ä³¸¯ÅÍ »ç¸Á
-		//Ã¼·Â 0 µÉ ¶§ Owner¿¡°Ô Àü´Þ (GetOwner())
+		// TODO : ìºë¦­í„° ì‚¬ë§
+		//ì²´ë ¥ 0 ë  ë•Œ Ownerì—ê²Œ ì „ë‹¬ (GetOwner())
 	}
 }

@@ -23,13 +23,13 @@ void UPlayerStatComponent::BeginPlay()
 
 void UPlayerStatComponent::InitStatus()
 {
-	// ì˜¨ë„ ì´ˆê¸° ê°’ ì„¸íŒ…
+	// ì˜¨ë„
 	CurrentTemperature = MaxTemperature;
 
-	// í”¼ë¡œë„ ì´ˆê¸° ê°’ ì„¸íŒ…
+	// í–‰ë™ë ¥
 	CurrentFatigue = MaxFatigue;
 
-	// í¬ë§Œê° ì´ˆê¸° ê°’ ì„¸íŒ…
+	//í˜„ìž¬ ë°°ê³ í””
 	CurrentHunger = MaxHunger;
 }
 
@@ -55,10 +55,10 @@ void UPlayerStatComponent::SetPlayerTemperature(float InTemperatureValue)
 	}
 	else
 	{
-		// ¿Âµµ °ªÀÌ 0ÀÌ µÇ¾î Ã¼·ÂÀÌ ¼Ò¸ðµÇ±â ½ÃÀÛ
+		// ì˜¨ë„ ê°’ì´ 0ì´ ë˜ì–´ ì²´ë ¥ì´ ì†Œëª¨ë˜ê¸° ì‹œìž‘
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			//TODO : Damage È£Ãâ·Î ¼öÁ¤ÇÊ¿ä
+			//TODO : Damage í˜¸ì¶œë¡œ ìˆ˜ì •í•„ìš”
 			EventSystem->Status.OnTemperaturePointChanged.Broadcast(CurrentTemperature / MaxTemperature);
 		}
 	}
@@ -78,7 +78,7 @@ void UPlayerStatComponent::SetPlayerFatigue(float InFatigueValue)
 	{
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			//TODO : Damage È£Ãâ·Î ¼öÁ¤ÇÊ¿ä
+			//TODO : Damage í˜¸ì¶œë¡œ ìˆ˜ì •í•„ìš”
 			EventSystem->Status.OnFatiguePointChanged.Broadcast(CurrentTemperature / MaxTemperature);
 		}
 	}
@@ -100,7 +100,7 @@ void UPlayerStatComponent::SetPlayerHunger(float InHungerValue)
 
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			//TODO : Damage È£Ãâ·Î ¼öÁ¤ÇÊ¿ä
+			//TODO : Damage í˜¸ì¶œë¡œ ìˆ˜ì •í•„ìš”
 			EventSystem->Status.OnHungerPointChanged.Broadcast(CurrentHunger / MaxHunger);
 		}
 	}

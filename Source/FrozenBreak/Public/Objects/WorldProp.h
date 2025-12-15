@@ -21,12 +21,14 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	virtual void DoAction_Implementation(/*µ¿ÀÛ Å¸ÀÔÀ» ÀÔ·Â¹Ş¾Æµµ ÁÁÀ» °Í °°À½...*/) override;
-	//¿¹½Ã : °ø°İÀÎÁö(¹ú¸ñµî Æ÷ÇÔ), È¹µæÀÎÁö, ÀÛ¾÷ÀÎÁö..
+	virtual void DoAction_Implementation(/*ë™ì‘ íƒ€ì…ì„ ì…ë ¥ë°›ì•„ë„ ì¢‹ì„ ê²ƒ ê°™ìŒ...*/) override;
+	//ì˜ˆì‹œ : ê³µê²©ì¸ì§€(ë²Œëª©ë“± í¬í•¨), íšë“ì¸ì§€, ì‘ì—…ì¸ì§€..
 
 	virtual void OnSelect_Implementation(bool bIsStarted) override;
 
-public:
+	void InitStat(float InAttack, float InHealth);
+
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Data")
 	TObjectPtr<class UStatComponent> StatComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Data")
