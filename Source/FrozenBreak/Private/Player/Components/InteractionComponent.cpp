@@ -25,8 +25,7 @@ void UInteractionComponent::BeginPlay()
 	Camera = ComponentOwner->FindComponentByClass<UCameraComponent>();
 	if (ComponentOwner && Camera)
 	{
-		// 이 컴포넌트의 주인은 라인트레이스 히트에서 제외됨
-		QueryParams.AddIgnoredActor(ComponentOwner);
+		
 	}
 	else
 	{
@@ -52,8 +51,7 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 		InteractionHitResult,		// 라인에 블록된 액터
 		CameraLocation,			
 		TargetLocation,
-		InteractableActorChannel,	// InteractableActorChannel이 Block으로 되어있는 액터만
-		QueryParams					// 제외할 것 (컴포넌트 주인)
+		InteractableActorChannel	// InteractableActorChannel이 Block으로 되어있는 액터만
 	);
 
 #if WITH_EDITOR
@@ -82,6 +80,7 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			
 		}
 		CurrentInteractionActor = nullptr;
+		LastInteractionActor = nullptr;
 		bIsInteracting = false;
 	}
 }
@@ -99,12 +98,10 @@ void UInteractionComponent::TryPickup_Implementation(AActor* Instigator)
 		CurrentInteractionActor = nullptr;
 		LastInteractionActor = nullptr;
 		bIsInteracting = false;
-
 	}
 	else
 	{
-		// LastInteractionActor 가 없다.
-		return;
+		UE_LOG(LogTemp, Log, TEXT("바라보고 있는 액터는 상호작용 불가능"));
 	}
 
 }

@@ -32,7 +32,7 @@ public:
 	void OnPickup_Implementation();
 
 private:
-	const ECollisionChannel InteractableChannel = ECC_GameTraceChannel1;
+	const ECollisionChannel InteractableActorChannel = ECollisionChannel::ECC_GameTraceChannel1;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
@@ -41,5 +41,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	TObjectPtr<class UWidgetComponent> PopupWidget = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemData")
+	TObjectPtr<class UItemDataAssetBase> ItemDataAsset;
 
 };
