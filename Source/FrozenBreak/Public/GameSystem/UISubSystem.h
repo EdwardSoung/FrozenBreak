@@ -12,7 +12,6 @@ class UUserWidget;
  * 
  */
 
-
 UCLASS()
 class FROZENBREAK_API UUISubSystem : public UGameInstanceSubsystem
 {

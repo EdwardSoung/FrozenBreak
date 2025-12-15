@@ -87,3 +87,14 @@ void UStatusComponent::InitStatus()
 	// 포만감 초기 값 세팅
 	CurrentHunger = MaxHunger;
 }
+
+void UStatusComponent::BindStatusSettingEvents()
+{
+	Super::BindStatusSettingEvents();
+	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+	{
+		EventSystem->Status.OnSetTemperature.AddDynamic(this, &UStatusComponent::SetPlayerTemperature);
+		EventSystem->Status.OnSetFatigue.AddDynamic(this, &UStatusComponent::SetPlayerFatigue);
+		EventSystem->Status.OnSetHunger.AddDynamic(this, &UStatusComponent::SetPlayerHunger);
+	}
+}

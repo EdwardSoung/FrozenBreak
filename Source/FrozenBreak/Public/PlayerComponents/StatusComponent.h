@@ -32,6 +32,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitStatus() override;
+	virtual void BindStatusSettingEvents() override;
 
 public:
 
@@ -67,4 +68,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Hunger")
 	float CurrentHunger = 0.0f;
 	// ------------------------------------------------------------------------------|
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Status")
+	TSubclassOf<class UStatusDataAsset> StatusContinuousSetDataClass = nullptr;
 };

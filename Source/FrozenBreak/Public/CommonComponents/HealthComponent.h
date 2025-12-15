@@ -26,6 +26,8 @@ protected:
 	// 게임 시작 시 각 Current 값들을 Max 값으로 초기화
 	virtual void InitStatus();
 
+	virtual void BindStatusSettingEvents();
+
 public:	
 
 protected:

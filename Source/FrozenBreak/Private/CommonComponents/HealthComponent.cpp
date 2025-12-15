@@ -32,6 +32,7 @@ void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	InitStatus();
+	BindStatusSettingEvents();
 }
 
 void UHealthComponent::InitStatus()
@@ -47,4 +48,12 @@ void UHealthComponent::InitStatus()
 	//{
 	//	EventSystem->Status.OnHealthPointChanged.Broadcast(CurrentHealth / MaxHealth);
 	//}
+}
+
+void UHealthComponent::BindStatusSettingEvents()
+{
+	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+	{
+		EventSystem->Status.OnSetHealth.AddDynamic(this, &UHealthComponent::SetPlayerHealth);
+	}
 }
