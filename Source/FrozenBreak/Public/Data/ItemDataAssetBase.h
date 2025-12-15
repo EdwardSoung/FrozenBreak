@@ -10,15 +10,7 @@
  * 
  */
 
-UENUM(BlueprintType)
-enum class EItemType : uint8
-{
-	None,
-	Wearable,		// 입을 수 있는 것
-	Carryable,		// 손에 들 수 있는 것
-	Eatable,		// 먹을 수 있는 것
-	Material,		// 재료들
-};
+
 
 UCLASS(BlueprintType)
 class FROZENBREAK_API UItemDataAssetBase : public UDataAsset
@@ -34,9 +26,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (MultiLine = true))
 	FText Description;
 
-	// 아이템 타입
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
-	EItemType ItemType = EItemType::None;
 
 	// 아이템 무게
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (ClampMin = "0"))
