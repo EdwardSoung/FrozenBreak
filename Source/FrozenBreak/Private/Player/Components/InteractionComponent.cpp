@@ -64,7 +64,7 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	{
 		if (!bIsInteracting)
 		{
-			IInteractable::Execute_OnInteractionStarted(CurrentInteractionActor);
+			IInteractable::Execute_OnSelect(LastInteractionActor, true);
 			UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
 
 		}
@@ -75,7 +75,7 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	{
 		if (bIsInteracting)
 		{
-			IInteractable::Execute_OnInteractionEnded(LastInteractionActor);
+			IInteractable::Execute_OnSelect(LastInteractionActor, false);
 			UE_LOG(LogTemp, Log, TEXT("Hit Actor End"));
 
 			CurrentInteractionActor = nullptr;
@@ -95,7 +95,7 @@ void UInteractionComponent::TryPickup_Implementation(AActor* Instigator)
 	if (CurrentInteractionActor)
 	{
 		// LastInteractionActor 가 있다.
-		IInteractable::Execute_OnPickup(CurrentInteractionActor, GetOwner());
+		IInteractable::Execute_DoAction(LastInteractionActor);
 		CurrentInteractionActor = nullptr;
 		LastInteractionActor = nullptr;
 		bIsInteracting = false;

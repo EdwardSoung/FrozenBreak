@@ -24,5 +24,7 @@ class FROZENBREAK_API IInteractable
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interact")
 	void DoAction();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interact")
+	void OnSelect(bool bIsStart);
 
 };

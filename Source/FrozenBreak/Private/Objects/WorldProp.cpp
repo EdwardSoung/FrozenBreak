@@ -21,6 +21,11 @@ void AWorldProp::BeginPlay()
 
 void AWorldProp::DoAction_Implementation()
 {
-	//UI 띄워주기
+	//마우스 키 누르는 등의 액션이 취해짐
 	//
+}
+
+void AWorldProp::OnSelect_Implementation(bool bIsStarted)
+{
+	//MouseOver되어 선택됨
 }
