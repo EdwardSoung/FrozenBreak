@@ -77,10 +77,11 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 		{
 			IInteractable::Execute_OnInteractionEnded(LastInteractionActor);
 			UE_LOG(LogTemp, Log, TEXT("Hit Actor End"));
-			
+
+			CurrentInteractionActor = nullptr;
+			LastInteractionActor = nullptr;
 		}
-		CurrentInteractionActor = nullptr;
-		LastInteractionActor = nullptr;
+
 		bIsInteracting = false;
 	}
 }
@@ -91,10 +92,10 @@ void UInteractionComponent::TryPickup_Implementation(AActor* Instigator)
 	// 인터렉션 컴포넌트는 플레이어가 인터렉션을 눌렀을 때 CurrentInteractionActor가 있는지 확인, 없으면 리턴 ->
 	// 있다면 LastInteractionActor, 플레이어(애니메이션, ??), 인벤토리 컴포넌트에게(얘한테는 CurrentInteractionActor를 추가로) 뭔가를 발송 (델리게이트나 인터페이스)
 
-	if (LastInteractionActor)
+	if (CurrentInteractionActor)
 	{
 		// LastInteractionActor 가 있다.
-		IInteractable::Execute_OnPickup(LastInteractionActor, GetOwner());
+		IInteractable::Execute_OnPickup(CurrentInteractionActor, GetOwner());
 		CurrentInteractionActor = nullptr;
 		LastInteractionActor = nullptr;
 		bIsInteracting = false;

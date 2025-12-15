@@ -21,6 +21,7 @@ AItemBase::AItemBase()
 
 	PopupWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("TextWidget"));
 	PopupWidget->SetupAttachment(RootComponent);
+	PopupWidget->SetRelativeLocation(FVector(0, 0, 0));
 	PopupWidget->SetWidgetSpace(EWidgetSpace::Screen);
 	PopupWidget->SetVisibility(false);
 }

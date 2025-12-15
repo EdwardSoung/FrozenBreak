@@ -15,22 +15,22 @@ class FROZENBREAK_API UItemData : public UDataAsset
 {
 	GENERATED_BODY()
 public:
-	// ¾ÆÀÌÅÛ Å¸ÀÔ
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
 	EItemType ItemType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
 	FText DisplayName;
 
-	// ¾ÆÀÌÅÛ ¼³¸í
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (MultiLine = true))
 	FText Description;
 
-	// ¾ÆÀÌÅÛ ¹«°Ô
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (ClampMin = "0"))
 	int32 ItemWeight = 0;
 
-	// ¾ÆÀÌÅÛ ¾ÆÀÌÄÜ (ÀÎº¥Åä¸®)
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ (ï¿½Îºï¿½ï¿½ä¸®)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
 	TSoftObjectPtr<UTexture2D> ItemIcon;
 };
