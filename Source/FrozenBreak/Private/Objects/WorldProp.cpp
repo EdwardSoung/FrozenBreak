@@ -39,7 +39,7 @@ void AWorldProp::BeginPlay()
 	{
 		if (Data)
 		{
-			//StatComponent->InitStat(Data->Health);
+			StatComponent->InitStat(Data->Durability);
 		}
 	}
 }
@@ -59,12 +59,11 @@ void AWorldProp::DoAction_Implementation()
 
 void AWorldProp::OnSelect_Implementation(bool bIsStarted)
 {
-	//거리 체크도 필요할 듯
-	//MouseOver되어 선택됨
 	if (auto Widget = Cast<UInteractionWidget>(InteractionWidget->GetUserWidgetObject()))
 	{
 		Widget->UpdateInteraction(Data->PropType, Data->InteractionKey);
 		InteractionWidget->SetVisibility(bIsStarted);
+		
 	}
 	
 }

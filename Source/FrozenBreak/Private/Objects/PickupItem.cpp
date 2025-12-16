@@ -40,7 +40,22 @@ void APickupItem::BeginPlay()
 	{
 		if (Data)
 		{
-			//StatComponent->InitStat(Data->Health, Data->Attack);
+			// Attack을 가지지 않은 아이템의 Attack 기본값 (0)
+			float Attack = 0.f;
+			if (const float* AttackStats = Data->Stats.Find(EItemStatType::Attack))
+			{
+				// 이 아이템에게 Attack Stats이 배정되어 있다
+				Attack = *AttackStats;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Log, TEXT("아이템에 Attack 스텟이 설정되어 있지 않거나, 필요없는 아이템 입니다."));
+			}
+			StatComponent->InitStat(Data->Durability, Attack);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Pickup Item Begin : 아이템 데이터가 없음!"));
 		}
 	}
 }
