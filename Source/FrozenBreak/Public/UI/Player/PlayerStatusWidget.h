@@ -25,10 +25,10 @@ protected:
 	void SetTemperatureDefence(FText InDefenceValue);
 
 	UFUNCTION()
-	void SetHandEquipment(UItemData* InHandItem); // 현재 Item type이 정해지지 않아 Text로 임시 구현
+	void SetHandEquipment(UItemData* InHandItem);
 
 	UFUNCTION()
-	void SetBodyEquipment(UItemData* InBodyItem); // 현재 Item type이 정해지지 않아 Text로 임시 구현
+	void SetBodyEquipment(UItemData* InBodyItem);
 
 protected:
 	UPROPERTY(meta = (BindWidget))
