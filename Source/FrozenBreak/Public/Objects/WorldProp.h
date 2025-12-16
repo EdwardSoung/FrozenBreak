@@ -5,10 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interface/Interactable.h"
+#include "GameSystem/Events/StatusEvents.h"
 #include "WorldProp.generated.h"
-
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSetFatigue, float, InFatigueValue);
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSetHunger, float, InHungerValue);
 
 UCLASS()
 class FROZENBREAK_API AWorldProp : public AActor, public IInteractable
@@ -34,8 +32,10 @@ public:
 	void InitStat(float InAttack, float InHealth);
 
 public:
-	//FOnSetFatigue OnSetFatigue;
-	//FOnSetHunger OnSetHunger;
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnSetFatigue OnSetFatigue;
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnSetHunger OnSetHunger;
 
 private:
 	const ECollisionChannel InteractableActorChannel = ECollisionChannel::ECC_GameTraceChannel1;
