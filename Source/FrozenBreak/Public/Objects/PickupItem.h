@@ -21,6 +21,9 @@ protected:
 	virtual void BeginPlay() override;
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mesh")
+	TObjectPtr<class UStaticMeshComponent> Mesh = nullptr;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Data")
 	TObjectPtr<class UStatComponent> StatComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Data")

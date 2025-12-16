@@ -3,6 +3,7 @@
 
 #include "Objects/PickupItem.h"
 #include "Data/ItemData.h"
+#include "Components/StaticMeshComponent.h"
 #include "CommonComponents/StatComponent.h"
 
 // Sets default values
@@ -10,6 +11,9 @@ APickupItem::APickupItem()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	SetRootComponent(Mesh);
 
 	StatComponent = CreateDefaultSubobject<UStatComponent>(TEXT("Stat Component"));
 }
