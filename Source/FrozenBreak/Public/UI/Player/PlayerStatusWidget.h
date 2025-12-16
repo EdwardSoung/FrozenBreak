@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "PlayerStatusWidget.generated.h"
 
+class UItemData;
 /**
  * 
  */
@@ -24,10 +25,10 @@ protected:
 	void SetTemperatureDefence(FText InDefenceValue);
 
 	UFUNCTION()
-	void SetHandEquipment(FText InHandItem); // 현재 Item type이 정해지지 않아 Text로 임시 구현
+	void SetHandEquipment(UItemData* InHandItem); // 현재 Item type이 정해지지 않아 Text로 임시 구현
 
 	UFUNCTION()
-	void SetBodyEquipment(FText InBodyItem); // 현재 Item type이 정해지지 않아 Text로 임시 구현
+	void SetBodyEquipment(UItemData* InBodyItem); // 현재 Item type이 정해지지 않아 Text로 임시 구현
 
 protected:
 	UPROPERTY(meta = (BindWidget))
