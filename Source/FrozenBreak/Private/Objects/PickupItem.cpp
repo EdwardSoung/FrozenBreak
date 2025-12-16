@@ -23,7 +23,7 @@ void APickupItem::BeginPlay()
 	{
 		if (Data)
 		{
-			StatComponent->InitStat(Data->Health, Data->Attack);
+			//StatComponent->InitStat(Data->Health, Data->Attack);
 		}
 	}
 }

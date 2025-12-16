@@ -49,3 +49,14 @@ enum class EInteractKeyType : uint8
 	Key_E,
 	Key_F,
 };
+
+UENUM(BlueprintType)
+enum class EItemStatType : uint8
+{
+	Attack,
+	Health,
+	Hunger,
+	Fatigue,
+	Temperature,
+	ColdResistance,
+};

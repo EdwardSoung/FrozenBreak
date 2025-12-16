@@ -23,7 +23,7 @@ void AWorldProp::BeginPlay()
 	{
 		if (Data)
 		{
-			StatComponent->InitStat(Data->Health);
+			//StatComponent->InitStat(Data->Health);
 		}
 	}
 }

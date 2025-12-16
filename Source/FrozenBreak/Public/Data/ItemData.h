@@ -25,13 +25,16 @@ public:
 	FText Description;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (ClampMin = "0"))
-	int32 ItemWeight = 0;
+	float ItemWeight = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
 	TSoftObjectPtr<UTexture2D> ItemIcon;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
-	float Attack = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
-	float Health = 0;
+
+	// 아이템 내구도
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	float Durability = -1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item|Stat")
+	TMap<EItemStatType, float> Stats;
 
 };
