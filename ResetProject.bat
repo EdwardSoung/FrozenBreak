@@ -27,6 +27,9 @@ if not exist "%EngineRoot%" (
 set "SelectorExe=C:\Program Files (x86)\Epic Games\Launcher\Engine\Binaries\Win64\UnrealVersionSelector.exe"
 set "BuildBat=%EngineRoot%\Engine\Build\BatchFiles\Build.bat"
 
+if not exist "%SelectorExe%" (
+set "SelectorExe=C:\Program Files\Epic Games\Launcher\Engine\Binaries\Win64\UnrealVersionSelector.exe"
+)
 :: 도구 파일이 진짜 있는지 2차 확인
 if not exist "%SelectorExe%" (
     echo [오류] UnrealVersionSelector.exe가 없습니다.
