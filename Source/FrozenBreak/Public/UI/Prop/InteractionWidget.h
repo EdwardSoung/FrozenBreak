@@ -23,6 +23,7 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> InteractionKey;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<class UInteractionTextData> TextData;
 
 public:
