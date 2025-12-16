@@ -23,7 +23,7 @@ void UCraftComponent::BindStatSettingEvents()
 // Current Craft Cost 값(진행 작업량) 셋팅과 UI 갱신
 void UCraftComponent::SstCurrentCraftCost(float InCraftAmount)
 {
-	if (InCraftAmount > 0)
+	if (InCraftAmount > 0 || MaxCraftCost <= 0)
 	{
 		if (CurrentCraftCost < MaxCraftCost)
 		{
@@ -41,7 +41,7 @@ void UCraftComponent::SstCurrentCraftCost(float InCraftAmount)
 	}
 	else
 	{
-		// TODO : Craft Amount(작업력)가 0일 경우 실패 처리
+		// TODO : Craft Amount(작업력) MaxCraftCost(작업량) 0일 경우 크래프트 실패 처리. 그냥 무시도 가능
 	}
 }
 
