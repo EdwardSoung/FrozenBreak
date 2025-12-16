@@ -21,16 +21,28 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+	
+	UFUNCTION(BlueprintCallable)
 	virtual void DoAction_Implementation(/*동작 타입을 입력받아도 좋을 것 같음...*/) override;
 	//예시 : 공격인지(벌목등 포함), 획득인지, 작업인지..
-
+	UFUNCTION(BlueprintCallable)
 	virtual void OnSelect_Implementation(bool bIsStarted) override;
 
 	void InitStat(float InAttack, float InHealth);
 
+private:
+	const ECollisionChannel InteractableActorChannel = ECollisionChannel::ECC_GameTraceChannel1;
+
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Data")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Stat")
 	TObjectPtr<class UStatComponent> StatComponent;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Data")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Data")
 	TObjectPtr<class UPropData> Data;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Prop|Mesh")
+	TObjectPtr<class UStaticMeshComponent> Mesh = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Prop|Widget")
+	TObjectPtr<class UWidgetComponent> InteractionWidget = nullptr;
+
 };

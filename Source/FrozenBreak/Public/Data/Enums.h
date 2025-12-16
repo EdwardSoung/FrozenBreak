@@ -54,9 +54,9 @@ UENUM(BlueprintType)
 enum class EItemStatType : uint8
 {
 	Attack,
-	Health,
-	Hunger,
-	Fatigue,
+	Health,			
+	Hunger,			//포만감
+	Fatigue,		//피로
 	Temperature,
 	ColdResistance,
 };

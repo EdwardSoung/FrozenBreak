@@ -28,5 +28,8 @@ public:
 	int32 GenerateItemCount;		//랜덤이면 범위값으로 수정필요
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop")
+	EInteractKeyType InteractionKey;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop")
 	float Durability;
 };

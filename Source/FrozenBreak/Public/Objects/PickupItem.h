@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Data/ItemData.h"
 #include "PickupItem.generated.h"
 
 UCLASS()
@@ -23,5 +24,5 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Data")
 	TObjectPtr<class UStatComponent> StatComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Data")
-	TObjectPtr<class UItemData> Data;
+	TObjectPtr<UItemData> Data;
 };
