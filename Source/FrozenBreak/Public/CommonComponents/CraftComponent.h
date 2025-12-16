@@ -19,11 +19,15 @@ public:
 	virtual void BeginPlay() override;
 	void BindStatSettingEvents();
 
-	UFUNCTION(BlueprintCallable)
-	void CraftItem();
-
 	UFUNCTION()
-	void SstCraftCost(float InCraftAmount);
+	void SstCurrentCraftCost(float InCraftAmount);
+
+	UFUNCTION(BlueprintCallable)
+	void TestCraft(float InCraftAmount);
+
+private:
+	UFUNCTION()
+	void StartCraft(float InCraftAmount);
 
 protected:
 	// 제작에 필요한 총 작업량(체력과 비슷한 개념)
@@ -36,9 +40,13 @@ protected:
 	// 제작에 사용되는 작업력(공격력과 비슷한 개념)
 	// 예) 100의 작업량을 가진 아이템을 초당 10의 작업력으로 작업 시 20초가 걸린다.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	float CurrentCraftAmount = 10.0f;
+	float CraftAmount = 10.0f;
 
 private:
 	// 제작 시작 시 가지는 현재 작업량(기본적으로 0)
 	float BaseCraftCost = 0.0f;
+
+	// 제작 타이머 관련 변수
+	FTimerHandle CraftHandle;
+	float CraftRate = 1.0f;
 };
