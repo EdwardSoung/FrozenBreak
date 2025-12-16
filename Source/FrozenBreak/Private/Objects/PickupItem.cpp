@@ -44,7 +44,7 @@ void APickupItem::BeginPlay()
 			float Attack = 0.f;
 			if (const float* AttackStats = Data->Stats.Find(EItemStatType::Attack))
 			{
-				// 이 아이템에게 Attack Stats이 배정되어 있다
+				// 이 아이템에게 Attack Stats이 설정되어 있다 (에디터에서 설정)
 				Attack = *AttackStats;
 			}
 			else
@@ -69,6 +69,8 @@ void APickupItem::DoAction_Implementation()
 
 		// Test용 액터 제거
 		SetActorHiddenInGame(true);
+
+		// 타이밍 문제로 null 참조가 일어나서 조금 늦게 제거
 		SetLifeSpan(0.001f);
 	}
 	else

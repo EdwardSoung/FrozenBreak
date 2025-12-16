@@ -10,7 +10,7 @@
 // Sets default values
 AWorldProp::AWorldProp()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	StatComponent = CreateDefaultSubobject<UStatComponent>(TEXT("Stat Component"));
@@ -34,7 +34,7 @@ AWorldProp::AWorldProp()
 void AWorldProp::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	if (StatComponent)
 	{
 		if (Data)
@@ -46,15 +46,36 @@ void AWorldProp::BeginPlay()
 
 void AWorldProp::DoAction_Implementation()
 {
-	//마우스 키 누르는 등의 액션이 취해짐
-	if (Data)
+	// 테스트
+	if (Data->PropType == EPropType::Tree)
 	{
-		UE_LOG(LogTemp, Log, TEXT("뭔가 상호작용이 일어나야 한다."));
+		UE_LOG(LogTemp, Log, TEXT("나무와 상호작용"));
+		return;
 	}
-	else
+	if (Data->PropType == EPropType::Rock)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("프롭 데이터가 세팅되어 있지 않습니다."));
+		UE_LOG(LogTemp, Log, TEXT("바위와 상호작용"));
+		return;
 	}
+	if (Data->PropType == EPropType::Bed)
+	{
+		UE_LOG(LogTemp, Log, TEXT("침대와 상호작용"));
+		return;
+	}
+	if (Data->PropType == EPropType::CraftingTable)
+	{
+		UE_LOG(LogTemp, Log, TEXT("제작대와 상호작용"));
+		return;
+	}
+	if (Data->PropType == EPropType::Campfire)
+	{
+		UE_LOG(LogTemp, Log, TEXT("모닥불과 상호작용"));
+		return;
+	}
+
+
+	UE_LOG(LogTemp, Warning, TEXT("프롭 데이터가 세팅되어 있지 않습니다."));
+
 }
 
 void AWorldProp::OnSelect_Implementation(bool bIsStarted)
@@ -63,7 +84,7 @@ void AWorldProp::OnSelect_Implementation(bool bIsStarted)
 	{
 		Widget->UpdateInteraction(Data->PropType, Data->InteractionKey);
 		InteractionWidget->SetVisibility(bIsStarted);
-		
+
 	}
-	
+
 }
