@@ -5,6 +5,7 @@
 #include "Components/TextBlock.h"
 #include "GameSystem/EventSubSystem.h"
 #include "UI/Player/EquipmentSlotWidget.h"
+#include "Data/ItemData.h"
 
 void UPlayerStatusWidget::NativeConstruct()
 {
@@ -22,7 +23,7 @@ void UPlayerStatusWidget::NativeConstruct()
 
 void UPlayerStatusWidget::SetInGameTime(FText InTimeValue)
 {
-	if (InGameTime)
+	if (InGameTime)	
 	{
 		InGameTime->SetText(InTimeValue);
 	}
@@ -36,7 +37,7 @@ void UPlayerStatusWidget::SetTemperatureDefence(FText InDefenceValue)
 	}
 }
 
-void UPlayerStatusWidget::SetHandEquipment(FText InHandItem)
+void UPlayerStatusWidget::SetHandEquipment(UItemData* InHandItem)
 {
 	if (HandEquipment)
 	{
@@ -44,7 +45,7 @@ void UPlayerStatusWidget::SetHandEquipment(FText InHandItem)
 	}
 }
 
-void UPlayerStatusWidget::SetBodyEquipment(FText InBodyItem)
+void UPlayerStatusWidget::SetBodyEquipment(UItemData* InBodyItem)
 {
 	if (BodyEquipment)
 	{

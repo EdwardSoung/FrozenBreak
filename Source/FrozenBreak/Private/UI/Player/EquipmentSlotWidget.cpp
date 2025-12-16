@@ -6,15 +6,18 @@
 #include "Components/TextBlock.h"
 #include "GameSystem/EventSubSystem.h"
 
-void UEquipmentSlotWidget::RefreshSlot(UTexture2D* InIcon, FText InName)
+void UEquipmentSlotWidget::RefreshSlot(UItemData* InItemData)
 {
-	if (ItemIcon)
+	if (InItemData)
 	{
-		ItemIcon->SetBrushFromTexture(InIcon);
-	}
-	if (!InName.IsEmpty())
-	{
-		ItemName->SetText(InName);
+		if (InItemData->ItemIcon)
+		{
+			ItemIcon->SetBrushFromTexture(InItemData->ItemIcon.Get());
+		}
+		if (!InItemData->DisplayName.IsEmpty())
+		{
+			ItemName->SetText(InItemData->DisplayName);
+		}
 	}
 }
 

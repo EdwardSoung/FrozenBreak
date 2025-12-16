@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Data/ItemData.h"
 #include "StatusEvents.generated.h"
 
 // UI 갱신 델리게이트
@@ -12,8 +13,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFatiguePointChanged, float, InCur
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHungerPointChanged, float, InCurrentHunger);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInGameTimeChanged, FText, InTime);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTemperatureDefenceChanged, FText, InDefenceValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHandEquipmentChanged, FText, InHandItem); // 현재 Item type이 정해지지 않아 Text로 임시 구현
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBodyEquipmentChanged, FText, InBodyItem); // 현재 Item type이 정해지지 않아 Text로 임시 구현
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHandEquipmentChanged, UItemData*, InHandItem);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBodyEquipmentChanged, UItemData*, InBodyItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCurrentCraftCostChanged, float, InCurrentCraftCost);
 
 // 스테이터스 값 세팅 델리게이트
