@@ -14,6 +14,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInGameTimeChanged, FText, InTime)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTemperatureDefenceChanged, FText, InDefenceValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHandEquipmentChanged, FText, InHandItem); // 현재 Item type이 정해지지 않아 Text로 임시 구현
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBodyEquipmentChanged, FText, InBodyItem); // 현재 Item type이 정해지지 않아 Text로 임시 구현
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCurrentCraftCostChanged, float, InCurrentCraftCost);
 
 // 스테이터스 값 세팅 델리게이트
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSetHealth, float, InHealthValue);
@@ -73,4 +74,8 @@ struct FStatusEvents
 	// 플레이어 포만감 셋팅
 	UPROPERTY(BlueprintAssignable)
 	FOnSetHunger OnSetHunger;
+
+	// 작업량 변화량
+	UPROPERTY(BlueprintAssignable)
+	FOnCurrentCraftCostChanged OnCurrentCraftCostChanged;
 };
