@@ -80,10 +80,10 @@ void AWorldProp::DoAction_Implementation()
 		
 
 		// 피로도 최대치 회복
-		OnSetFatigue.Broadcast(FatigueRecoveryAmount);
-
-		// 배고픔 일정수치 감소
-		OnSetHunger.Broadcast(HungerReductionAmount);
+		//OnSetFatigue.Broadcast(FatigueRecoveryAmount);
+		//
+		//// 배고픔 일정수치 감소
+		//OnSetHunger.Broadcast(HungerReductionAmount);
 
 		UE_LOG(LogTemp, Log, TEXT("침대와 상호작용"));
 		return;
