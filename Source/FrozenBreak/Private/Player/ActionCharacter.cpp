@@ -18,6 +18,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 
+#include "Interface/Interactable.h"
+
 
 // Sets default values
 AActionCharacter::AActionCharacter()
@@ -47,6 +49,9 @@ AActionCharacter::AActionCharacter()
 	MoveComp->bOrientRotationToMovement = false;
 	MoveComp->bUseControllerDesiredRotation = false;
 	MoveComp->RotationRate = FRotator(0.f, 0.f, 0.f);
+
+	// Interaction Component
+	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));
 
 	// 점프 높이, 공중에서 캐릭터 제어
 	GetCharacterMovement()->JumpZVelocity = 600.0f;
@@ -208,6 +213,15 @@ void AActionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 			&AActionCharacter::OnSprintStopped
 		);
 	}
+	if (IA_Interaction)
+	{
+		EnhancedInput->BindAction(
+			IA_Interaction,
+			ETriggerEvent::Started,
+			this,
+			&AActionCharacter::OnInteration
+		);
+	}
 }
 
 
@@ -283,4 +297,9 @@ void AActionCharacter::OnSprintStarted()
 void AActionCharacter::OnSprintStopped()
 {
 	GetCharacterMovement()->MaxWalkSpeed = 200.0f; //기본속도로 복귀 시킴
+}
+
+void AActionCharacter::OnInteration()
+{
+	IInteractable::Execute_DoAction(InteractionComponent);
 }

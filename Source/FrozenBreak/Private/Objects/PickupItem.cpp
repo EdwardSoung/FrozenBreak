@@ -45,13 +45,14 @@ void APickupItem::BeginPlay()
 			float Attack = 0.f;
 			if (const float* AttackStats = Data->Stats.Find(EItemStatType::Attack))
 			{
-				// 이 아이템에게 Attack Stats이 설정되어 있다 (에디터에서 설정)
+				// 이 아이템에게 Attack Stats이 설정되어 있다 (에디터에서 설정된)
 				Attack = *AttackStats;
 			}
 			else
 			{
 				UE_LOG(LogTemp, Log, TEXT("아이템에 Attack 스텟이 설정되어 있지 않거나, 필요없는 아이템 입니다."));
 			}
+			// 데이터 에셋에 작성된 데이터를 StatComponent로 보낸다.
 			StatComponent->InitStat(Data->Durability, Attack);
 		}
 		else
@@ -83,6 +84,7 @@ void APickupItem::DoAction_Implementation() // 아이템을 획득
 
 void APickupItem::OnSelect_Implementation(bool bIsStarted)
 {
+	// 라인 트레이스에 맞은 시점에 위젯 텍스트를 업데이트 한 뒤, 보여준다.
 	if (auto Widget = Cast<UInteractionWidget>(InteractionWidget->GetUserWidgetObject()))
 	{
 		Widget->UpdateInteraction(Data->ItemType, Data->InteractionKey);

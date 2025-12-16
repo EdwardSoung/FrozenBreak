@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interface/Interactable.h"
 #include "ActionCharacter.generated.h"
 
 // ===== Forward Declarations =====
@@ -14,7 +15,7 @@ class UInputMappingContext;
 struct FInputActionValue;
 
 UCLASS()
-class FROZENBREAK_API AActionCharacter : public ACharacter
+class FROZENBREAK_API AActionCharacter : public ACharacter, public IInteractable
 {
 	GENERATED_BODY()
 
@@ -61,7 +62,14 @@ protected:
 	TObjectPtr<UInputAction> IA_Sprint = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> IA_Interaction = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> IMC_Player = nullptr;
+
+	// Interaction Component
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player|Component")
+	TObjectPtr<class UInteractionComponent> InteractionComponent = nullptr;
 
 protected:
 	// ===== Input Functions =====
@@ -74,4 +82,5 @@ protected:
 	void OnCrouchToggle();
 	void OnSprintStarted();
 	void OnSprintStopped();
+	void OnInteration();
 };

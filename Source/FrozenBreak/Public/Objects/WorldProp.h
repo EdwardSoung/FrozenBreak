@@ -32,6 +32,7 @@ public:
 	void InitStat(float InAttack, float InHealth);
 
 public:
+	// StatusEvents에서 온 델리게이트들
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnSetFatigue OnSetFatigue;
 	UPROPERTY(BlueprintAssignable, Category = "Events")

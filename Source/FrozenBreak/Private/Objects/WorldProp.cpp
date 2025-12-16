@@ -41,14 +41,21 @@ void AWorldProp::BeginPlay()
 	{
 		if (Data)
 		{
+			// 데이터 에셋에 작성된 데이터를 StatComponent로 보낸다.
 			StatComponent->InitStat(Data->Durability);
 		}
+	}
+	else
+	{
+		// 이건 정말 끔찍한 일이야
+		return;
 	}
 }
 
 void AWorldProp::DoAction_Implementation()
 {
-	// 테스트
+	// 주석 == ToDo
+	// 어느정도 작성되면 타입별로 분리해 함수로 뺄 예정
 	if (Data->PropType == EPropType::Tree)
 	{
 		// Player : 나무 베는 애님
@@ -86,6 +93,7 @@ void AWorldProp::DoAction_Implementation()
 		OnSetHunger.Broadcast(HungerReductionAmount);
 
 		UE_LOG(LogTemp, Log, TEXT("침대와 상호작용"));
+		UE_LOG(LogTemp, Log, TEXT("피로도 회복 : %.1f, 배고픔 감소 : %.1f"), FatigueRecoveryAmount, HungerReductionAmount);
 		return;
 	}
 	if (Data->PropType == EPropType::CraftingTable)
@@ -110,6 +118,7 @@ void AWorldProp::DoAction_Implementation()
 
 void AWorldProp::OnSelect_Implementation(bool bIsStarted)
 {
+	// 라인 트레이스에 맞은 시점에 위젯 텍스트를 업데이트 한 뒤, 보여준다.
 	if (auto Widget = Cast<UInteractionWidget>(InteractionWidget->GetUserWidgetObject()))
 	{
 		Widget->UpdateInteraction(Data->PropType, Data->InteractionKey);
