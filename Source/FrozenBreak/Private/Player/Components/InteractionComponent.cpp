@@ -64,25 +64,42 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	{
 		if (!bIsInteracting)
 		{
-			IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
-			UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
-
+			if (CurrentInteractionActor)
+			{
+				IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
+				UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
+				bIsInteracting = true;
+			}
+		}
+		else if (CurrentInteractionActor != LastInteractionActor)
+		{
+			if (LastInteractionActor)
+			{
+				IInteractable::Execute_OnSelect(LastInteractionActor, false);
+				UE_LOG(LogTemp, Log, TEXT("Hit Actor End (Switch): %s"), *LastInteractionActor->GetName());
+			}
+			if (CurrentInteractionActor)
+			{
+				IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
+				UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *CurrentInteractionActor->GetName());
+			}
 		}
 		LastInteractionActor = CurrentInteractionActor;
-		bIsInteracting = true;
+
 	}
 	else
 	{
 		if (bIsInteracting)
 		{
-			IInteractable::Execute_OnSelect(LastInteractionActor, false);
-			UE_LOG(LogTemp, Log, TEXT("Hit Actor End"));
-
+			if (LastInteractionActor)
+			{
+				IInteractable::Execute_OnSelect(LastInteractionActor, false);
+				UE_LOG(LogTemp, Log, TEXT("Hit Actor End"));
+			}
 			CurrentInteractionActor = nullptr;
 			LastInteractionActor = nullptr;
+			bIsInteracting = false;
 		}
-
-		bIsInteracting = false;
 	}
 }
 
