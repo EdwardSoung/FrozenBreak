@@ -1,0 +1,36 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Components/ActorComponent.h"
+#include "Data/Enums.h"
+#include "Data/ItemDataList.h"
+#include "InventoryComponent.generated.h"
+
+class UInventoryItem;
+
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+class FROZENBREAK_API UInventoryComponent : public UActorComponent
+{
+	GENERATED_BODY()
+
+public:	
+	// Sets default values for this component's properties
+	UInventoryComponent();
+
+	UInventoryItem* GetItem(EItemType Type);
+
+protected:
+	UFUNCTION()
+	void AddItem(EItemType Type, int32 Amount);
+	// Called when the game starts
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
+	TObjectPtr<UItemDataList> DataList;
+
+private:
+	TArray<UInventoryItem*> Items;
+
+};

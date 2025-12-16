@@ -3,11 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Data/Enums.h"
+#include "Objects/InventoryItem.h"
 #include "CharacterEvents.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTestDeletage);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerDead);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStartCraft, float, InCraftAmount);
+
+//Inventory
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGetPickupItem, EItemType, InType, int32, Amount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInitInventoryUI, TArray<UInventoryItem*>, InData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAddItemToInventoryUI, UInventoryItem*, InItem);
 
 
 USTRUCT(BlueprintType)
@@ -26,4 +33,8 @@ struct FCharacterEvents
 	// 작업력과 함께 Broadcast를 날릴 시 타이머를 통해 해당 작업력 비율로 작업량이 늘기 시작(0~MAX).
 	UPROPERTY(BlueprintAssignable)
 	FOnStartCraft OnStartCraft;
+
+	FOnGetPickupItem OnGetPickupItem;
+	FOnInitInventoryUI OnInitInventoryUI;
+	FOnAddItemToInventoryUI OnAddItemToInventoryUI;
 };
