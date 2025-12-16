@@ -33,6 +33,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetTimeNormalized() const { return TimeNormalized; }
 
+	// 인게임 시간 N시간 즉시 진행 (예: Sleep 4시간)
+	UFUNCTION(BlueprintCallable, Category = "Time")
+	void SkipTimeByHours(float Hours);
+
 private:
 	// === Internal ===
 	void UpdateDirectionalLight();
