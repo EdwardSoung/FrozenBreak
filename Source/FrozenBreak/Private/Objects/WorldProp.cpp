@@ -49,26 +49,43 @@ void AWorldProp::DoAction_Implementation()
 	// 테스트
 	if (Data->PropType == EPropType::Tree)
 	{
+		// Player : 나무 베는 애님
+		// Tree : 나무 베는 애님 노티파이에 맞춰 Durability가 깎여야 하고
+		// Durability가 0이 되었을 시 Timber를 드랍? 인벤에 추가?
+		// Durability가 0이 되었을 시 Tree 액터가 없어질 지??
+		// 중복실행을 막아야 함
 		UE_LOG(LogTemp, Log, TEXT("나무와 상호작용"));
 		return;
 	}
 	if (Data->PropType == EPropType::Rock)
 	{
+		// Player : 채굴하는 애님
+		// Rock : 채굴하는 애님 노티파이에 맞춰 Durability가 깎여야 하고
+		// Durability가 0이 되었을 시 Stone를 드랍? 인벤에 추가?
+		// Durability가 0이 되었을 시 Rock 액터가 없어질 지??
+		// 중복실행을 막아야 함
 		UE_LOG(LogTemp, Log, TEXT("바위와 상호작용"));
 		return;
 	}
 	if (Data->PropType == EPropType::Bed)
 	{
+		// Player : 침대에 눕는 애님은 없으니 위젯 애니메이션으로 검어졌다가 시간지나고 뭐 텍스트 띄우고...
+		// Player 피로도를 회복 시켜줘야 한다.
+		// 중복실행을 막아야 함
 		UE_LOG(LogTemp, Log, TEXT("침대와 상호작용"));
 		return;
 	}
 	if (Data->PropType == EPropType::CraftingTable)
 	{
+		// HUD : 제작대 UI를 띄워야 한다.
+		// 중복실행을 막아야 함
 		UE_LOG(LogTemp, Log, TEXT("제작대와 상호작용"));
 		return;
 	}
 	if (Data->PropType == EPropType::Campfire)
 	{
+		// HUD : 요리 UI를 띄워야 한다.
+		// 중복실행을 막아야 함
 		UE_LOG(LogTemp, Log, TEXT("모닥불과 상호작용"));
 		return;
 	}
