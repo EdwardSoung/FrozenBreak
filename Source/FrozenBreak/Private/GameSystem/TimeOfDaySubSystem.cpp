@@ -1,0 +1,97 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "GameSystem/TimeOfDaySubSystem.h"
+#include "GameSystem/EventSubSystem.h"
+#include "Engine/World.h"
+#include "EngineUtils.h"
+#include "Engine/DirectionalLight.h"
+#include "Components/LightComponent.h"
+
+void UTimeOfDaySubSystem::Initialize(FSubsystemCollectionBase& Collection)
+{
+	Super::Initialize(Collection);
+	FindDirectionalLight();
+	EventSystem = UEventSubSystem::Get(this);
+}
+
+void UTimeOfDaySubSystem::Deinitialize()
+{
+	CachedDirectionalLight.Reset();
+	Super::Deinitialize();
+}
+
+bool UTimeOfDaySubSystem::IsGameWorldSafe() const
+{
+	const UWorld* World = GetWorld();
+	return World && World->IsGameWorld();
+}
+
+void UTimeOfDaySubSystem::Tick(float DeltaTime)
+{
+	if (DayLengthSeconds <= KINDA_SMALL_NUMBER) return;
+
+	TimeNormalized += DeltaTime / DayLengthSeconds;
+	if (TimeNormalized >= 1.0f)
+	{
+		TimeNormalized = FMath::Fmod(TimeNormalized, 1.0f);
+	}
+
+	UpdateDirectionalLight();
+	BroadcastTimeIfMinuteChanged();
+}
+
+void UTimeOfDaySubSystem::SetTimeNormalized(float InNormalized)
+{
+	TimeNormalized = FMath::Clamp(InNormalized, 0.0f, 1.0f);
+	UpdateDirectionalLight();
+	BroadcastTimeIfMinuteChanged();
+}
+
+void UTimeOfDaySubSystem::FindDirectionalLight()
+{
+	if (!GetWorld()) return;
+
+	for (TActorIterator<ADirectionalLight> It(GetWorld()); It; ++It)
+	{
+		// 첫 번째 DirectionalLight 사용
+		CachedDirectionalLight = *It;
+		break;
+	}
+}
+
+void UTimeOfDaySubSystem::UpdateDirectionalLight()
+{
+	if (!CachedDirectionalLight.IsValid())
+	{
+		FindDirectionalLight();
+		return;
+	}
+
+	const float Pitch = 90.0f - (TimeNormalized * 360.0f);
+	CachedDirectionalLight->SetActorRotation(FRotator(Pitch, 0.0f, 0.0f));
+}
+
+void UTimeOfDaySubSystem::BroadcastTimeIfMinuteChanged()
+{
+	const float TotalMinutesFloat = TimeNormalized * 24.0f * 60.0f;
+	const int32 TotalMinutes = FMath::FloorToInt(TotalMinutesFloat);
+	const int32 Minute = TotalMinutes % 60;
+
+	if (Minute != CachedMinute)
+	{
+		CachedMinute = Minute;
+		EventSystem->Status.OnInGameTimeChanged.Broadcast(MakeTimeText24H());
+	}
+}
+
+FText UTimeOfDaySubSystem::MakeTimeText24H() const
+{
+	const int32 TotalMinutes = FMath::FloorToInt(TimeNormalized * 24.0f * 60.0f);
+	const int32 Hour = (TotalMinutes / 60) % 24;
+	const int32 Minute = TotalMinutes % 60;
+
+	return FText::FromString(
+		FString::Printf(TEXT("%02d:%02d"), Hour, Minute)
+	);
+}
