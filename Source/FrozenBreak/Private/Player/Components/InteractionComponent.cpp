@@ -25,7 +25,7 @@ void UInteractionComponent::BeginPlay()
 	Camera = ComponentOwner->FindComponentByClass<UCameraComponent>();
 	if (ComponentOwner && Camera)
 	{
-		
+
 	}
 	else
 	{
@@ -49,7 +49,7 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	const bool bHit = GetWorld()->LineTraceSingleByChannel
 	(
 		InteractionHitResult,		// 라인에 블록된 액터
-		CameraLocation,			
+		CameraLocation,
 		TargetLocation,
 		InteractableActorChannel	// InteractableActorChannel이 Block으로 되어있는 액터만
 	);
@@ -88,22 +88,23 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UInteractionComponent::DoAction_Implementation()
 {
-	// 플레이어가 인터렉션을 눌렀음 -> 눌렀다는걸 인터렉션 컴포넌트한테 알려줌 -> 
-	// 인터렉션 컴포넌트는 플레이어가 인터렉션을 눌렀을 때 CurrentInteractionActor가 있는지 확인, 없으면 리턴 ->
-	// 있다면 LastInteractionActor, 플레이어(애니메이션, ??), 인벤토리 컴포넌트에게(얘한테는 CurrentInteractionActor를 추가로) 뭔가를 발송 (델리게이트나 인터페이스)
+	bool bIsTryAction = false;
 
-	if (CurrentInteractionActor)
+	if (bIsInteracting)		// 상호작용 가능한 액터를 바라보고 있을 때만
 	{
-		// LastInteractionActor 가 있다.
-		IInteractable::Execute_DoAction(LastInteractionActor);
-		CurrentInteractionActor = nullptr;
-		LastInteractionActor = nullptr;
-		bIsInteracting = false;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("바라보고 있는 액터는 상호작용 불가능"));
-	}
+		if (CurrentInteractionActor)
+		{
+			IInteractable::Execute_DoAction(LastInteractionActor);
 
+			CurrentInteractionActor = nullptr;
+			LastInteractionActor = nullptr;
+			bIsInteracting = false;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("대상이 없거나 상호작용을 할 수 없는 대상"));
+			return;
+		}
+	}
 }
 

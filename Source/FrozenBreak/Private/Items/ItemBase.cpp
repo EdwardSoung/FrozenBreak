@@ -48,6 +48,8 @@ void AItemBase::OnSelect_Implementation(bool bIsStart)
 
 void AItemBase::DoAction_Implementation()
 {
+
+
 	if (ItemDataAsset.IsValid())
 	{
 		SetActorHiddenInGame(true);
