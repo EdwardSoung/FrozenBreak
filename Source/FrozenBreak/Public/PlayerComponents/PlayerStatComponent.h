@@ -15,15 +15,15 @@ class FROZENBREAK_API UPlayerStatComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UPlayerStatComponent();
-	// ¿Âµµ Áõ°¨ ÇÔ¼ö
+	// ï¿½Âµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
 	UFUNCTION(BlueprintCallable, Category = "Status|Temperature")
 	void SetPlayerTemperature(float InTemperatureValue);
 
-	// ÇÇ·Îµµ Áõ°¨ ÇÔ¼ö
+	// ï¿½Ç·Îµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
 	UFUNCTION(BlueprintCallable, Category = "Status|Stamina")
 	void SetPlayerFatigue(float InFatigueValue);
 
-	// Æ÷¸¸°¨ Áõ°¨ ÇÔ¼ö
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
 	UFUNCTION(BlueprintCallable, Category = "Status|Hunger")
 	void SetPlayerHunger(float InHungerValue);
 
@@ -36,34 +36,34 @@ protected:
 public:
 
 protected:
-	// ------------------------------------------------------------------------------ ÇÃ·¹ÀÌ¾î ¿Âµµ °ª
-	// ÇÃ·¹ÀÌ¾î ÃÖ´ë ¿Âµµ °ª
+	// ------------------------------------------------------------------------------ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Âµï¿½ ï¿½ï¿½
+	// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Ö´ï¿½ ï¿½Âµï¿½ ï¿½ï¿½
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Temperature")
 	float MaxTemperature = 100.0f;
 
-	// ÇÃ·¹ÀÌ¾î ÇöÀç ¿Âµµ °ª
+	// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Âµï¿½ ï¿½ï¿½
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Temperature")
 	float CurrentTemperature = 0.0f;
 	// ------------------------------------------------------------------------------|
 
 
-	// ------------------------------------------------------------------------------ ÇÃ·¹ÀÌ¾î ÇÇ·Îµµ °ª
-	// ÇÃ·¹ÀÌ¾î ÃÖ´ë ¿Âµµ °ª
+	// ------------------------------------------------------------------------------ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Ç·Îµï¿½ ï¿½ï¿½
+	// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Ö´ï¿½ ï¿½Âµï¿½ ï¿½ï¿½
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Fatigue")
 	float MaxFatigue = 100.0f;
 
-	// ÇÃ·¹ÀÌ¾î ÇöÀç ¿Âµµ °ª
+	// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Âµï¿½ ï¿½ï¿½
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Fatigue")
 	float CurrentFatigue = 0.0f;
 	// ------------------------------------------------------------------------------|
 
 
-	// ------------------------------------------------------------------------------ ÇÃ·¹ÀÌ¾î Æ÷¸¸°¨ °ª
-	// ÇÃ·¹ÀÌ¾î ÃÖ´ë ¿Âµµ °ª
+	// ------------------------------------------------------------------------------ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+	// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Ö´ï¿½ ï¿½Âµï¿½ ï¿½ï¿½
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Hunger")
 	float MaxHunger = 100.0f;
 
-	// ÇÃ·¹ÀÌ¾î ÇöÀç ¿Âµµ °ª
+	// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Âµï¿½ ï¿½ï¿½
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Hunger")
 	float CurrentHunger = 0.0f;
 	// ------------------------------------------------------------------------------|

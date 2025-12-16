@@ -7,6 +7,7 @@
 #include "Components/WidgetComponent.h"
 #include "CommonComponents/StatComponent.h"
 #include "UI/Prop/InteractionWidget.h"
+#include <GameSystem/EventSubSystem.h>
 
 // Sets default values
 APickupItem::APickupItem()
@@ -19,7 +20,7 @@ APickupItem::APickupItem()
 	SetRootComponent(Mesh);
 
 	// 트레이스가 맞도록 쿼리 활성화
-	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	// 인터랙션 트레이스 채널 Block (InteractionComponent와 동일 채널)
 	Mesh->SetCollisionResponseToChannel(InteractableActorChannel, ECR_Block);
@@ -69,9 +70,8 @@ void APickupItem::DoAction_Implementation() // 아이템을 획득
 		// 인벤토리 컴포넌트에게 ItemData를 넘겨 AddItem 시켜야 한다.
 
 
-		// Test용 액터 제거
+		
 		SetActorHiddenInGame(true);
-
 		// 타이밍 문제로 null 참조가 일어나서 조금 늦게 제거
 		SetLifeSpan(0.001f);
 	}

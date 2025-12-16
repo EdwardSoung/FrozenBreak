@@ -2,10 +2,12 @@
 
 
 #include "Objects/WorldProp.h"
+#include "GameSystem/Events/StatusEvents.h"
 #include "CommonComponents/StatComponent.h"
 #include "Components/WidgetComponent.h"
 #include "UI/Prop/InteractionWidget.h"
 #include "Data/PropData.h"
+#include <GameSystem/EventSubSystem.h>
 
 // Sets default values
 AWorldProp::AWorldProp()
@@ -69,9 +71,20 @@ void AWorldProp::DoAction_Implementation()
 	}
 	if (Data->PropType == EPropType::Bed)
 	{
+		// if (잘 수 있는 시간대가 있어야 한다)
 		// Player : 침대에 눕는 애님은 없으니 위젯 애니메이션으로 검어졌다가 시간지나고 뭐 텍스트 띄우고...
 		// Player 피로도를 회복 시켜줘야 한다.
+		// 자고 일어났을 때 Player 배고픔을 깎을 지?
 		// 중복실행을 막아야 함
+
+		
+
+		// 피로도 최대치 회복
+		OnSetFatigue.Broadcast(FatigueRecoveryAmount);
+
+		// 배고픔 일정수치 감소
+		OnSetHunger.Broadcast(HungerReductionAmount);
+
 		UE_LOG(LogTemp, Log, TEXT("침대와 상호작용"));
 		return;
 	}
