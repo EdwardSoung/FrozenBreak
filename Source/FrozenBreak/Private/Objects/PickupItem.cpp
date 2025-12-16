@@ -28,10 +28,6 @@ APickupItem::APickupItem()
 	InteractionWidget->SetupAttachment(RootComponent);
 	InteractionWidget->SetRelativeLocation(FVector(0, 0, 0));
 	InteractionWidget->SetWidgetSpace(EWidgetSpace::Screen);
-	if (auto Widget = Cast<UInteractionWidget>(InteractionWidget->GetUserWidgetObject()))
-	{
-		Widget->UpdateInteraction(Data->ItemType, Data->InteractionKey);
-	}
 	InteractionWidget->SetVisibility(false);
 }
 
@@ -55,6 +51,10 @@ void APickupItem::DoAction_Implementation()
 	if (Data)
 	{
 		UE_LOG(LogTemp, Log, TEXT("뭔가 상호작용이 일어나야 한다."));
+
+		// Test용 액터 제거
+		SetActorHiddenInGame(true);
+		SetLifeSpan(0.001f);
 	}
 	else
 	{
@@ -64,6 +64,10 @@ void APickupItem::DoAction_Implementation()
 
 void APickupItem::OnSelect_Implementation(bool bIsStarted)
 {
-	InteractionWidget->SetVisibility(bIsStarted);
+	if (auto Widget = Cast<UInteractionWidget>(InteractionWidget->GetUserWidgetObject()))
+	{
+		Widget->UpdateInteraction(Data->ItemType, Data->InteractionKey);
+		InteractionWidget->SetVisibility(bIsStarted);
+	}
 }
 

@@ -27,10 +27,6 @@ AWorldProp::AWorldProp()
 	InteractionWidget->SetupAttachment(RootComponent);
 	InteractionWidget->SetRelativeLocation(FVector(0, 0, 0));
 	InteractionWidget->SetWidgetSpace(EWidgetSpace::Screen);
-	if (auto Widget = Cast<UInteractionWidget>(InteractionWidget->GetUserWidgetObject()))
-	{
-		Widget->UpdateInteraction(Data->PropType, Data->InteractionKey);
-	}
 	InteractionWidget->SetVisibility(false);
 }
 
@@ -65,5 +61,10 @@ void AWorldProp::OnSelect_Implementation(bool bIsStarted)
 {
 	//거리 체크도 필요할 듯
 	//MouseOver되어 선택됨
-	InteractionWidget->SetVisibility(bIsStarted);
+	if (auto Widget = Cast<UInteractionWidget>(InteractionWidget->GetUserWidgetObject()))
+	{
+		Widget->UpdateInteraction(Data->PropType, Data->InteractionKey);
+		InteractionWidget->SetVisibility(bIsStarted);
+	}
+	
 }
