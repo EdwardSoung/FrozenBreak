@@ -52,7 +52,7 @@ echo [현재 경로] %CurrentPath%
 echo.
 
 echo [1단계: 폴더 청소]
-set DELETE_LIST=Binaries Intermediate DerivedDataCache .vs .vscode
+set DELETE_LIST=Binaries Intermediate DerivedDataCache
 for %%F in (%DELETE_LIST%) do (
     if exist "%CurrentPath%%%F" (
         echo  - 삭제 중: %%F
