@@ -41,7 +41,7 @@ void UPlayerStatusWidget::SetHandEquipment(UItemData* InHandItem)
 {
 	if (HandEquipment)
 	{
-		HandEquipment->RefreshSlot(DefaultItemIcon, InHandItem);
+		HandEquipment->RefreshSlot(InHandItem);
 	}
 }
 
@@ -49,7 +49,7 @@ void UPlayerStatusWidget::SetBodyEquipment(UItemData* InBodyItem)
 {
 	if (BodyEquipment)
 	{
-		BodyEquipment->RefreshSlot(DefaultItemIcon, InBodyItem);
+		BodyEquipment->RefreshSlot(InBodyItem);
 	}
 }
 
