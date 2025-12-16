@@ -19,6 +19,7 @@
 #include "Components/SkeletalMeshComponent.h"
 
 #include "Interface/Interactable.h"
+#include "Player/Components/InteractionComponent.h"
 
 
 // Sets default values
