@@ -34,6 +34,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	float Durability = -1;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
+	EInteractKeyType InteractionKey;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item|Stat")
 	TMap<EItemStatType, float> Stats;
 

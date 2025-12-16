@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Data/ItemData.h"
+#include "Interface/Interactable.h"
 #include "PickupItem.generated.h"
 
 UCLASS()
-class FROZENBREAK_API APickupItem : public AActor
+class FROZENBREAK_API APickupItem : public AActor, public IInteractable
 {
 	GENERATED_BODY()
 	
@@ -20,12 +21,25 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mesh")
-	TObjectPtr<class UStaticMeshComponent> Mesh = nullptr;
+public:
+	UFUNCTION(BlueprintCallable)
+	virtual void DoAction_Implementation() override;
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void OnSelect_Implementation(bool bIsStarted) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Data")
+private:
+	const ECollisionChannel InteractableActorChannel = ECollisionChannel::ECC_GameTraceChannel1;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Stat")
 	TObjectPtr<class UStatComponent> StatComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Data")
-	TObjectPtr<UItemData> Data;
+	TObjectPtr<class UItemData> Data;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item|Mesh")
+	TObjectPtr<class UStaticMeshComponent> Mesh = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item|Widget")
+	TObjectPtr<class UWidgetComponent> InteractionWidget = nullptr;
 };
