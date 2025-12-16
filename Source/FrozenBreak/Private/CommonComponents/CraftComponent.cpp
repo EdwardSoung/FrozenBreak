@@ -23,7 +23,7 @@ void UCraftComponent::BindStatSettingEvents()
 // Current Craft Cost 값(진행 작업량) 셋팅과 UI 갱신
 void UCraftComponent::SstCurrentCraftCost(float InCraftAmount)
 {
-	if (InCraftAmount > 0 || MaxCraftCost <= 0)
+	if (InCraftAmount > 0 && MaxCraftCost > 0)
 	{
 		if (CurrentCraftCost < MaxCraftCost)
 		{
@@ -47,7 +47,6 @@ void UCraftComponent::SstCurrentCraftCost(float InCraftAmount)
 
 void UCraftComponent::TestCraft(float InCraftAmount)
 {
-
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
 		EventSystem->Chraracter.OnStartCraft.Broadcast(InCraftAmount);
