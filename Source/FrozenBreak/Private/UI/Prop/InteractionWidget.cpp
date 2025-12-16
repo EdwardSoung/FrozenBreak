@@ -9,9 +9,27 @@ void UInteractionWidget::UpdateInteraction(EPropType InType, EInteractKeyType In
 {
 	if (TextData)
 	{
-		FText* TypeText = TextData->TypeText.Find(InType);
+		FText* TypeText = TextData->PropTypeText.Find(InType);
 		InteractionType->SetText(*TypeText);
 		
+		FText* KeyText = TextData->KeyText.Find(InKey);
+		//FText FormatPattern = FText::FromString(TEXT("[{0}]"));
+		InteractionKey->SetText(*KeyText);
+
+	}
+	else
+	{
+		//꺼줄지..?
+	}
+}
+
+void UInteractionWidget::UpdateInteraction(EItemType InType, EInteractKeyType InKey)
+{
+	if (TextData)
+	{
+		FText* TypeText = TextData->ItemTypeText.Find(InType);
+		InteractionType->SetText(*TypeText);
+
 		FText* KeyText = TextData->KeyText.Find(InKey);
 		//FText FormatPattern = FText::FromString(TEXT("[{0}]"));
 		InteractionKey->SetText(*KeyText);

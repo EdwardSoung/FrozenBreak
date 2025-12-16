@@ -28,4 +28,5 @@ protected:
 
 public:
 	void UpdateInteraction(EPropType InType, EInteractKeyType InKey);
+	void UpdateInteraction(EItemType InType, EInteractKeyType InKey);
 };

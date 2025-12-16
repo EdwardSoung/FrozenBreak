@@ -17,7 +17,10 @@ class FROZENBREAK_API UInteractionTextData : public UDataAsset
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TMap<EPropType, FText> TypeText;
+	TMap<EPropType, FText> PropTypeText;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TMap<EItemType, FText> ItemTypeText;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TMap<EInteractKeyType, FText> KeyText;
