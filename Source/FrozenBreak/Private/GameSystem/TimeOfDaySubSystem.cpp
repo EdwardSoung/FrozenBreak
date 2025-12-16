@@ -60,6 +60,23 @@ void UTimeOfDaySubSystem::FindDirectionalLight()
 	}
 }
 
+void UTimeOfDaySubSystem::SkipTimeByHours(float Hours)
+{
+	// Hours가 음수면 되감기 느낌이 되지만, 보통은 0 이상만 허용
+	if (FMath::IsNearlyZero(Hours)) return;
+
+	const float DeltaNormalized = Hours / 24.0f;
+
+	// 즉시 점프
+	TimeNormalized = TimeNormalized + DeltaNormalized;
+	TimeNormalized = FMath::Fmod(TimeNormalized, 1.0f);
+	if (TimeNormalized < 0.0f) TimeNormalized += 1.0f;
+
+	// 라이트/시간 UI 갱신
+	UpdateDirectionalLight();
+	BroadcastTimeIfMinuteChanged();
+}
+
 void UTimeOfDaySubSystem::UpdateDirectionalLight()
 {
 	if (!CachedDirectionalLight.IsValid())
