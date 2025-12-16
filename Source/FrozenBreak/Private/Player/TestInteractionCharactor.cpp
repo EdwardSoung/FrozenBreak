@@ -52,7 +52,7 @@ void ATestInteractionCharactor::SetupPlayerInputComponent(UInputComponent* Playe
 	if (enhanced)
 	{
 		enhanced->BindAction(IA_Move, ETriggerEvent::Triggered, this, &ATestInteractionCharactor::OnMoveInput);
-		enhanced->BindAction(IA_Interaction, ETriggerEvent::Triggered, this, &ATestInteractionCharactor::OnInteractionInput);
+		enhanced->BindAction(IA_Interaction, ETriggerEvent::Started, this, &ATestInteractionCharactor::OnInteractionInput);
 	}
 }
 

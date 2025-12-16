@@ -101,7 +101,5 @@ void AWorldProp::OnSelect_Implementation(bool bIsStarted)
 	{
 		Widget->UpdateInteraction(Data->PropType, Data->InteractionKey);
 		InteractionWidget->SetVisibility(bIsStarted);
-
 	}
-
 }

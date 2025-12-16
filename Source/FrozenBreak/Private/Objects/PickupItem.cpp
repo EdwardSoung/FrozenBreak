@@ -60,12 +60,14 @@ void APickupItem::BeginPlay()
 	}
 }
 
-void APickupItem::DoAction_Implementation()
+void APickupItem::DoAction_Implementation() // 아이템을 획득
 {
 	//마우스 키 누르는 등의 액션이 취해짐
 	if (Data)
 	{
-		UE_LOG(LogTemp, Log, TEXT("뭔가 상호작용이 일어나야 한다."));
+		// ToDo
+		// 인벤토리 컴포넌트에게 ItemData를 넘겨 AddItem 시켜야 한다.
+
 
 		// Test용 액터 제거
 		SetActorHiddenInGame(true);
