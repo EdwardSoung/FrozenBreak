@@ -122,6 +122,8 @@ void AActionCharacter::BeginPlay()
 void AActionCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+
 }
 
 
@@ -251,18 +253,49 @@ void AActionCharacter::Landed(const FHitResult& Hit) // 착지
 void AActionCharacter::OnMove(const FInputActionValue& Value)
 {
 	const FVector2D Input = Value.Get<FVector2D>();
+
+	// 먼저 락이면 이동 자체 차단
+	if (bLandingLocked)
+	{
+		return;
+	}
+
 	if (Input.IsNearlyZero())
 	{
 		return;
 	}
 
+	// 여기서 "뒤로 달리기" 막기: Input.Y < 0 이면 뒤로
+	if (GetCharacterMovement())
+	{
+		if (bIsCrouched)
+		{
+			// 앉기는 기존 MaxWalkSpeedCrouched가 알아서 처리하지만
+			// 혹시 스프린트 값이 남아있을 수 있으니 워크로 내려줌
+			GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+		}
+		else
+		{
+			if (Input.Y < -0.1f) // 뒤로 입력
+			{
+				GetCharacterMovement()->MaxWalkSpeed = BackwardMaxSpeed;
+			}
+			else
+			{
+				if (bWantsSprint)
+				{
+					GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+				}
+				else
+				{
+					GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+				}
+			}
+		}
+	}
+
 	AddMovementInput(GetActorForwardVector(), Input.Y);
 	AddMovementInput(GetActorRightVector(), Input.X);
-
-	if (bLandingLocked)
-	{
-		return;
-	}
 }
 
 
@@ -324,6 +357,8 @@ void AActionCharacter::OnSprintStarted()
 	{
 		return;
 	}
+
+	bWantsSprint = true;
 }
 
 void AActionCharacter::OnSprintStopped()
@@ -334,6 +369,8 @@ void AActionCharacter::OnSprintStopped()
 	{
 		return;
 	}
+	
+	bWantsSprint = false;
 }
 
 void AActionCharacter::OnInteration()
