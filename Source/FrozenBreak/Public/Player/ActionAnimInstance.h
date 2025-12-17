@@ -62,9 +62,7 @@ protected: // 뒤로 걷기(뒤로 달리기도 추가 예정)
 	UPROPERTY(BlueprintReadOnly, Category = "Anim")
 	bool bIsMovingBackward = false;
 
-protected:
-	UFUNCTION()
-	void AnimNotify_HarvestEnd();
+
 
 protected: // 에임 오프셋 (상반신만 움직이게)
 	//UPROPERTY(BlueprintReadOnly, Category = "Aim")

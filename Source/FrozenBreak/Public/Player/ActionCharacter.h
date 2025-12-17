@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interface/Interactable.h"
+#include "Tools/AxeActor.h"
 #include "ActionCharacter.generated.h"
 
 // ===== Forward Declarations =====
@@ -65,6 +66,9 @@ protected:
 	TObjectPtr<UInputAction> IA_Interaction = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> IA_Harvest = nullptr; // 나무 캐기 전용
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> IMC_Player = nullptr;
 
 	// Interaction Component
@@ -99,6 +103,21 @@ protected: // 달리기 조건 설정
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
 	float BackwardMaxSpeed = 200.0f;
 
+protected: // 도끼질
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Harvest")
+	UAnimMontage* HarvestMontage = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Harvest")
+	bool bIsHarvesting = false;
+
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "Tools")
+	TSubclassOf<AAxeActor> DefaultToolsClass;
+
+	UPROPERTY()
+	AAxeActor* CurrentTools;
+
 protected:
 	// ===== Input Functions =====
 	void OnMove(const FInputActionValue& Value);
@@ -111,4 +130,9 @@ protected:
 	void OnSprintStarted();
 	void OnSprintStopped();
 	void OnInteration();
+	void OnHarvestStarted();
+
+public:
+	void EndHarvest();
+	void OnHarvestHit();
 };
