@@ -126,5 +126,23 @@ void UActionAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	*/
 }
 
+void UActionAnimInstance::AnimNotify_HarvestEnd()
+{
+
+	UE_LOG(LogTemp, Warning, TEXT("[AnimNotify] HarvestEnd called"));
+
+	if (!OwnerCharacter)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[AnimNotify] OwnerCharacter is NULL"));
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("[AnimNotify] Calling EndHarvest"));
+	if (!OwnerCharacter)
+	{
+		return;
+	}
+	OwnerCharacter->EndHarvest();
+}
 
 

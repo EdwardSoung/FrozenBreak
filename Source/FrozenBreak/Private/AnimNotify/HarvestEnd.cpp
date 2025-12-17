@@ -23,5 +23,7 @@ void UHarvestEnd::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* An
 		return;
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("[AnimNotify C++] HarvestEnd"));
+
 	Character->EndHarvest();
 }
