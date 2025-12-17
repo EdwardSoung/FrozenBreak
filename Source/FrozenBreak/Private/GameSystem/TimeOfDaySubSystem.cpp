@@ -7,12 +7,18 @@
 #include "EngineUtils.h"
 #include "Engine/DirectionalLight.h"
 #include "Components/LightComponent.h"
+#include "GameSystem/GameManager.h"
 
 void UTimeOfDaySubSystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 	FindDirectionalLight();
 	EventSystem = UEventSubSystem::Get(this);
+
+	if (UGameManager* GameMgr = UGameManager::Get(this))
+	{
+		TimeNormalized = GameMgr->GetInGameStartTime();
+	}
 }
 
 void UTimeOfDaySubSystem::Deinitialize()

@@ -23,6 +23,8 @@ public:
 	TSubclassOf<class UUserWidget> GetWidgetClass(EWidgetType InType);
 
 	TSubclassOf<class APickupItem> GetPickupItemClass(EItemType InType);
+
+	inline float GetInGameStartTime() { return InGameStartTime; }
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
@@ -30,4 +32,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<class UDataTable> PickupItemTable;
+
+	// 인게임 시작 시간(0~1 : 0.25 = 6시, 0.5 = 12시, 0.75 = 18시, 1.0 = 00시)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
+	float InGameStartTime = 0.5f;
 };

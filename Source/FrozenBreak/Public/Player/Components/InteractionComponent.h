@@ -47,7 +47,7 @@ private:
 protected:
 	// 라인의 길이
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float InteractionDistance = 300.f;
+	float InteractionDistance = 600.f;
 
 	// 한번만 실행되게 만들기 위한 bool
 	bool bIsInteracting = false;

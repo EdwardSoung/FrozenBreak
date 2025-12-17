@@ -10,9 +10,11 @@
 
 #include "Objects/PickupItem.h"
 
+#include "GameSystem/EventSubSystem.h"
+#include "GameSystem/ItemFactorySubSystem.h"
+
 #include "UI/Prop/InteractionWidget.h"
 #include "Data/PropData.h"
-#include "GameSystem/EventSubSystem.h"
 #include "Interface/Interactable.h"
 #include "GameSystem/TimeOfDaySubSystem.h"
 
@@ -68,14 +70,14 @@ void AWorldProp::BeginPlay()
 
 void AWorldProp::DoAction_Implementation()
 {
-	UE_LOG(LogTemp, Log, TEXT("WorldProp : 인터페이스 받았음"))
-		// 주석 == ToDo
-		// 어느정도 작성되면 타입별로 분리해 함수로 뺄 예정
-		if (Data->PropType == EPropType::Tree)
-		{
-			TreeAction();
-			return;
-		}
+	UE_LOG(LogTemp, Log, TEXT("WorldProp : 인터페이스 받았음"));
+	// 주석 == ToDo
+	// 어느정도 작성되면 타입별로 분리해 함수로 뺄 예정
+	if (Data->PropType == EPropType::Tree)
+	{
+		TreeAction();
+		return;
+	}
 	if (Data->PropType == EPropType::Rock)
 	{
 		RockAction();
@@ -83,19 +85,19 @@ void AWorldProp::DoAction_Implementation()
 	}
 	if (Data->PropType == EPropType::Bed)
 	{
-		// if (잘 수 있는 시간대가 있어야 한다)
-		// Player : 침대에 눕는 애님은 없으니 위젯 애니메이션으로 검어졌다가 시간지나고 뭐 텍스트 띄우고...
-		// Player 피로도를 회복 시켜줘야 한다.
-		// 자고 일어났을 때 Player 배고픔을 깎을 지?
-		// 중복실행을 막아야 함
+		// 잘 수 있는 시간인지
+		IsBedTime();
 
-		if (EventSystem)
+		// 잘 수 있을때만
+		if (bIsBedTime)
 		{
-			EventSystem->Status.OnSetFatigue.Broadcast(FatigueRecoveryAmount);
-			EventSystem->Status.OnSetHunger.Broadcast(HungerReductionAmount);
-			UE_LOG(LogTemp, Log, TEXT("BroadCast 보냄."));
+			BedAction();
 		}
-		GetWorld()->GetSubsystem<UTimeOfDaySubSystem>()->SkipTimeByHours(BedUsageHours);
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("잘 수 있는 시간이 아닙니다."));
+		}
+
 		return;
 	}
 	if (Data->PropType == EPropType::CraftingTable)
@@ -130,9 +132,7 @@ void AWorldProp::OnSelect_Implementation(bool bIsStarted)
 
 void AWorldProp::TreeAction()
 {
-	// Player : 나무 베는 애님
-		// Tree : 나무 베는 애님 노티파이에 맞춰 Durability가 깎여야 하고
-		// 중복실행을 막아야 함
+	// 중복실행을 막아야 함
 	UE_LOG(LogTemp, Log, TEXT("나무와 상호작용"));
 
 	if (EventSystem)
@@ -149,26 +149,23 @@ void AWorldProp::TreeAction()
 	// 나무의 Durability가 0 이하 일 때
 	if (StatComponent->CurrentHealth <= 0)
 	{
-		UWorld* World = GetWorld();
 
-		const FTransform BaseTransform = GetActorTransform();
-
-		FActorSpawnParameters Params;
-		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		Params.Owner = this;
-		Params.Instigator = GetInstigator();
-
-		const float ZGap = 50.f;
-
-		// Timber를 Data->GenerateItemCount만큼 생성한다.
-		for (int32 i = 0; i < Data->GenerateItemCount; ++i)
+		if (UItemFactorySubSystem* Factory = GetGameInstance()
+			? GetGameInstance()->GetSubsystem<UItemFactorySubSystem>()
+			: nullptr)
 		{
-			const FVector SpawnLocation = BaseTransform.GetLocation() + FVector(0.f, 0.f, ZGap * i);
-			const FTransform SpawnTransform(BaseTransform.GetRotation(), SpawnLocation, FVector(1.f));
+			const float ZGap = 50.f;
+			for (int32 i = 0; i < Data->GenerateItemCount; ++i)
+			{
+				const FVector SpawnLocation = GetActorLocation() + FVector(0.f, 0.f, ZGap * i);
 
-			APickupItem* SpawnItem = World->SpawnActor<APickupItem>(GenerateItemClass, SpawnTransform, Params);
+				Factory->Spawn(Data->GenerateItemType, SpawnLocation, i);
+			}
 		}
-
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ItemFactorySubSystem이 없다."));
+		}
 
 		SetActorHiddenInGame(true);
 		SetLifeSpan(0.001f);
@@ -178,9 +175,6 @@ void AWorldProp::TreeAction()
 void AWorldProp::RockAction()
 {
 	// Player : 채굴하는 애님
-	// Rock : 채굴하는 애님 노티파이에 맞춰 Durability가 깎여야 하고
-	// Durability가 0이 되었을 시 Stone를 드랍? 인벤에 추가?
-	// Durability가 0이 되었을 시 Rock 액터가 없어질 지??
 	// 중복실행을 막아야 함
 	UE_LOG(LogTemp, Log, TEXT("바위와 상호작용"));
 
@@ -196,43 +190,64 @@ void AWorldProp::RockAction()
 
 	if (StatComponent->CurrentHealth <= 0)
 	{
-		UWorld* World = GetWorld();
 
-		const FTransform BaseTransform = GetActorTransform();
-
-		FActorSpawnParameters Params;
-		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-		Params.Owner = this;
-		Params.Instigator = GetInstigator();
-
-		// 위치 랜덤 범위
-		const FVector Range(50.f, 50.f, 150.f);
-
-		// Stone을 Data->GenerateItemCount만큼 생성한다.
-		for (int32 i = 0; i < Data->GenerateItemCount; ++i)
+		if (UItemFactorySubSystem* Factory = GetGameInstance()
+			? GetGameInstance()->GetSubsystem<UItemFactorySubSystem>()
+			: nullptr)
 		{
-			// 위치 랜덤 오프셋
-			const FVector RandomOffset(
-				FMath::FRandRange(-Range.X, Range.X),
-				FMath::FRandRange(-Range.Y, Range.Y),
-				FMath::FRandRange(-Range.Z, Range.Z));
+			const FVector Range(50.f, 50.f, 150.f);
+			for (int32 i = 0; i < Data->GenerateItemCount; ++i)
+			{
+				// 위치 랜덤 오프셋
+				const FVector RandomOffset(
+					FMath::FRandRange(-Range.X, Range.X),
+					FMath::FRandRange(-Range.Y, Range.Y),
+					FMath::FRandRange(-Range.Z, Range.Z));
 
-			const FVector SpawnLocation = BaseTransform.GetLocation() + RandomOffset;
+				const FVector SpawnLocation = GetActorLocation() + RandomOffset;
 
-			// 회전 랜덤(Pitch/Yaw/Roll 모두)
-			const FRotator RandomRot(
-				FMath::FRandRange(0.f, 360.f), // Pitch
-				FMath::FRandRange(0.f, 360.f), // Yaw
-				FMath::FRandRange(0.f, 360.f)  // Roll
-			);
+				Factory->Spawn(Data->GenerateItemType, SpawnLocation, i);
+			}
 
-			const FTransform SpawnTransform(FQuat(RandomRot), SpawnLocation, FVector(1.f));
-			APickupItem* SpawnItem = World->SpawnActor<APickupItem>(GenerateItemClass, SpawnTransform, Params);
 		}
-
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ItemFactorySubSystem이 없다."));
+		}
 
 		SetActorHiddenInGame(true);
 		SetLifeSpan(0.001f);
 	}
 
+}
+
+void AWorldProp::BedAction()
+{
+	// Player : 침대에 눕는 애님은 없으니 위젯 애니메이션으로 검어졌다가 시간지나고 뭐 텍스트 띄우고...
+	// 중복실행을 막아야 함
+	if (EventSystem)
+	{
+		EventSystem->Status.OnSetFatigue.Broadcast(FatigueRecoveryAmount);
+		EventSystem->Status.OnSetHunger.Broadcast(HungerReductionAmount);
+		UE_LOG(LogTemp, Log, TEXT("BroadCast 보냄."));
+	}
+	GetWorld()->GetSubsystem<UTimeOfDaySubSystem>()->SkipTimeByHours(BedUsageHours);
+}
+
+void AWorldProp::IsBedTime()
+{
+	// 근데 이게 여기에 있어도 되는 것인가
+
+	float TimeNormalized = GetWorld()->GetSubsystem<UTimeOfDaySubSystem>()->GetTimeNormalized();
+	const int32 TotalMinutes = FMath::FloorToInt(TimeNormalized * 24.0f * 60.0f);
+	const int32 Hour = (TotalMinutes / 60) % 24;
+
+	// 이 시간부터 잘 수 있다. (테스트용 임시값)
+	const int32 BedTimeStart = 6;
+
+	// 이 시간부터 잘 수 없다. (테스트용 임시값)
+	const int32 BedTimeEnd = 7;
+
+	// BedTimeStart와 BedTimeEnd 사이의 시간이여야만 잘 수 있다.
+	bIsBedTime = (Hour >= BedTimeStart) && (Hour < BedTimeEnd);
 }
