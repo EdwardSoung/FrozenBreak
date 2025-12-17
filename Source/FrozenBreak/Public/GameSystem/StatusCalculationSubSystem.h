@@ -37,21 +37,21 @@ public:
 
 	// 체온 값 +,-
 	UFUNCTION(BlueprintCallable)
-	inline void IncreaseTemperature(float InValue) { if (StatusDataAsset) StatusDataAsset->Temperature += InValue; }
+	inline void IncreaseTemperature(float InValue) { if (StatusDataAsset) Temperature += InValue; }
 	UFUNCTION(BlueprintCallable)
-	inline void DecreaseTemperature(float InValue) { if (StatusDataAsset) StatusDataAsset->Temperature -= InValue; }
+	inline void DecreaseTemperature(float InValue) { if (StatusDataAsset)  Temperature -= InValue; }
 
 	// 활동력 값 +,-
 	UFUNCTION(BlueprintCallable)
-	inline void IncreaseFatigue(float InValue) { if (StatusDataAsset) StatusDataAsset->Fatigue += InValue; }
+	inline void IncreaseFatigue(float InValue) { if (StatusDataAsset) Fatigue += InValue; }
 	UFUNCTION(BlueprintCallable)
-	inline void DecreaseFatigue(float InValue) { if (StatusDataAsset) StatusDataAsset->Fatigue -= InValue; }
+	inline void DecreaseFatigue(float InValue) { if (StatusDataAsset) Fatigue -= InValue; }
 
 	// 포만감 값 +,-
 	UFUNCTION(BlueprintCallable)
-	inline void IncreaseHunger(float InValue) { if (StatusDataAsset) StatusDataAsset->Hunger += InValue; }
+	inline void IncreaseHunger(float InValue) { if (StatusDataAsset) Hunger += InValue; }
 	UFUNCTION(BlueprintCallable)
-	inline void DecreaseHunger(float InValue) { if (StatusDataAsset) StatusDataAsset->Hunger -= InValue; }
+	inline void DecreaseHunger(float InValue) { if (StatusDataAsset) Hunger -= InValue;}
 
 	UFUNCTION(BlueprintCallable)
 	void StartStatLoop();
@@ -70,14 +70,22 @@ private:
 	void SetFatigue();
 	void SetHunger();
 
+	void ResetStatValues();
+
 protected:
 	UPROPERTY()
 	class UEventSubSystem* EventSystem = nullptr;
 
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UStatusDataAsset> StatusDataAsset = nullptr;
+	TObjectPtr<UStatusDataAsset> StatusDataAsset = nullptr; // 해당 데이터 애셋은 디폴트 값만 관리
+
 private:
 	FTimerHandle TemperatureTimer;
 	FTimerHandle FatigueTimer;
 	FTimerHandle HungerTimer;
+
+	// 실제 증감 값은 아래 데이터를 사용
+	float Temperature = 0.0f;
+	float Fatigue = 0.0f;
+	float Hunger = 0.0f;
 };

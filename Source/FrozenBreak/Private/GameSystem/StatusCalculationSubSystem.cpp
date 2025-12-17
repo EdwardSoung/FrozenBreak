@@ -17,21 +17,32 @@ void UStatusCalculationSubSystem::Deinitialize()
 
 void UStatusCalculationSubSystem::SetTemperature()
 {
-	if (EventSystem) EventSystem->Status.OnSetTemperature.Broadcast(StatusDataAsset->Temperature);
+	if (EventSystem) EventSystem->Status.OnSetTemperature.Broadcast(Temperature);
 }
 
 void UStatusCalculationSubSystem::SetFatigue()
 {
-	if (EventSystem) EventSystem->Status.OnSetFatigue.Broadcast(StatusDataAsset->Fatigue);
+	if (EventSystem) EventSystem->Status.OnSetFatigue.Broadcast(Fatigue);
 }
 
 void UStatusCalculationSubSystem::SetHunger()
 {
-	if (EventSystem) EventSystem->Status.OnSetHunger.Broadcast(StatusDataAsset->Hunger);
+	if (EventSystem) EventSystem->Status.OnSetHunger.Broadcast(Hunger);
+}
+
+void UStatusCalculationSubSystem::ResetStatValues()
+{
+	if (StatusDataAsset)
+	{
+		Temperature = StatusDataAsset->Temperature;
+		Fatigue = StatusDataAsset->Fatigue;
+		Hunger = StatusDataAsset->Hunger;
+	}
 }
 
 void UStatusCalculationSubSystem::StartStatLoop()
 {
+	ResetStatValues();
 	StartTemperatureLoop();
 	StartFatigueLoop();
 	StartHungerLoop();
