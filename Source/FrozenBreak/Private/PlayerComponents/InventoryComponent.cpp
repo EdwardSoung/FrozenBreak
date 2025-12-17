@@ -35,16 +35,29 @@ void UInventoryComponent::BeginPlay()
 //우선은...중복 허용하지 않음
 void UInventoryComponent::AddItem(EItemType Type, int32 Amount)
 {
+	UInventoryItem* AddedItem = nullptr;
 	if (UInventoryItem* TargetItem = GetItem(Type))
 	{
 		TargetItem->AddAmount(Amount);
+		AddedItem = TargetItem;
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		{
+			EventSystem->Chraracter.OnUpdateInventoryItem.Broadcast(Type);
+		}
 	}
 	else
 	{
 		auto NewItem = NewObject<UInventoryItem>(this);
 		auto NewData = DataList->ItemAssetData.Find(Type)->Get();
 		NewItem->Initialize(NewData);
+		NewItem->AddAmount(Amount);
 		Items.Add(NewItem);
+		AddedItem = NewItem;
+
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		{
+			EventSystem->Chraracter.OnAddItemToInventoryUI.Broadcast(AddedItem);
+		}
 	}
 }
 
