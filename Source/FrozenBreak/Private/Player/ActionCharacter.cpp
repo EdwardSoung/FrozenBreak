@@ -211,6 +211,27 @@ void AActionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 }
 
 
+void AActionCharacter::Landed(const FHitResult& Hit) // 착지
+{
+	Super::Landed(Hit);
+	if (!GetCharacterMovement())
+	{
+		return;
+	}
+
+	const float LandingVelocityZ = GetCharacterMovement()->Velocity.Z;
+
+	if (LandingVelocityZ <= HardLandVelocityZ && HardLandMontage)
+	{
+		//이동 잠금
+		bLandingLocked = true;
+		// 이동 완전 차단
+		GetCharacterMovement()->DisableMovement();
+		// 몽타주 재생
+		PlayAnimMontage(HardLandMontage);
+	}
+}
+
 // ===== Movement =====
 void AActionCharacter::OnMove(const FInputActionValue& Value)
 {
@@ -222,6 +243,11 @@ void AActionCharacter::OnMove(const FInputActionValue& Value)
 
 	AddMovementInput(GetActorForwardVector(), Input.Y);
 	AddMovementInput(GetActorRightVector(), Input.X);
+
+	if (bLandingLocked)
+	{
+		return;
+	}
 }
 
 
@@ -278,9 +304,19 @@ void AActionCharacter::OnSprintStarted()
 	}
 
 	GetCharacterMovement()->MaxWalkSpeed = 650.0f; //달리기 속도
+
+	if (bLandingLocked)
+	{
+		return;
+	}
 }
 
 void AActionCharacter::OnSprintStopped()
 {
 	GetCharacterMovement()->MaxWalkSpeed = 200.0f; //기본속도로 복귀 시킴
+
+	if (bLandingLocked)
+	{
+		return;
+	}
 }

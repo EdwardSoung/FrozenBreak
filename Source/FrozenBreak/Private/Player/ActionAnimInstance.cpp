@@ -40,6 +40,9 @@ void UActionAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	const FVector2D Vel2D(Velocity.X, Velocity.Y);
 	Speed = FVector(Velocity.X, Velocity.Y, 0.0f).Size();
 
+	const float AccelSize2D = MovementComp->GetCurrentAcceleration().Size2D();
+	const bool hasInput = (AccelSize2D > 5.0f);
+
 	bIsFalling = MovementComp->IsFalling(); // 점프 애니메이션 
 
 	bIsCrouching = OwnerCharacter->bIsCrouched;// 앉기 애니메이션
@@ -50,6 +53,11 @@ void UActionAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		RightAmount = 0.0f;
 		bIsStrafing = false;
+
+		ForwardAmount = 0.0f;
+		bIsMovingBackward = false;
+
+		return;
 	}
 	else
 	{
@@ -70,7 +78,7 @@ void UActionAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 			// x가 앞은 + 뒤는 -
 			ForwardAmount = FMath::Clamp(Local2D.X/ Len, -1.0f, 1.0f);
-			bIsMovingBackward = (ForwardAmount <= -0.35f) && (Speed >= 3.0f);
+			bIsMovingBackward = (ForwardAmount <= -0.35f) && (Speed >= 10.0f);
 		}
 		else
 		{
@@ -80,6 +88,18 @@ void UActionAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			ForwardAmount = 0.0f;
 			bIsMovingBackward = false;
 
+		}
+		if (bIsStrafing) // 옆걷기 속도에 따라 애니메이션 변화
+		{
+			// 원하는 값으로 조절 가능
+			const float WalkSpeed = 150.0f;
+			const float RunSpeed = 520.0f;
+
+			StrafeRunAlpha = FMath::Clamp((Speed - WalkSpeed) / (RunSpeed - WalkSpeed), 0.0f, 1.0f);
+		}
+		else
+		{
+			StrafeRunAlpha = 0.0f;
 		}
 
 		

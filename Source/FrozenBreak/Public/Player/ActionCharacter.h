@@ -63,6 +63,19 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> IMC_Player = nullptr;
 
+
+public: //랜딩
+	UPROPERTY(EditAnywhere, Category = "Landing")
+	float HardLandVelocityZ = -900.0f;
+
+	UPROPERTY(VisibleAnywhere, Category = "Landing")
+	bool bLandingLocked = false;
+
+	UPROPERTY(EditAnywhere, Category = "Landing")
+	UAnimMontage* HardLandMontage;
+
+	virtual void Landed(const FHitResult& Hit) override;
+
 protected:
 	// ===== Input Functions =====
 	void OnMove(const FInputActionValue& Value);

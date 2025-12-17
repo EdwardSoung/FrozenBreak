@@ -21,8 +21,8 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	virtual void DoAction_Implementation(/*╣©юш е╦ютю╩ ют╥б╧ч╬ф╣╣ ааю╩ ╟м ╟╟ю╫...*/) override;
-	//©╧╫ц : ╟Ь╟щюнаЖ(╧З╦Я╣Н фВгт), х╧╣ФюнаЖ, юш╬ВюнаЖ..
+	virtual void DoAction_Implementation(/*О©╫О©╫О©╫О©╫ е╦О©╫О©╫О©╫О©╫ О©╫т╥б╧ч╬ф╣О©╫ О©╫О©╫О©╫О©╫ О©╫О©╫ О©╫О©╫О©╫О©╫...*/) override;
+	//О©╫О©╫О©╫О©╫ : О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫(О©╫О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫), х╧О©╫О©╫О©╫О©╫О©╫О©╫, О©╫ш╬О©╫О©╫О©╫О©╫О©╫..
 
 	virtual void OnSelect_Implementation(bool bIsStarted) override;
 

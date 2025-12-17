@@ -22,7 +22,7 @@ protected:
 
 public:
 	void OnDamaged(float InDamage);
-	//TODO : Owner ¼¼ÆÃ. 
+	//TODO : Owner ï¿½ï¿½ï¿½ï¿½. 
 public:	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
 	float Attack = 0;

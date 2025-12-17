@@ -20,13 +20,13 @@ enum class EItemType : uint8
 	None,
 	Wood,
 	Stone,
-	Vine,		//µ¢Äð
-	Axe,		//µµ³¢
-	Pickaxe,	//°î±ªÀÌ
+	Vine,		//ï¿½ï¿½ï¿½ï¿½
+	Axe,		//ï¿½ï¿½ï¿½ï¿½
+	Pickaxe,	//ï¿½î±ªï¿½ï¿½
 	Knife,
 	Meat,
 	Fruit,
-	//..Ãß°¡ ÇÊ¿ä
+	//..ï¿½ß°ï¿½ ï¿½Ê¿ï¿½
 };
 
 UENUM(BlueprintType)
@@ -35,8 +35,8 @@ enum class EPropType : uint8
 	None,
 	Tree,
 	Rock,
-	//..Å»Ãâ±¸ µ¹¹«´õ±â¶û
-	//ÀÛ¾÷´ë È­·Î µîµî..
+	//..Å»ï¿½â±¸ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	//ï¿½Û¾ï¿½ï¿½ï¿½ È­ï¿½ï¿½ ï¿½ï¿½ï¿½..
 };
 
 UENUM(BlueprintType)
