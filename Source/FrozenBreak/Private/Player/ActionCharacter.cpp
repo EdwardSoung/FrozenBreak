@@ -35,6 +35,9 @@ AActionCharacter::AActionCharacter()
 	CameraBoom->TargetArmLength = 350.0f;
 	CameraBoom->bUsePawnControlRotation = true;
 
+	CameraBoom->bDoCollisionTest = false;
+
+
 	// 카메라 이동 부드럽게
 	CameraBoom->bEnableCameraLag = true;
 	CameraBoom->CameraLagSpeed = 12.0f;
@@ -42,6 +45,7 @@ AActionCharacter::AActionCharacter()
 	// ===== Follow Camera =====
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+
 	FollowCamera->bUsePawnControlRotation = false;
 
 	// ===== Rotation Settings (배그식 TPS) =====
