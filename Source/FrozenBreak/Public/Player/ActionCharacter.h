@@ -83,6 +83,22 @@ public: //랜딩
 
 	virtual void Landed(const FHitResult& Hit) override;
 
+protected: // 달리기 조건 설정
+
+	UPROPERTY(VisibleAnywhere, Category = "Movement")
+	bool bWantsSprint = false;
+
+	// 속도 상수 
+	UPROPERTY(EditDefaultsOnly, Category = "Movement")
+	float WalkSpeed = 200.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Movement")
+	float SprintSpeed = 650.0f;
+
+	// 뒤로는 여기까지만 
+	UPROPERTY(EditDefaultsOnly, Category = "Movement")
+	float BackwardMaxSpeed = 200.0f;
+
 protected:
 	// ===== Input Functions =====
 	void OnMove(const FInputActionValue& Value);
