@@ -31,13 +31,6 @@ public:
 
 	void InitStat(float InAttack, float InHealth);
 
-public:
-	// StatusEvents에서 온 델리게이트들
-	UPROPERTY(BlueprintAssignable, Category = "Events")
-	FOnSetFatigue OnSetFatigue;
-	UPROPERTY(BlueprintAssignable, Category = "Events")
-	FOnSetHunger OnSetHunger;
-
 private:
 	const ECollisionChannel InteractableActorChannel = ECollisionChannel::ECC_GameTraceChannel1;
 
@@ -52,6 +45,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Prop|Widget")
 	TObjectPtr<class UWidgetComponent> InteractionWidget = nullptr;
+
+	UPROPERTY()
+	class UEventSubSystem* EventSystem = nullptr;
 
 protected:
 	// 침대 사용시 회복시킬 피로도 (최대치)

@@ -125,7 +125,8 @@ void UInteractionComponent::DoAction_Implementation() // 플레이어가 상호�
 		if (CurrentInteractionActor) // 바라보고 있는 액터에게
 		{
 			// "너가 할 수 있는거 하셈" 알림
-			IInteractable::Execute_DoAction(LastInteractionActor);
+			UE_LOG(LogTemp, Log, TEXT("인컴 : 인터페이스 받고 바라보고 있는 액터에게 인터페이스 보냄"))
+			IInteractable::Execute_DoAction(CurrentInteractionActor);
 
 			// 초기화
 			CurrentInteractionActor = nullptr;

@@ -7,7 +7,8 @@
 #include "Components/WidgetComponent.h"
 #include "UI/Prop/InteractionWidget.h"
 #include "Data/PropData.h"
-#include <GameSystem/EventSubSystem.h>
+#include "GameSystem/EventSubSystem.h"
+#include "Interface/Interactable.h"
 
 // Sets default values
 AWorldProp::AWorldProp()
@@ -30,12 +31,19 @@ AWorldProp::AWorldProp()
 	InteractionWidget->SetRelativeLocation(FVector(0, 0, 0));
 	InteractionWidget->SetWidgetSpace(EWidgetSpace::Screen);
 	InteractionWidget->SetVisibility(false);
+
 }
 
 // Called when the game starts or when spawned
 void AWorldProp::BeginPlay()
 {
 	Super::BeginPlay();
+
+	EventSystem = UEventSubSystem::Get(this);
+	if (!EventSystem)
+	{
+		UE_LOG(LogTemp, Log, TEXT("EventSystem이 설정되어 있지 않다."));
+	}
 
 	if (StatComponent)
 	{
@@ -54,6 +62,7 @@ void AWorldProp::BeginPlay()
 
 void AWorldProp::DoAction_Implementation()
 {
+	UE_LOG(LogTemp, Log, TEXT("WorldProp : 인터페이스 받았음"))
 	// 주석 == ToDo
 	// 어느정도 작성되면 타입별로 분리해 함수로 뺄 예정
 	if (Data->PropType == EPropType::Tree)
@@ -84,16 +93,13 @@ void AWorldProp::DoAction_Implementation()
 		// 자고 일어났을 때 Player 배고픔을 깎을 지?
 		// 중복실행을 막아야 함
 
-		
+		if (EventSystem)
+		{
+			EventSystem->Status.OnSetFatigue.Broadcast(FatigueRecoveryAmount);
+			EventSystem->Status.OnSetHunger.Broadcast(HungerReductionAmount);
+			UE_LOG(LogTemp, Log, TEXT("BroadCast 보냄."));
+		}
 
-		// 피로도 최대치 회복
-		OnSetFatigue.Broadcast(FatigueRecoveryAmount);
-		
-		// 배고픔 일정수치 감소
-		OnSetHunger.Broadcast(HungerReductionAmount);
-
-		UE_LOG(LogTemp, Log, TEXT("침대와 상호작용"));
-		UE_LOG(LogTemp, Log, TEXT("피로도 회복 : %.1f, 배고픔 감소 : %.1f"), FatigueRecoveryAmount, HungerReductionAmount);
 		return;
 	}
 	if (Data->PropType == EPropType::CraftingTable)
