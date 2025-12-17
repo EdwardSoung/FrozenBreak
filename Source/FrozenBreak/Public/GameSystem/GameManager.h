@@ -19,10 +19,15 @@ class FROZENBREAK_API UGameManager : public UGameInstance
 public:
 	static UGameManager* Get(const UObject* WorldContextObject);
 
-	//Data Table / Asset µîÀÇ ÀÚ·á, Blueprint ¿ÀºêÁ§Æ® Á÷Á¢ ¿¬°á ½Ã GameInstance¿¡¼­ »ç¿ëÇÕ´Ï´Ù.
+	//Data Table / Asset ë“±ì˜ ìë£Œ, Blueprint ì˜¤ë¸Œì íŠ¸ ì§ì ‘ ì—°ê²° ì‹œ GameInstanceì—ì„œ ì‚¬ìš©í•©ë‹ˆë‹¤.
 	TSubclassOf<class UUserWidget> GetWidgetClass(EWidgetType InType);
+
+	TSubclassOf<class APickupItem> GetPickupItemClass(EItemType InType);
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<class UDataTable> WidgetData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
+	TObjectPtr<class UDataTable> PickupItemTable;
 };

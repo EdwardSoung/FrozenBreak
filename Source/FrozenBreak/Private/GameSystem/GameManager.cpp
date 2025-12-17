@@ -3,6 +3,7 @@
 
 #include "GameSystem/GameManager.h"
 #include "Data/WidgetDataTable.h"
+#include "Data/ItemObjectTableData.h"
 
 UGameManager* UGameManager::Get(const UObject* WorldContextObject)
 {
@@ -26,6 +27,21 @@ TSubclassOf<UUserWidget> UGameManager::GetWidgetClass(EWidgetType InType)
         if (row->Type == InType)
         {
             return row->WidgetClass;
+        }
+    }
+    return nullptr;
+}
+
+TSubclassOf<APickupItem> UGameManager::GetPickupItemClass(EItemType InType)
+{
+    TArray<FItemObjectTableData*> Rows;
+    PickupItemTable->GetAllRows(TEXT("SpawnInit"), Rows);
+
+    for (FItemObjectTableData* row : Rows)
+    {
+        if (row->Type == InType)
+        {
+            return row->ItemClass;
         }
     }
     return nullptr;
