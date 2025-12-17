@@ -33,7 +33,7 @@ APickupItem::APickupItem()
 	Mesh->SetEnableGravity(true);
 
 	InteractionWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("TextWidget"));
-	InteractionWidget->SetupAttachment(RootComponent);
+	InteractionWidget->SetupAttachment(Mesh);
 	InteractionWidget->SetRelativeLocation(FVector(0, 0, 0));
 	InteractionWidget->SetWidgetSpace(EWidgetSpace::Screen);
 	InteractionWidget->SetVisibility(false);
