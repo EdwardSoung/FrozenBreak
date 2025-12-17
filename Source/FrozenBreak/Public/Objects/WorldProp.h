@@ -38,6 +38,7 @@ private:
 private:
 	void TreeAction();
 	void RockAction();
+	void BedAction();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Stat")
@@ -67,4 +68,6 @@ protected:
 
 	// 침대 사용시 감소시킬 배고픔
 	const float HungerReductionAmount = -30.f;
+
+	bool bIsBedTime = false;
 };

@@ -88,14 +88,29 @@ void AWorldProp::DoAction_Implementation()
 		// Player 피로도를 회복 시켜줘야 한다.
 		// 자고 일어났을 때 Player 배고픔을 깎을 지?
 		// 중복실행을 막아야 함
+		float TimeNormalized = GetWorld()->GetSubsystem<UTimeOfDaySubSystem>()->GetTimeNormalized();
+		const int32 TotalMinutes = FMath::FloorToInt(TimeNormalized * 24.0f * 60.0f);
+		const int32 Hour = (TotalMinutes / 60) % 24;
 
-		if (EventSystem)
+		// 이 시간부터 잘 수 있다. (테스트용 임시값)
+		const int32 BedTimeStart = 6;
+
+		// 이 시간부터 잘 수 없다. (테스트용 임시값)
+		const int32 BedTimeEnd = 7;
+
+		// BedTimeStart와 BedTimeEnd 사이의 시간이여야만 잘 수 있다.
+		bIsBedTime = (Hour >= BedTimeStart) && (Hour < BedTimeEnd);
+
+		// 잘 수 있을때만
+		if (bIsBedTime)
 		{
-			EventSystem->Status.OnSetFatigue.Broadcast(FatigueRecoveryAmount);
-			EventSystem->Status.OnSetHunger.Broadcast(HungerReductionAmount);
-			UE_LOG(LogTemp, Log, TEXT("BroadCast 보냄."));
+			BedAction();
 		}
-		GetWorld()->GetSubsystem<UTimeOfDaySubSystem>()->SkipTimeByHours(BedUsageHours);
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("잘 수 있는 시간이 아닙니다."));
+		}
+
 		return;
 	}
 	if (Data->PropType == EPropType::CraftingTable)
@@ -235,4 +250,15 @@ void AWorldProp::RockAction()
 		SetLifeSpan(0.001f);
 	}
 
+}
+
+void AWorldProp::BedAction()
+{
+	if (EventSystem)
+	{
+		EventSystem->Status.OnSetFatigue.Broadcast(FatigueRecoveryAmount);
+		EventSystem->Status.OnSetHunger.Broadcast(HungerReductionAmount);
+		UE_LOG(LogTemp, Log, TEXT("BroadCast 보냄."));
+	}
+	GetWorld()->GetSubsystem<UTimeOfDaySubSystem>()->SkipTimeByHours(BedUsageHours);
 }
