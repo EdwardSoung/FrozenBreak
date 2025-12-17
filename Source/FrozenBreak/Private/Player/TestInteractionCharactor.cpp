@@ -69,6 +69,7 @@ void ATestInteractionCharactor::OnMoveInput(const FInputActionValue& InValue)
 
 void ATestInteractionCharactor::OnInteractionInput(const FInputActionValue& Invale)
 {
+	UE_LOG(LogTemp, Log, TEXT("Player가 InteractionComponent로 인터페이스 전달"));
 	IInteractable::Execute_DoAction(InteractionComponent);
 }
 

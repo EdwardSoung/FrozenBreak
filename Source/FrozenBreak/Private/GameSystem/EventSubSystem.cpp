@@ -11,7 +11,7 @@ UEventSubSystem* UEventSubSystem::Get(const UObject* WorldContextObject)
         {
             if (UGameInstance* GameInstance = World->GetGameInstance())
             {
-                // GameInstance¿¡¼­ ¼­ºê½Ã½ºÅÛÀ» °¡Á®¿É´Ï´Ù.
+                // GameInstanceï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ã½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½É´Ï´ï¿½.
                 return GameInstance->GetSubsystem<UEventSubSystem>();
             }
         }
