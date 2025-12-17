@@ -35,6 +35,10 @@ private:
 	const ECollisionChannel InteractableActorChannel = ECollisionChannel::ECC_GameTraceChannel1;
 	const float BedUsageHours = 4.0f;
 
+private:
+	void TreeAction();
+	void RockAction();
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Stat")
 	TObjectPtr<class UStatComponent> StatComponent;
