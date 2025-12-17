@@ -132,9 +132,7 @@ void AWorldProp::OnSelect_Implementation(bool bIsStarted)
 
 void AWorldProp::TreeAction()
 {
-	// Player : 나무 베는 애님
-		// Tree : 나무 베는 애님 노티파이에 맞춰 Durability가 깎여야 하고
-		// 중복실행을 막아야 함
+	// 중복실행을 막아야 함
 	UE_LOG(LogTemp, Log, TEXT("나무와 상호작용"));
 
 	if (EventSystem)
@@ -177,9 +175,6 @@ void AWorldProp::TreeAction()
 void AWorldProp::RockAction()
 {
 	// Player : 채굴하는 애님
-	// Rock : 채굴하는 애님 노티파이에 맞춰 Durability가 깎여야 하고
-	// Durability가 0이 되었을 시 Stone를 드랍? 인벤에 추가?
-	// Durability가 0이 되었을 시 Rock 액터가 없어질 지??
 	// 중복실행을 막아야 함
 	UE_LOG(LogTemp, Log, TEXT("바위와 상호작용"));
 
@@ -219,43 +214,6 @@ void AWorldProp::RockAction()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("ItemFactorySubSystem이 없다."));
 		}
-
-
-		// ====== Data->GenerateItemType 생성인데 수정될 예정일듯 ======
-		//UWorld* World = GetWorld();
-		//
-		//const FTransform BaseTransform = GetActorTransform();
-		//
-		//FActorSpawnParameters Params;
-		//Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-		//Params.Owner = this;
-		//Params.Instigator = GetInstigator();
-		//
-		//// 위치 랜덤 범위
-		//const FVector Range(50.f, 50.f, 150.f);
-		//
-		//// Stone을 Data->GenerateItemCount만큼 생성한다.
-		//for (int32 i = 0; i < Data->GenerateItemCount; ++i)
-		//{
-		//	// 위치 랜덤 오프셋
-		//	const FVector RandomOffset(
-		//		FMath::FRandRange(-Range.X, Range.X),
-		//		FMath::FRandRange(-Range.Y, Range.Y),
-		//		FMath::FRandRange(-Range.Z, Range.Z));
-		//
-		//	const FVector SpawnLocation = BaseTransform.GetLocation() + RandomOffset;
-		//
-		//	// 회전 랜덤(Pitch/Yaw/Roll 모두)
-		//	const FRotator RandomRot(
-		//		FMath::FRandRange(0.f, 360.f), // Pitch
-		//		FMath::FRandRange(0.f, 360.f), // Yaw
-		//		FMath::FRandRange(0.f, 360.f)  // Roll
-		//	);
-		//
-		//	const FTransform SpawnTransform(FQuat(RandomRot), SpawnLocation, FVector(1.f));
-		//	APickupItem* SpawnItem = World->SpawnActor<APickupItem>(GenerateItemClass, SpawnTransform, Params);
-		//}
-		// ===========================================================
 
 		SetActorHiddenInGame(true);
 		SetLifeSpan(0.001f);

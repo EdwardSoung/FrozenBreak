@@ -2,12 +2,18 @@
 
 
 #include "Objects/PickupItem.h"
+#include "Kismet/GameplayStatics.h"
+
 #include "Data/ItemData.h"
+
+#include "PlayerComponents/InventoryComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/WidgetComponent.h"
 #include "CommonComponents/StatComponent.h"
+
 #include "UI/Prop/InteractionWidget.h"
-#include <GameSystem/EventSubSystem.h>
+#include "GameSystem/EventSubSystem.h"
+
 
 // Sets default values
 APickupItem::APickupItem()
@@ -44,6 +50,12 @@ void APickupItem::BeginPlay()
 {
 	Super::BeginPlay();
 		
+	EventSystem = UEventSubSystem::Get(this);
+	if (!EventSystem)
+	{
+		UE_LOG(LogTemp, Log, TEXT("EventSystem이 설정되어 있지 않다."));
+	}
+
 	if (StatComponent)
 	{
 		if (Data)
@@ -71,17 +83,9 @@ void APickupItem::BeginPlay()
 
 void APickupItem::DoAction_Implementation() // 아이템을 획득
 {
-	//마우스 키 누르는 등의 액션이 취해짐
 	if (Data)
 	{
-		// ToDo
-		// 인벤토리 컴포넌트에게 ItemData를 넘겨 AddItem 시켜야 한다.
-
-
-		
-		SetActorHiddenInGame(true);
-		// 타이밍 문제로 null 참조가 일어나서 조금 늦게 제거
-		SetLifeSpan(0.001f);
+		EventSystem->Chraracter.OnGetPickupItem.Broadcast(Data->ItemType, 1);
 	}
 	else
 	{

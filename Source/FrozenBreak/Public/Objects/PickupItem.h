@@ -44,4 +44,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item|Widget")
 	TObjectPtr<class UWidgetComponent> InteractionWidget = nullptr;
+
+	UPROPERTY()
+	class UEventSubSystem* EventSystem = nullptr;
 };
