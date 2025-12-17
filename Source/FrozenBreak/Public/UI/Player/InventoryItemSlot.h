@@ -9,7 +9,7 @@
 
 /**
  * 
- */
+ */	
 UCLASS()
 class FROZENBREAK_API UInventoryItemSlot : public UUserWidget, public IUserObjectListEntry
 {
@@ -22,6 +22,8 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> AmountText;
 
+protected:
+	virtual void NativeOnInitialized() override;
 public:
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 	virtual void NativeOnItemSelectionChanged(bool bIsSelected) override;

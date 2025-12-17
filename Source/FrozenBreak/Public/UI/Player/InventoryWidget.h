@@ -17,6 +17,7 @@ class FROZENBREAK_API UInventoryWidget : public UUserWidget
 
 private:
 	TArray<class UInventoryItem*> ItemDataList;
+	float Weight = 0.0f;
 	
 protected:
 	UPROPERTY(meta = (BindWidget))
@@ -33,12 +34,21 @@ protected:
 	TObjectPtr<class UTextBlock> UseButtonText;
 
 protected:
-	virtual void NativeOnInitialized() override;
+	virtual void NativeConstruct() override;
 private:
 	UFUNCTION()
-	void UpdateItemAmount(EItemType InType, int32 InAmount);
+	void UpdateItemByType(EItemType InType);
 	UFUNCTION()
 	void AddItem(class UInventoryItem* InItem);
 	UFUNCTION()
 	void InitData(TArray<class UInventoryItem*> InData);
+	UFUNCTION()
+	void RemoveItem(class UInventoryItem* InItem);
+	UFUNCTION()
+	void TrashItem();
+	UFUNCTION()
+	void CloseWidget();
+
+	void UpdateWeight();
+
 };

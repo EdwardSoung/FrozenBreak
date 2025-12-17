@@ -30,6 +30,8 @@ public:
 private:
 	UPROPERTY()
 	TMap<EWidgetType, UUserWidget*> CreatedWidgets;
+	UPROPERTY()
+	TMap<EWidgetType, UUserWidget*> OpenedWidgets;
 
 	TObjectPtr<class APlayerController> CurrentPlayerController = nullptr;
 };
