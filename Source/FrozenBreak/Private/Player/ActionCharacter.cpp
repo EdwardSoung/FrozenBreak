@@ -21,6 +21,8 @@
 #include "Interface/Interactable.h"
 #include "Player/Components/InteractionComponent.h"
 
+#include "Tools/AxeActor.h"
+
 
 // Sets default values
 AActionCharacter::AActionCharacter()
@@ -75,45 +77,52 @@ void AActionCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// 로컬 플레이어만 입력 처리
-	if (!IsLocallyControlled())
+	//입력 세팅은 로컬만
+	if (IsLocallyControlled())
 	{
-		return;
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		if (PC)
+		{
+			ULocalPlayer* LocalPlayer = PC->GetLocalPlayer();
+			if (LocalPlayer)
+			{
+				UEnhancedInputLocalPlayerSubsystem* Subsystem =
+					LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+
+				if (Subsystem && IMC_Player)
+				{
+					Subsystem->AddMappingContext(IMC_Player, 0);
+				}
+			}
+
+			PC->SetInputMode(FInputModeGameOnly());
+			PC->bShowMouseCursor = false;
+
+			if (PC->PlayerCameraManager)
+			{
+				PC->PlayerCameraManager->ViewPitchMin = -45.0f;
+				PC->PlayerCameraManager->ViewPitchMax = 45.0f;
+			}
+		}
 	}
 
-	APlayerController* PC = Cast<APlayerController>(GetController());
-	if (!PC)
+	// 도끼 스폰/어태치는 여기서 무조건 시도 (
+	if (DefaultToolsClass && GetMesh())
 	{
-		return;
-	}
+		FActorSpawnParameters Params;
+		Params.Owner = this;
+		Params.Instigator = this;
 
-	ULocalPlayer* LocalPlayer = PC->GetLocalPlayer();
-	if (!LocalPlayer)
-	{
-		return;
-	}
+		CurrentTools = GetWorld()->SpawnActor<AAxeActor>(DefaultToolsClass, Params);
 
-	UEnhancedInputLocalPlayerSubsystem* Subsystem =
-		LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
-
-	if (!Subsystem)
-	{
-		return;
-	}
-
-	if (IMC_Player)
-	{
-		Subsystem->AddMappingContext(IMC_Player, 0);
-	}
-
-	PC->SetInputMode(FInputModeGameOnly());
-	PC->bShowMouseCursor = false;
-
-	// 카메라 Pitch 제한
-	if (PC->PlayerCameraManager)
-	{
-		PC->PlayerCameraManager->ViewPitchMin = -45.0f;
-		PC->PlayerCameraManager->ViewPitchMax = 45.0f;
+		if (CurrentTools)
+		{
+			CurrentTools->AttachToComponent(
+				GetMesh(),
+				FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+				TEXT("WeaponSocket")
+			);
+		}
 	}
 }
 
@@ -224,6 +233,14 @@ void AActionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 			this,
 			&AActionCharacter::OnInteration
 		);
+	}
+	if (IA_Harvest)
+	{
+		EnhancedInput->BindAction(
+			IA_Harvest, 
+			ETriggerEvent::Started, 
+			this, 
+			&AActionCharacter::OnHarvestStarted);
 	}
 }
 
@@ -376,4 +393,90 @@ void AActionCharacter::OnSprintStopped()
 void AActionCharacter::OnInteration()
 {
 	IInteractable::Execute_DoAction(InteractionComponent);
+}
+
+void AActionCharacter::OnHarvestStarted()
+{
+
+	UE_LOG(LogTemp, Warning, TEXT("[Harvest] Clicked"));
+
+	if (bIsHarvesting)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Harvest] Already harvesting"));
+		return;
+	}
+
+	if (!HarvestMontage)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Harvest] HarvestMontage is NULL"));
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("[Harvest] Setting harvesting true"));
+	bIsHarvesting = true;
+
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 0.0f;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("[Harvest] Calling PlayAnimMontage"));
+	const float Len = PlayAnimMontage(HarvestMontage);
+	UE_LOG(LogTemp, Warning, TEXT("[Harvest] Montage Len = %f"), Len);
+}
+
+void AActionCharacter::EndHarvest()
+{
+
+	UE_LOG(LogTemp, Warning, TEXT("[Harvest] EndHarvest called"));
+
+	// 잠금 OFF
+	bIsHarvesting = false;
+
+	// 이동 복구
+	if (GetCharacterMovement())
+	{
+		 GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+
+		 GetCharacterMovement()->MaxWalkSpeed = 200.0f;
+	}
+}
+
+void AActionCharacter::OnHarvestHit()
+{
+	if (!bIsHarvesting) return;
+	if (!CurrentTools) return;
+
+	const float Range = 300.0f;
+	const float Radius = 55.0f;
+
+	const FVector Start = CurrentTools->GetActorLocation();
+	const FVector End = Start + (CurrentTools->GetActorForwardVector() * Range);
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	Params.AddIgnoredActor(CurrentTools);
+
+	FHitResult Hit;
+	const bool bHit = GetWorld()->SweepSingleByChannel(
+		Hit,
+		Start,
+		End,
+		FQuat::Identity,
+		ECollisionChannel::ECC_GameTraceChannel1,
+		FCollisionShape::MakeSphere(Radius),
+		Params
+	);
+
+	if (!bHit) return;
+
+	AActor* HitActor = Hit.GetActor();
+	if (!HitActor) return;
+
+	UE_LOG(LogTemp, Warning, TEXT("[AxeHit] Hit Actor : %s"), *HitActor->GetName());
+
+	if (HitActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+	{
+		IInteractable::Execute_DoAction(HitActor);
+	}
 }
