@@ -24,4 +24,12 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Events")
 	FStatusEvents Status;
+
+public:
+	//임시..
+	UFUNCTION(BlueprintCallable)
+	void TestAddItem(EItemType Type, int32 Amount)
+	{
+		Chraracter.OnGetPickupItem.Broadcast(Type, Amount);
+	}
 };

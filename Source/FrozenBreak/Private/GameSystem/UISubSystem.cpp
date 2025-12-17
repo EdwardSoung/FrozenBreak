@@ -5,6 +5,7 @@
 #include "GameSystem/GameManager.h"
 #include "Player/ThirdPersonPlayerController.h"
 #include "Blueprint/UserWidget.h"
+#include "UI/Player/InventoryWidget.h"
 
 UUISubSystem* UUISubSystem::Get(const UObject* WorldContextObject)
 {
@@ -14,7 +15,7 @@ UUISubSystem* UUISubSystem::Get(const UObject* WorldContextObject)
 		{
 			if (UGameInstance* GameInstance = World->GetGameInstance())
 			{
-				// GameInstance¿¡¼­ ¼­ºê½Ã½ºÅÛÀ» °¡Á®¿É´Ï´Ù.
+				// GameInstanceì—ì„œ ì„œë¸Œì‹œìŠ¤í…œì„ ê°€ì ¸ì˜µë‹ˆë‹¤.
 				return GameInstance->GetSubsystem<UUISubSystem>();
 			}
 		}
@@ -29,7 +30,7 @@ UUserWidget* UUISubSystem::ShowWidget(EWidgetType InWidgetType)
 		CurrentPlayerController = GetWorld()->GetFirstPlayerController();
 	}
 
-	//GameMode·Î ¸·À»Áö ¿©ºÎ...
+	//GameModeë¡œ ë§‰ì„ì§€ ì—¬ë¶€...
 
 	UUserWidget* Widget = nullptr;
 
@@ -41,7 +42,14 @@ UUserWidget* UUISubSystem::ShowWidget(EWidgetType InWidgetType)
 		{
 			Widget->AddToViewport();
 		}
-		Widget->SetVisibility(ESlateVisibility::Visible);
+		if (Widget->Implements<UOpenable>())
+		{
+			IOpenable::Execute_OpenWidget(Widget);
+		}
+		else
+		{
+			Widget->SetVisibility(ESlateVisibility::Visible);
+		}
 	}
 	else
 	{
@@ -59,8 +67,21 @@ UUserWidget* UUISubSystem::ShowWidget(EWidgetType InWidgetType)
 		{
 			CreatedWidgets.Add(InWidgetType, Widget);
 			Widget->AddToViewport();
-			return Widget;
 		}
+	}
+
+	if (Widget && InWidgetType != EWidgetType::HUD)
+	{
+		//ê¸°ë³¸ HUDê°€ ì•„ë‹ ë•Œ ì²˜ìŒ ì—´ì–´ì£¼ëŠ”ê±°ë©´ ì¸í’‹ëª¨ë“œ ë³€ê²½
+		if (OpenedWidgets.Num() == 0)
+		{
+			FInputModeUIOnly InputMode;
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			CurrentPlayerController->SetInputMode(InputMode);
+			CurrentPlayerController->bShowMouseCursor = true;
+		}
+		
+		OpenedWidgets.Add(InWidgetType, Widget);
 	}
 
 	return Widget;
@@ -70,6 +91,28 @@ void UUISubSystem::HideWidget(EWidgetType InWidgetType)
 {
 	if (CreatedWidgets.Contains(InWidgetType))
 	{
-		CreatedWidgets[InWidgetType]->SetVisibility(ESlateVisibility::Collapsed);
+		if (CreatedWidgets[InWidgetType]->Implements<UOpenable>())
+		{
+			IOpenable::Execute_CloseWidget(CreatedWidgets[InWidgetType]);
+		}
+		else
+		{
+			CreatedWidgets[InWidgetType]->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
+
+	if (OpenedWidgets.Contains(InWidgetType))
+	{
+		OpenedWidgets.Remove(InWidgetType);
+
+		if (OpenedWidgets.Num() == 0)
+		{
+			FInputModeGameAndUI InputMode;
+			//InputMode.SetWidgetToFocus();
+			CurrentPlayerController->bShowMouseCursor = false;
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			InputMode.SetHideCursorDuringCapture(false);
+			CurrentPlayerController->SetInputMode(InputMode);
+		}
 	}
 }
