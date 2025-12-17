@@ -22,12 +22,9 @@ void UInventoryComponent::BeginPlay()
 
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
-		//음..인벤토리 저장되면?
-		if (Items.Num() > 0)
-		{
-			EventSystem->Chraracter.OnInitInventoryUI.Broadcast(Items);
-		}
 		EventSystem->Chraracter.OnGetPickupItem.AddDynamic(this, &UInventoryComponent::AddItem);
+		EventSystem->Chraracter.OnRequestInventoryInit.AddDynamic(this, &UInventoryComponent::InitInventoryUI);
+		EventSystem->Chraracter.OnTrashItem.AddDynamic(this, &UInventoryComponent::TrashItem);
 	}
 
 }
@@ -61,6 +58,11 @@ void UInventoryComponent::AddItem(EItemType Type, int32 Amount)
 	}
 }
 
+void UInventoryComponent::TrashItem(UInventoryItem* InItem)
+{
+	Items.Remove(InItem);
+}
+
 UInventoryItem* UInventoryComponent::GetItem(EItemType Type)
 {
 	for (auto Item : Items)
@@ -72,4 +74,15 @@ UInventoryItem* UInventoryComponent::GetItem(EItemType Type)
 	}
 
 	return nullptr;
+}
+
+void UInventoryComponent::InitInventoryUI()
+{
+	if (Items.Num() > 0)
+	{
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		{
+			EventSystem->Chraracter.OnInitInventoryUI.Broadcast(Items);
+		}
+	}
 }

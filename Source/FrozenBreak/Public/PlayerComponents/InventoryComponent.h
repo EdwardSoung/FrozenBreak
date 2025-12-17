@@ -21,9 +21,15 @@ public:
 
 	UInventoryItem* GetItem(EItemType Type);
 
+	UFUNCTION()
+	void InitInventoryUI();
+
 protected:
 	UFUNCTION()
 	void AddItem(EItemType Type, int32 Amount);
+	UFUNCTION()
+	void TrashItem(UInventoryItem* InItem);
+
 	// Called when the game starts
 	virtual void BeginPlay() override;
 

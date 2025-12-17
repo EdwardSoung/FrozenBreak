@@ -42,7 +42,14 @@ UUserWidget* UUISubSystem::ShowWidget(EWidgetType InWidgetType)
 		{
 			Widget->AddToViewport();
 		}
-		Widget->SetVisibility(ESlateVisibility::Visible);
+		if (Widget->Implements<UOpenable>())
+		{
+			IOpenable::Execute_OpenWidget(Widget);
+		}
+		else
+		{
+			Widget->SetVisibility(ESlateVisibility::Visible);
+		}
 	}
 	else
 	{
@@ -84,7 +91,14 @@ void UUISubSystem::HideWidget(EWidgetType InWidgetType)
 {
 	if (CreatedWidgets.Contains(InWidgetType))
 	{
-		CreatedWidgets[InWidgetType]->SetVisibility(ESlateVisibility::Collapsed);
+		if (CreatedWidgets[InWidgetType]->Implements<UOpenable>())
+		{
+			IOpenable::Execute_CloseWidget(CreatedWidgets[InWidgetType]);
+		}
+		else
+		{
+			CreatedWidgets[InWidgetType]->SetVisibility(ESlateVisibility::Collapsed);
+		}
 	}
 
 	if (OpenedWidgets.Contains(InWidgetType))

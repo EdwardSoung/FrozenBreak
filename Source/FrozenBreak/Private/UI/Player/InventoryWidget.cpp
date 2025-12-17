@@ -12,17 +12,20 @@
 
 void UInventoryWidget::NativeConstruct()
 {
-	Super::NativeConstruct();
+	Super::NativeConstruct();	
 
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
 		EventSystem->Chraracter.OnInitInventoryUI.AddDynamic(this, &UInventoryWidget::InitData);
 		EventSystem->Chraracter.OnAddItemToInventoryUI.AddDynamic(this, &UInventoryWidget::AddItem);
 		EventSystem->Chraracter.OnUpdateInventoryItem.AddDynamic(this, &UInventoryWidget::UpdateItemByType);
+
+		//최초에 생성되면..초기화 요청
+		EventSystem->Chraracter.OnRequestInventoryInit.Broadcast();
 	}
 
 	TrashButton->OnClicked.AddDynamic(this, &UInventoryWidget::TrashItem);
-	CloseButton->OnClicked.AddDynamic(this, &UInventoryWidget::CloseWidget);
+	CloseButton->OnClicked.AddDynamic(this, &UInventoryWidget::HideWidget);
 }
 
 void UInventoryWidget::UpdateItemByType(EItemType InType)
@@ -73,14 +76,21 @@ void UInventoryWidget::TrashItem()
 
 	if (Selected)
 	{
+		//InventoryList->ClearSelection();
 		InventoryList->RemoveItem(Selected);
 		UInventoryItem* selectedItem = Cast<UInventoryItem>(Selected);
 		ItemDataList.Remove(selectedItem);
+
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		{
+			EventSystem->Chraracter.OnTrashItem.Broadcast(selectedItem);
+		}
 	}
+	UpdateWeight();
 }
 
-void UInventoryWidget::CloseWidget()
-{
+void UInventoryWidget::HideWidget()
+{	
 	if (UUISubSystem* UISystem = UUISubSystem::Get(this))
 	{
 		UISystem->HideWidget(EWidgetType::Inventory);
@@ -96,4 +106,16 @@ void UInventoryWidget::UpdateWeight()
 	}
 	FString weightValue = FString::Printf(TEXT("%.2f"), Weight);
 	WeightText->SetText(FText::FromString(weightValue));
+}
+
+void UInventoryWidget::OpenWidget_Implementation()
+{
+	SetVisibility(ESlateVisibility::Visible);
+
+	InventoryList->ClearSelection();
+}
+
+void UInventoryWidget::CloseWidget_Implementation()
+{
+	SetVisibility(ESlateVisibility::Collapsed);
 }

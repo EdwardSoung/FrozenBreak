@@ -5,13 +5,14 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Data/Enums.h"
+#include "Interface/UI/Openable.h"
 #include "InventoryWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class FROZENBREAK_API UInventoryWidget : public UUserWidget
+class FROZENBREAK_API UInventoryWidget : public UUserWidget, public IOpenable
 {
 	GENERATED_BODY()
 
@@ -47,8 +48,11 @@ private:
 	UFUNCTION()
 	void TrashItem();
 	UFUNCTION()
-	void CloseWidget();
+	void HideWidget();
 
 	void UpdateWeight();
 
+public:
+	void OpenWidget_Implementation();
+	void CloseWidget_Implementation();
 };

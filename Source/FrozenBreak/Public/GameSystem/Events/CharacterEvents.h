@@ -16,6 +16,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGetPickupItem, EItemType, InType
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInitInventoryUI, TArray<UInventoryItem*>, InData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAddItemToInventoryUI, UInventoryItem*, InItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUpdateInventoryItem, EItemType, InType);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRequestInventoryInit);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTrashItem, UInventoryItem*, InItem);
 
 
 USTRUCT(BlueprintType)
@@ -40,4 +42,6 @@ struct FCharacterEvents
 	FOnInitInventoryUI OnInitInventoryUI;
 	FOnAddItemToInventoryUI OnAddItemToInventoryUI;
 	FOnUpdateInventoryItem OnUpdateInventoryItem;
+	FOnRequestInventoryInit OnRequestInventoryInit;
+	FOnTrashItem OnTrashItem;
 };
