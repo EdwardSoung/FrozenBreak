@@ -39,6 +39,7 @@ private:
 	void TreeAction();
 	void RockAction();
 	void BedAction();
+	void IsBedTime();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Stat")

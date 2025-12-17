@@ -68,14 +68,14 @@ void AWorldProp::BeginPlay()
 
 void AWorldProp::DoAction_Implementation()
 {
-	UE_LOG(LogTemp, Log, TEXT("WorldProp : 인터페이스 받았음"))
-		// 주석 == ToDo
-		// 어느정도 작성되면 타입별로 분리해 함수로 뺄 예정
-		if (Data->PropType == EPropType::Tree)
-		{
-			TreeAction();
-			return;
-		}
+	UE_LOG(LogTemp, Log, TEXT("WorldProp : 인터페이스 받았음"));
+	// 주석 == ToDo
+	// 어느정도 작성되면 타입별로 분리해 함수로 뺄 예정
+	if (Data->PropType == EPropType::Tree)
+	{
+		TreeAction();
+		return;
+	}
 	if (Data->PropType == EPropType::Rock)
 	{
 		RockAction();
@@ -83,23 +83,8 @@ void AWorldProp::DoAction_Implementation()
 	}
 	if (Data->PropType == EPropType::Bed)
 	{
-		// if (잘 수 있는 시간대가 있어야 한다)
-		// Player : 침대에 눕는 애님은 없으니 위젯 애니메이션으로 검어졌다가 시간지나고 뭐 텍스트 띄우고...
-		// Player 피로도를 회복 시켜줘야 한다.
-		// 자고 일어났을 때 Player 배고픔을 깎을 지?
-		// 중복실행을 막아야 함
-		float TimeNormalized = GetWorld()->GetSubsystem<UTimeOfDaySubSystem>()->GetTimeNormalized();
-		const int32 TotalMinutes = FMath::FloorToInt(TimeNormalized * 24.0f * 60.0f);
-		const int32 Hour = (TotalMinutes / 60) % 24;
-
-		// 이 시간부터 잘 수 있다. (테스트용 임시값)
-		const int32 BedTimeStart = 6;
-
-		// 이 시간부터 잘 수 없다. (테스트용 임시값)
-		const int32 BedTimeEnd = 7;
-
-		// BedTimeStart와 BedTimeEnd 사이의 시간이여야만 잘 수 있다.
-		bIsBedTime = (Hour >= BedTimeStart) && (Hour < BedTimeEnd);
+		// 잘 수 있는 시간인지
+		IsBedTime();
 
 		// 잘 수 있을때만
 		if (bIsBedTime)
@@ -254,6 +239,8 @@ void AWorldProp::RockAction()
 
 void AWorldProp::BedAction()
 {
+	// Player : 침대에 눕는 애님은 없으니 위젯 애니메이션으로 검어졌다가 시간지나고 뭐 텍스트 띄우고...
+	// 중복실행을 막아야 함
 	if (EventSystem)
 	{
 		EventSystem->Status.OnSetFatigue.Broadcast(FatigueRecoveryAmount);
@@ -261,4 +248,20 @@ void AWorldProp::BedAction()
 		UE_LOG(LogTemp, Log, TEXT("BroadCast 보냄."));
 	}
 	GetWorld()->GetSubsystem<UTimeOfDaySubSystem>()->SkipTimeByHours(BedUsageHours);
+}
+
+void AWorldProp::IsBedTime()
+{
+	float TimeNormalized = GetWorld()->GetSubsystem<UTimeOfDaySubSystem>()->GetTimeNormalized();
+	const int32 TotalMinutes = FMath::FloorToInt(TimeNormalized * 24.0f * 60.0f);
+	const int32 Hour = (TotalMinutes / 60) % 24;
+
+	// 이 시간부터 잘 수 있다. (테스트용 임시값)
+	const int32 BedTimeStart = 6;
+
+	// 이 시간부터 잘 수 없다. (테스트용 임시값)
+	const int32 BedTimeEnd = 7;
+
+	// BedTimeStart와 BedTimeEnd 사이의 시간이여야만 잘 수 있다.
+	bIsBedTime = (Hour >= BedTimeStart) && (Hour < BedTimeEnd);
 }
