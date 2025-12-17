@@ -9,6 +9,7 @@
 #include "Data/PropData.h"
 #include "GameSystem/EventSubSystem.h"
 #include "Interface/Interactable.h"
+#include "GameSystem/TimeOfDaySubSystem.h"
 
 // Sets default values
 AWorldProp::AWorldProp()
@@ -99,7 +100,7 @@ void AWorldProp::DoAction_Implementation()
 			EventSystem->Status.OnSetHunger.Broadcast(HungerReductionAmount);
 			UE_LOG(LogTemp, Log, TEXT("BroadCast 보냄."));
 		}
-
+		GetWorld()->GetSubsystem<UTimeOfDaySubSystem>()->SkipTimeByHours(BedUsageHours);
 		return;
 	}
 	if (Data->PropType == EPropType::CraftingTable)

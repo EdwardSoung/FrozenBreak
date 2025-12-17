@@ -33,6 +33,7 @@ public:
 
 private:
 	const ECollisionChannel InteractableActorChannel = ECollisionChannel::ECC_GameTraceChannel1;
+	const float BedUsageHours = 4.0f;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Stat")
