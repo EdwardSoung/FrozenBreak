@@ -22,9 +22,18 @@ void UInventoryItemSlot::NativeOnListItemObjectSet(UObject* ListItemObject)
 		
 		AmountText->SetText(FText::AsNumber(ItemData->GetAmount()));
 	}	
+
+	if (Selected)
+	{
+		Selected->SetVisibility(ESlateVisibility::Hidden);
+	}
+
 }
 
 void UInventoryItemSlot::NativeOnItemSelectionChanged(bool bIsSelected)
 {
-	Selected->SetVisibility(bIsSelected ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	if (Selected)
+	{
+		Selected->SetVisibility(bIsSelected ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	}
 }
