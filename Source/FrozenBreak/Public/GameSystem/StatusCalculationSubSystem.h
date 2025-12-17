@@ -53,6 +53,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	inline void DecreaseHunger(float InValue) { if (StatusDataAsset) Hunger -= InValue;}
 
+	// 방한값 셋팅 함수
+	UFUNCTION(BlueprintCallable)
+	inline void SetTemperatureDefence(float InValue) { TemerpatureDefence = InValue; }
+
 	UFUNCTION(BlueprintCallable)
 	void StartStatLoop();
 
@@ -88,4 +92,6 @@ private:
 	float Temperature = 0.0f;
 	float Fatigue = 0.0f;
 	float Hunger = 0.0f;
+
+	float TemerpatureDefence = 0.0f; // 방한 값
 };
