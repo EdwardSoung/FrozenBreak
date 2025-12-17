@@ -53,18 +53,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	inline void DecreaseHunger(float InValue) { if (StatusDataAsset) StatusDataAsset->Hunger -= InValue; }
 
-	// 체온 지속 셋팅 타이머 시작
 	UFUNCTION(BlueprintCallable)
+	void StartStatLoop();
+
+private:
+	// 체온 지속 셋팅 타이머 시작
 	void StartTemperatureLoop();
 
 	// 활동력 지속 셋팅 타이머 시작
-	UFUNCTION(BlueprintCallable)
 	void StartFatigueLoop();
 
 	// 포만감 지속 셋팅 타이머 시작
-	UFUNCTION(BlueprintCallable)
 	void StartHungerLoop();
-private:
+
 	void SetTemperature();
 	void SetFatigue();
 	void SetHunger();

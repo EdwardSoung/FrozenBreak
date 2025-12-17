@@ -67,4 +67,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Hunger")
 	float CurrentHunger = 0.0f;
 	// ------------------------------------------------------------------------------|
+
+	// Data Asset 형태의 상태 지속 증감값
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Status")
+	TObjectPtr<class UStatusDataAsset> StatusDataAsset = nullptr;
 };

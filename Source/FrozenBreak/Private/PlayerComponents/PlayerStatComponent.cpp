@@ -2,7 +2,9 @@
 
 
 #include "PlayerComponents/PlayerStatComponent.h"
+#include "Data/StatusDataAsset.h"
 #include <GameSystem/EventSubSystem.h>
+#include <GameSystem/StatusCalculationSubSystem.h>
 
 // Sets default values for this component's properties
 UPlayerStatComponent::UPlayerStatComponent()
@@ -33,6 +35,13 @@ void UPlayerStatComponent::InitStatus()
 
 	//현재 배고픔
 	CurrentHunger = MaxHunger;
+
+	if (StatusDataAsset)
+	{
+		UStatusCalculationSubSystem* StatusCalulater = GetWorld()->GetSubsystem<UStatusCalculationSubSystem>();
+		StatusCalulater->SetStatusDataAsset(StatusDataAsset);
+		StatusCalulater->StartStatLoop();
+	}
 }
 
 void UPlayerStatComponent::BindStatSettingEvents()

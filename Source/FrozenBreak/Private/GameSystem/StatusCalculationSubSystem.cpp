@@ -30,6 +30,13 @@ void UStatusCalculationSubSystem::SetHunger()
 	if (EventSystem) EventSystem->Status.OnSetHunger.Broadcast(StatusDataAsset->Hunger);
 }
 
+void UStatusCalculationSubSystem::StartStatLoop()
+{
+	StartTemperatureLoop();
+	StartFatigueLoop();
+	StartHungerLoop();
+}
+
 void UStatusCalculationSubSystem::StartTemperatureLoop()
 {
 	UWorld* World = GetWorld();
