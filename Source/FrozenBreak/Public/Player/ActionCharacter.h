@@ -61,6 +61,9 @@ protected:
 	TObjectPtr<UInputAction> IA_Sprint = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> IA_AxeAction = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> IMC_Player = nullptr;
 
 
@@ -92,6 +95,15 @@ protected: // 달리기 조건 설정
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
 	float BackwardMaxSpeed = 200.0f;
 
+protected: // 도끼질
+	UPROPERTY(EditAnywhere, Category = "AxeActing")
+	UAnimMontage* HarvestMontage = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = "AxeActing")
+	bool bIsHarvest = false;
+
+
+
 protected:
 	// ===== Input Functions =====
 	void OnMove(const FInputActionValue& Value);
@@ -103,4 +115,9 @@ protected:
 	void OnCrouchToggle();
 	void OnSprintStarted();
 	void OnSprintStopped();
+	void OnAxeActing();
+
+public:
+
+	void EndHarvest();
 };

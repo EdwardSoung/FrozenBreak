@@ -210,6 +210,15 @@ void AActionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 			&AActionCharacter::OnSprintStopped
 		);
 	}
+	if (IA_AxeAction)
+	{
+		EnhancedInput->BindAction(
+			IA_AxeAction,
+			ETriggerEvent::Started,
+			this,
+			&AActionCharacter::OnAxeActing
+		);
+	}
 }
 
 
@@ -357,3 +366,58 @@ void AActionCharacter::OnSprintStopped()
 	
 	bWantsSprint = false;
 }
+
+void AActionCharacter::OnAxeActing()
+{
+
+	UE_LOG(LogTemp, Warning, TEXT("[Harvest] Clicked"));
+
+	if (bIsHarvest)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Harvest] Already harvesting"));
+		return;
+	}
+
+	if (!HarvestMontage)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Harvest] HarvestMontage is NULL"));
+		return;
+	}
+
+	bIsHarvest = true;
+	UE_LOG(LogTemp, Warning, TEXT("[Harvest] Play Montage"));
+
+	PlayAnimMontage(HarvestMontage);
+	if (bLandingLocked)
+	{
+		return;
+	}
+	if (bIsHarvest)
+	{
+		return;
+	}
+	if (!HarvestMontage)
+	{
+		return;
+	}
+
+	bIsHarvest = true;
+
+	PlayAnimMontage(HarvestMontage);
+
+	GetCharacterMovement()->DisableMovement(); // 채집중 이동불가 
+}
+
+void AActionCharacter::EndHarvest()
+{
+
+
+	bIsHarvest = false;
+
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+
+	GetCharacterMovement()->MaxWalkSpeed = 200.0f;
+
+
+}
+
