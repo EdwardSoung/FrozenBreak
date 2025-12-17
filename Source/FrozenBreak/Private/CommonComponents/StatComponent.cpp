@@ -49,3 +49,9 @@ void UStatComponent::OnDamaged(float InDamage)
 		//체력 0 될 때 Owner에게 전달 (GetOwner())
 	}
 }
+
+// ==== 프롭 상호작용 테스트용 입니다 ====
+void UStatComponent::OnPropDamaged(float InDamage)
+{
+	CurrentHealth -= InDamage;
+}

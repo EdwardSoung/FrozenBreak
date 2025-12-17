@@ -47,10 +47,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Prop|Widget")
 	TObjectPtr<class UWidgetComponent> InteractionWidget = nullptr;
 
+	// ==== 테스트 ====
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class APickupItem> GenerateItemClass = nullptr;
+
 	UPROPERTY()
 	class UEventSubSystem* EventSystem = nullptr;
 
 protected:
+	// 작업시 소모시킬 피로도 (최종(확정된) 값이 아님)
+	const float FatigueCostPerWork = -0.5f;
+
 	// 침대 사용시 회복시킬 피로도 (최대치)
 	const float FatigueRecoveryAmount = 100.f;
 

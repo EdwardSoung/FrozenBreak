@@ -16,14 +16,21 @@ APickupItem::APickupItem()
 	PrimaryActorTick.bCanEverTick = false;
 
 	StatComponent = CreateDefaultSubobject<UStatComponent>(TEXT("Stat Component"));
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	SetRootComponent(Mesh);
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	SetRootComponent(Root);
 
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	Mesh->SetupAttachment(Root);
 	// 트레이스가 맞도록 쿼리 활성화
 	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
+	// 플레이어(캐릭터) 채널 무시
+	Mesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	// 인터랙션 트레이스 채널 Block (InteractionComponent와 동일 채널)
 	Mesh->SetCollisionResponseToChannel(InteractableActorChannel, ECR_Block);
+	// 물리 시뮬레이션 활성화
+	Mesh->SetSimulatePhysics(true);
+	Mesh->SetEnableGravity(true);
 
 	InteractionWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("TextWidget"));
 	InteractionWidget->SetupAttachment(RootComponent);

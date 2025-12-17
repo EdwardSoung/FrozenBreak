@@ -3,8 +3,13 @@
 
 #include "Objects/WorldProp.h"
 #include "GameSystem/Events/StatusEvents.h"
+
+#include "Components/SceneComponent.h"
 #include "CommonComponents/StatComponent.h"
 #include "Components/WidgetComponent.h"
+
+#include "Objects/PickupItem.h"
+
 #include "UI/Prop/InteractionWidget.h"
 #include "Data/PropData.h"
 #include "GameSystem/EventSubSystem.h"
@@ -74,6 +79,54 @@ void AWorldProp::DoAction_Implementation()
 		// Durability가 0이 되었을 시 Tree 액터가 없어질 지??
 		// 중복실행을 막아야 함
 		UE_LOG(LogTemp, Log, TEXT("나무와 상호작용"));
+
+		if (EventSystem)
+		{
+			// 플레이어 피로도 감소? 시키기
+			EventSystem->Status.OnSetFatigue.Broadcast(FatigueCostPerWork);
+			// 프롭 Durability에 데미지 주기. 인데
+			// 1. 어처피 Attack 값이 변할 일 없으니 WorldProp에 상수 만드는 방법 (데이터와 같은 값)
+			// 2. 
+
+			// 임시
+			StatComponent->OnPropDamaged(25.f);
+
+			UE_LOG(LogTemp, Log, TEXT("나무를 베었다. 나무 Durability : %.1f"), StatComponent->CurrentHealth);
+		}
+
+		// 나무의 Durability가 0 이하 일 때
+		if (StatComponent->CurrentHealth <= 0)
+		{
+			UWorld* Wolrd = GetWorld();
+
+			const FTransform BaseTransform = GetActorTransform();
+
+			FActorSpawnParameters Params;
+			Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			Params.Owner = this;
+			Params.Instigator = GetInstigator();
+
+			// 스폰 될 때 세워서 나오게 하려 한 흔적
+			//const FRotator SetSpawnItemRotation(0.f, 0.f, 90.f);
+			//const FTransform SpawnTarnsform(FQuat(SetSpawnItemRotation), GetActorTransform().GetLocation());
+			//
+
+			const float ZGap = 45.f;
+
+			// Timer를 Data->GenerateItemCount만큼 생성한다.
+			for (int32 i = 0; i < Data->GenerateItemCount; ++i)
+			{
+				const FVector SpawnLocation = BaseTransform.GetLocation() + FVector(0.f, 0.f, ZGap * i);
+				const FTransform SpawnTransform(BaseTransform.GetRotation(), SpawnLocation, FVector(1.f));
+
+				APickupItem* SpawnItem = Wolrd->SpawnActor<APickupItem>(GenerateItemClass, SpawnTransform, Params);
+			}
+
+
+			SetActorHiddenInGame(true);
+			SetLifeSpan(0.001f);
+		}
+
 		return;
 	}
 	if (Data->PropType == EPropType::Rock)
