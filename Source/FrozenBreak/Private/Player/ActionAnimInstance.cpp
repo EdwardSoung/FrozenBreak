@@ -104,4 +104,45 @@ void UActionAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 		
 	}
+	/*
+	if (OwnerCharacter)
+	{
+		AController* Ctrl = OwnerCharacter->GetController();
+		if (Ctrl)
+		{
+			const FRotator ControlRot = Ctrl->GetControlRotation();
+			const FRotator ActorRot = OwnerCharacter->GetActorRotation();
+
+			// Yaw: 시점 - 캐릭터 (정규화)
+			const float RawYaw = ControlRot.Yaw - ActorRot.Yaw;
+			AimYaw = FRotator::NormalizeAxis(RawYaw);
+
+			// Pitch: 컨트롤러 Pitch를 -90~90로 정규화 
+			float P = ControlRot.Pitch;
+			P = FRotator::NormalizeAxis(P);
+			AimPitch = P;
+		}
+	}
+	*/
 }
+
+void UActionAnimInstance::AnimNotify_HarvestEnd()
+{
+
+	UE_LOG(LogTemp, Warning, TEXT("[AnimNotify] HarvestEnd called"));
+
+	if (!OwnerCharacter)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[AnimNotify] OwnerCharacter is NULL"));
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("[AnimNotify] Calling EndHarvest"));
+	if (!OwnerCharacter)
+	{
+		return;
+	}
+	OwnerCharacter->EndHarvest();
+}
+
+
