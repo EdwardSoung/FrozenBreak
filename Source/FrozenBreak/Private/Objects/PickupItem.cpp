@@ -86,6 +86,9 @@ void APickupItem::DoAction_Implementation() // 아이템을 획득
 	if (Data)
 	{
 		EventSystem->Chraracter.OnGetPickupItem.Broadcast(Data->ItemType, 1);
+
+		SetActorHiddenInGame(true);
+		SetLifeSpan(0.001f);
 	}
 	else
 	{

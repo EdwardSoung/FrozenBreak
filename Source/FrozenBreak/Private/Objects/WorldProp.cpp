@@ -73,51 +73,54 @@ void AWorldProp::DoAction_Implementation()
 	UE_LOG(LogTemp, Log, TEXT("WorldProp : 인터페이스 받았음"));
 	// 주석 == ToDo
 	// 어느정도 작성되면 타입별로 분리해 함수로 뺄 예정
-	if (Data->PropType == EPropType::Tree)
+	if (Data)
 	{
-		TreeAction();
-		return;
-	}
-	if (Data->PropType == EPropType::Rock)
-	{
-		RockAction();
-		return;
-	}
-	if (Data->PropType == EPropType::Bed)
-	{
-		// 잘 수 있는 시간인지
-		IsBedTime();
-
-		// 잘 수 있을때만
-		if (bIsBedTime)
+		if (Data->PropType == EPropType::Tree)
 		{
-			BedAction();
+			TreeAction();
+			return;
 		}
-		else
+		if (Data->PropType == EPropType::Rock)
 		{
-			UE_LOG(LogTemp, Log, TEXT("잘 수 있는 시간이 아닙니다."));
+			RockAction();
+			return;
 		}
+		if (Data->PropType == EPropType::Bed)
+		{
+			// 잘 수 있는 시간인지
+			IsBedTime();
 
-		return;
+			// 잘 수 있을때만
+			if (bIsBedTime)
+			{
+				BedAction();
+			}
+			else
+			{
+				UE_LOG(LogTemp, Log, TEXT("잘 수 있는 시간이 아닙니다."));
+			}
+
+			return;
+		}
+		if (Data->PropType == EPropType::CraftingTable)
+		{
+			// HUD : 제작대 UI를 띄워야 한다.
+			// 중복실행을 막아야 함
+			UE_LOG(LogTemp, Log, TEXT("제작대와 상호작용"));
+			return;
+		}
+		if (Data->PropType == EPropType::Campfire)
+		{
+			// HUD : 요리 UI를 띄워야 한다.
+			// 중복실행을 막아야 함
+			UE_LOG(LogTemp, Log, TEXT("모닥불과 상호작용"));
+			return;
+		}
 	}
-	if (Data->PropType == EPropType::CraftingTable)
+	else
 	{
-		// HUD : 제작대 UI를 띄워야 한다.
-		// 중복실행을 막아야 함
-		UE_LOG(LogTemp, Log, TEXT("제작대와 상호작용"));
-		return;
+		UE_LOG(LogTemp, Warning, TEXT("프롭 데이터가 세팅되어 있지 않습니다."));
 	}
-	if (Data->PropType == EPropType::Campfire)
-	{
-		// HUD : 요리 UI를 띄워야 한다.
-		// 중복실행을 막아야 함
-		UE_LOG(LogTemp, Log, TEXT("모닥불과 상호작용"));
-		return;
-	}
-
-
-	UE_LOG(LogTemp, Warning, TEXT("프롭 데이터가 세팅되어 있지 않습니다."));
-
 }
 
 void AWorldProp::OnSelect_Implementation(bool bIsStarted)
@@ -154,7 +157,7 @@ void AWorldProp::TreeAction()
 			? GetGameInstance()->GetSubsystem<UItemFactorySubSystem>()
 			: nullptr)
 		{
-			const float ZGap = 50.f;
+			const float ZGap = 75.f;
 			for (int32 i = 0; i < Data->GenerateItemCount; ++i)
 			{
 				const FVector SpawnLocation = GetActorLocation() + FVector(0.f, 0.f, ZGap * i);
@@ -242,11 +245,12 @@ void AWorldProp::IsBedTime()
 	const int32 TotalMinutes = FMath::FloorToInt(TimeNormalized * 24.0f * 60.0f);
 	const int32 Hour = (TotalMinutes / 60) % 24;
 
+	// 24시간제 사용
 	// 이 시간부터 잘 수 있다. (테스트용 임시값)
-	const int32 BedTimeStart = 6;
+	const int32 BedTimeStart = 12;
 
 	// 이 시간부터 잘 수 없다. (테스트용 임시값)
-	const int32 BedTimeEnd = 7;
+	const int32 BedTimeEnd = 13;
 
 	// BedTimeStart와 BedTimeEnd 사이의 시간이여야만 잘 수 있다.
 	bIsBedTime = (Hour >= BedTimeStart) && (Hour < BedTimeEnd);
