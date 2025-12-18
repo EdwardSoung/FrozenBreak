@@ -263,10 +263,10 @@ void AActionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 			&AActionCharacter::OnInteration
 		);
 	}
-	if (IA_Harvest)
+	if (IA_ToolAction)
 	{
 		EnhancedInput->BindAction(
-			IA_Harvest, 
+			IA_ToolAction,
 			ETriggerEvent::Started, 
 			this, 
 			&AActionCharacter::OnHarvestStarted);
@@ -541,6 +541,7 @@ void AActionCharacter::OnHarvestHit()
 }
 
 
+
 void AActionCharacter::OnPickaxeStarted() // 곡괭이 전용
 {
 
@@ -672,4 +673,28 @@ void AActionCharacter::EndMining()
 void AActionCharacter::SetHeldItemType(EItemType NewType) // 지금 뭐들고 있는지 
 {
 	CurrentHeldItemType = NewType;
+}
+
+void AActionCharacter::OnToolHit() // 지금 들고있는 무기에 맞춰 행동
+{
+	if (CurrentHeldItemType == EItemType::Axe)
+	{
+		OnHarvestHit();
+	}
+	else if (CurrentHeldItemType == EItemType::Pickaxe)
+	{
+		OnPickaxeHit();
+	}
+}
+
+void AActionCharacter::OnToolEnd()
+{
+	if (CurrentHeldItemType == EItemType::Axe)
+	{
+		EndHarvest();
+	}
+	else if (CurrentHeldItemType == EItemType::Pickaxe)
+	{
+		EndMining();
+	}
 }
