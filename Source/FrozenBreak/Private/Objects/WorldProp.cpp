@@ -243,6 +243,10 @@ void AWorldProp::RockAction()
 				const FVector SpawnLocation = GetActorLocation() + RandomOffset;
 
 				Factory->Spawn(Data->GenerateItemType, SpawnLocation, i);
+				StatComponent->CurrentHealth = StatComponent->MaxHealth;
+				CurrentSpawnCount++;
+				UE_LOG(LogTemp, Log, TEXT("Stone 생성. 생성된 수 : %d, 남은 생성 수 : %d"), 
+					CurrentSpawnCount, (MaxSpawnCount - CurrentSpawnCount));
 			}
 
 		}
@@ -250,10 +254,14 @@ void AWorldProp::RockAction()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("ItemFactorySubSystem이 없다."));
 		}
+	}
 
+	if (CurrentSpawnCount >= MaxSpawnCount)
+	{
 		SetActorHiddenInGame(true);
 		SetLifeSpan(0.001f);
 	}
+
 
 }
 

@@ -31,12 +31,6 @@ public:
 	int32 GenerateItemCount;		//랜덤이면 범위값으로 수정필요
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop")
-	int32 CurrentSpawnCount;		// 나무, 바위가 GenerateItemCount을 생성한 횟수
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop")
-	int32 MaxSpawnCount;			// 나무, 바위가 GenerateItemCount을 생성할 수 있는 최대 수
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop")
 	EInteractKeyType InteractionKey;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop")
