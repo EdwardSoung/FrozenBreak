@@ -269,7 +269,7 @@ void AActionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 			IA_ToolAction,
 			ETriggerEvent::Started, 
 			this, 
-			&AActionCharacter::OnHarvestStarted);
+			&AActionCharacter::OnToolActionStarted);
 	}
 }
 
@@ -427,17 +427,43 @@ void AActionCharacter::OnInteration()
 
 void AActionCharacter::OnHarvestStarted()
 {
+	/*
+	UE_LOG(LogTemp, Warning, TEXT("[HarvestStart] Enter Held=%d bIsHarvesting=%d Falling=%d Tools=%s"),
+		(int32)CurrentHeldItemType,
+		bIsHarvesting,
+		GetCharacterMovement() ? GetCharacterMovement()->IsFalling() : -1,
+		CurrentTools ? *CurrentTools->GetName() : TEXT("None")
+	);
+	*/
+
 	if (GetCharacterMovement()->IsFalling())
+	{
+		
+		//UE_LOG(LogTemp, Warning, TEXT("Blocked: Falling"));
 		return;
+
+	}
 
 	if (bIsHarvesting)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("Blocked: Already Harvesting"));
 		return;
+	}
 
 	if (CurrentHeldItemType != EItemType::Axe)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("Blocked: Not Axe"));
 		return;
+	}
+
+	
 
 	if (!CurrentTools)
-		return;
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("Blocked: No Tools"));
+		 return;
+	}
+
 
 	PendingHarvestTarget = nullptr;
 	PendingHarvestImpactPoint = FVector::ZeroVector;
@@ -476,7 +502,7 @@ void AActionCharacter::OnHarvestStarted()
 	if (!bHit || !Hit.GetActor())
 		return;
 
-	if (HitActor->ActorHasTag("Stone"))
+	if (!HitActor->ActorHasTag("Tree"))
 	{
 		return;
 	}
@@ -529,6 +555,9 @@ void AActionCharacter::OnHarvestHit()
 	AActor* Target = PendingHarvestTarget.Get();
 	if (!Target) return;
 
+	if (!Target->ActorHasTag("Tree"))
+		return;
+
 	if (Target->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
 	{
 		if (AxeHitSound)
@@ -544,9 +573,13 @@ void AActionCharacter::OnHarvestHit()
 
 void AActionCharacter::OnPickaxeStarted() // 곡괭이 전용
 {
-
+	UE_LOG(LogTemp, Warning, TEXT("[Pickaxe] OnPickaxeStarted ENTER"));
+	UE_LOG(LogTemp, Warning, TEXT("[Pickaxe] Enter bIsMining=%d"), bIsMining);
 	if (GetCharacterMovement()->IsFalling())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Pickaxe] return: Falling"));
 		return;
+	}
 
 	if (bIsMining)
 		return;
@@ -616,6 +649,9 @@ void AActionCharacter::OnPickaxeStarted() // 곡괭이 전용
 		GetCharacterMovement()->MaxWalkSpeed = 0.0f; // 채굴시 움직이지 못하게 
 	}
 
+	float Len = PlayAnimMontage(PickaxeMontage);
+	UE_LOG(LogTemp, Warning, TEXT("[Pickaxe] Play Len=%.3f"), Len);
+
 	PlayAnimMontage(PickaxeMontage);
 
 	// 디버그
@@ -624,6 +660,7 @@ void AActionCharacter::OnPickaxeStarted() // 곡괭이 전용
 	DrawDebugSphere(GetWorld(), End, Radius, 12, FColor::Yellow, false, 1.0f);
 
 }
+
 
 void AActionCharacter::OnPickaxeHit()
 {
@@ -675,6 +712,22 @@ void AActionCharacter::SetHeldItemType(EItemType NewType) // 지금 뭐들고 �
 	CurrentHeldItemType = NewType;
 }
 
+
+void AActionCharacter::OnToolActionStarted()
+{
+	if (CurrentHeldItemType == EItemType::Axe)
+	{
+		OnHarvestStarted();
+		return;
+	}
+
+	if (CurrentHeldItemType == EItemType::Pickaxe)
+	{
+		OnPickaxeStarted();
+		return;
+	}
+}
+
 void AActionCharacter::OnToolHit() // 지금 들고있는 무기에 맞춰 행동
 {
 	if (CurrentHeldItemType == EItemType::Axe)
@@ -698,3 +751,5 @@ void AActionCharacter::OnToolEnd()
 		EndMining();
 	}
 }
+
+
