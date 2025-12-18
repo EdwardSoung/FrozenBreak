@@ -111,14 +111,14 @@ void AActionCharacter::BeginPlay()
 		}
 	}
 
-	// 도끼 스폰/어태치는 여기서 무조건 시도 (
+	
 	if (DefaultToolsClass && GetMesh())
 	{
 		FActorSpawnParameters Params;
 		Params.Owner = this;
 		Params.Instigator = this;
 
-		CurrentTools = GetWorld()->SpawnActor<AAxeActor>(DefaultToolsClass, Params);
+		CurrentTools = GetWorld()->SpawnActor<AToolActor>(DefaultToolsClass, Params);
 
 		if (CurrentTools)
 		{
@@ -127,6 +127,16 @@ void AActionCharacter::BeginPlay()
 				FAttachmentTransformRules::SnapToTargetNotIncludingScale,
 				TEXT("WeaponSocket")
 			);
+
+			
+			SetHeldItemType(CurrentTools->ToolType); // 내가 지금 뭘 들고 있는지 
+
+			UE_LOG(LogTemp, Warning, TEXT("[Tool] Equipped: %s Type=%d"),
+				*CurrentTools->GetName(), (int32)CurrentTools->ToolType);
+		}
+		else
+		{
+			SetHeldItemType(EItemType::None);
 		}
 	}
 }
@@ -270,6 +280,7 @@ void AActionCharacter::Landed(const FHitResult& Hit) // 착지
 		PlayAnimMontage(HardLandMontage);
 	}
 }
+
 
 // ===== Movement =====
 void AActionCharacter::OnMove(const FInputActionValue& Value)
@@ -510,4 +521,9 @@ void AActionCharacter::OnHarvestHit()
 		
 		IInteractable::Execute_DoAction(Target);
 	}
+}
+
+void AActionCharacter::SetHeldItemType(EItemType NewType) // 지금 뭐들고 있는지 
+{
+	CurrentHeldItemType = NewType;
 }
