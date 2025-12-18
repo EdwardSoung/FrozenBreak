@@ -160,8 +160,7 @@ protected: // 아이템 관련
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tool")
 	AToolActor* CurrentTools = nullptr;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
-	EItemType CurrentHeldItemType = EItemType::None;
+
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
 	void SetHeldItemType(EItemType NewType);
@@ -191,6 +190,10 @@ protected:
 	//곡괭이질
 	void OnPickaxeStarted();
 
+	//통합버전 
+
+	void OnToolActionStarted();
+
 public:
 	//곡괭이질
 	void EndMining();
@@ -203,5 +206,8 @@ public:
 	void OnToolHit();
 	void OnToolEnd();
 
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+	EItemType CurrentHeldItemType = EItemType::None;
 
 };
