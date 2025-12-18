@@ -445,10 +445,15 @@ void AActionCharacter::OnHarvestStarted()
 		Hit.GetActor() ? *Hit.GetActor()->GetName() : TEXT("None")
 	);
 
+	AActor* HitActor = Hit.GetActor();
 	if (!bHit || !Hit.GetActor())
 		return;
 
-	AActor* HitActor = Hit.GetActor();
+	if (HitActor->ActorHasTag("Stone"))
+	{
+		return;
+	}
+
 	if (!HitActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
 		return;
 
