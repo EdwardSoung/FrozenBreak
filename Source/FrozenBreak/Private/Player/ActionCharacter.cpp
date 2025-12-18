@@ -729,6 +729,22 @@ void AActionCharacter::OnToolActionStarted()
 	}
 }
 
+
+void AActionCharacter::OnToolActionStarted()
+{
+	if (CurrentHeldItemType == EItemType::Axe)
+	{
+		OnHarvestStarted();
+		return;
+	}
+
+	if (CurrentHeldItemType == EItemType::Pickaxe)
+	{
+		OnPickaxeStarted();
+		return;
+	}
+}
+
 void AActionCharacter::OnToolHit() // 지금 들고있는 무기에 맞춰 행동
 {
 	if (CurrentHeldItemType == EItemType::Axe)
