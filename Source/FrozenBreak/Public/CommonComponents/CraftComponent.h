@@ -31,7 +31,7 @@ private:
 
 protected:
 	// 제작에 필요한 총 작업량(체력과 비슷한 개념)
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float MaxCraftCost = 100.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -39,7 +39,7 @@ protected:
 
 	// 제작에 사용되는 작업력(공격력과 비슷한 개념)
 	// 예) 100의 작업량을 가진 아이템을 초당 10의 작업력으로 작업 시 10초가 걸린다.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float CraftAmount = 10.0f;
 
 private:

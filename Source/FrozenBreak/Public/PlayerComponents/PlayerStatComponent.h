@@ -38,7 +38,7 @@ public:
 protected:
 	// ------------------------------------------------------------------------------ �÷��̾� �µ� ��
 	// �÷��̾� �ִ� �µ� ��
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Temperature")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Status|Temperature")
 	float MaxTemperature = 100.0f;
 
 	// �÷��̾� ���� �µ� ��
@@ -49,7 +49,7 @@ protected:
 
 	// ------------------------------------------------------------------------------ �÷��̾� �Ƿε� ��
 	// �÷��̾� �ִ� �µ� ��
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Fatigue")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Status|Fatigue")
 	float MaxFatigue = 100.0f;
 
 	// �÷��̾� ���� �µ� ��
@@ -60,7 +60,7 @@ protected:
 
 	// ------------------------------------------------------------------------------ �÷��̾� ������ ��
 	// �÷��̾� �ִ� �µ� ��
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Hunger")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Status|Hunger")
 	float MaxHunger = 100.0f;
 
 	// �÷��̾� ���� �µ� ��

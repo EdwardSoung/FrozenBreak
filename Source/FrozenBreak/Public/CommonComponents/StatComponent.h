@@ -27,10 +27,10 @@ public:
 	// ==== 프롭 상호작용 테스트용 입니다 ====
 	void OnPropDamaged(float InDamage);
 public:	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	float Attack = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
 	float CurrentHealth = -1;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	float MaxHealth = -1;
 };
