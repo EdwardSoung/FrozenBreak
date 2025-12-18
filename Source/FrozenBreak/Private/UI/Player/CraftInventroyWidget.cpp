@@ -8,19 +8,45 @@
 #include "Components/Button.h"
 #include <UI/Player/CraftableItemSlot.h>
 #include <GameSystem/EventSubSystem.h>
+#include <GameSystem/UISubSystem.h>
 
 void UCraftInventroyWidget::NativeConstruct()
 {
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
-		EventSystem->Chraracter.OnInitCraftInventoryUI.AddDynamic(this, &UCraftInventroyWidget::InitCraftableData);
-		EventSystem->Chraracter.OnAddItemToCraftInventoryUI.AddDynamic(this, &UCraftInventroyWidget::AddCraftItem);
-		EventSystem->Chraracter.OnUpdateCraftItem.AddDynamic(this, &UCraftInventroyWidget::UpdateCraftItemByType);
-		EventSystem->Chraracter.OnRemoveCraftItem.AddDynamic(this, &UCraftInventroyWidget::RemoveCraftItem);
+		EventSystem->Chraracter.OnInitCraftUI.AddDynamic(this, &UCraftInventroyWidget::InitCraftableData);
+		//EventSystem->Chraracter.OnAddItemToCraftInventoryUI.AddDynamic(this, &UCraftInventroyWidget::AddCraftItem);
+		//EventSystem->Chraracter.OnUpdateCraftItem.AddDynamic(this, &UCraftInventroyWidget::UpdateCraftItemByType);
+		//EventSystem->Chraracter.OnRemoveCraftItem.AddDynamic(this, &UCraftInventroyWidget::RemoveCraftItem);
+
+		EventSystem->Chraracter.OnRequestIventoryItems.Broadcast();
+
 	}
+	OnNativeVisibilityChanged.AddUFunction(this, "RequestInventoryData");
+
+	CraftButton->OnClicked.AddDynamic(this, &UCraftInventroyWidget::StartCraft);
+	CloseCraftButton->OnClicked.AddDynamic(this, &UCraftInventroyWidget::CloseCraft);
 
 	//최초에 생성되면..초기화 요청
 	//EventSystem->Chraracter.OnRequestInventoryInit.Broadcast();
+}
+
+void UCraftInventroyWidget::StartCraft()
+{
+	auto Selected = CarftInventoryList->GetSelectedItem();
+
+	if (Selected)
+	{
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		{
+			UInventoryItem* ItemToCraft = Cast<UInventoryItem>(Selected);
+			EventSystem->Chraracter.OnCraftRequested.Broadcast(ItemToCraft);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Nothing Selected"));
+	}
 }
 
 void UCraftInventroyWidget::UpdateCraftItemByType(EItemType InType)
@@ -39,6 +65,17 @@ void UCraftInventroyWidget::UpdateCraftItemByType(EItemType InType)
 	}
 }
 
+void UCraftInventroyWidget::RequestInventoryData()
+{
+	if (this->GetVisibility() == ESlateVisibility::Visible)
+	{
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		{
+			EventSystem->Chraracter.OnRequestIventoryItems.Broadcast();
+		}
+	}
+}
+
 void UCraftInventroyWidget::AddCraftItem(UInventoryItem* InItem)
 {
 	CraftItemDataList.Add(InItem);
@@ -48,10 +85,19 @@ void UCraftInventroyWidget::AddCraftItem(UInventoryItem* InItem)
 void UCraftInventroyWidget::InitCraftableData(TArray<class UInventoryItem*> InData)
 {
 	CraftItemDataList = InData;
-	for (auto data : CraftItemDataList)
+
+	if (CarftInventoryList)
 	{
-		CarftInventoryList->AddItem(data);
+		CarftInventoryList->ClearListItems();
 	}
+
+	for (UInventoryItem* Data : CraftItemDataList)
+	{
+		if (!Data) continue;
+		CarftInventoryList->AddItem(Data);
+	}
+
+	CarftInventoryList->RequestRefresh();
 }
 
 void UCraftInventroyWidget::RemoveCraftItem(UInventoryItem* InItem)
@@ -70,4 +116,12 @@ void UCraftInventroyWidget::RemoveCraftItem(UInventoryItem* InItem)
 	// 4) (선택) 로그
 	UE_LOG(LogTemp, Log, TEXT("[CraftUI] Removed craft item. Type=%d"),
 		(int32)InItem->GetData()->ItemType);
+}
+
+void UCraftInventroyWidget::CloseCraft()
+{
+	if (UUISubSystem* UISystem = UUISubSystem::Get(this))
+	{
+		UISystem->HideWidget(EWidgetType::CraftInventory);
+	}
 }

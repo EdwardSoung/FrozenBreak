@@ -13,13 +13,19 @@ UCLASS()
 class FROZENBREAK_API UCraftInventroyWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
 protected:
 	virtual void NativeConstruct() override;
+
+	UFUNCTION()
+	void StartCraft();
 
 private:
 	UFUNCTION()
 	void UpdateCraftItemByType(EItemType InType);
+
+	UFUNCTION()
+	void RequestInventoryData();
 
 	UFUNCTION()
 	void AddCraftItem(class UInventoryItem* InItem);
@@ -29,6 +35,9 @@ private:
 
 	UFUNCTION()
 	void RemoveCraftItem(UInventoryItem* InItem);
+
+	UFUNCTION()
+	void CloseCraft();
 
 private:
 	TArray<class UInventoryItem*> CraftItemDataList;

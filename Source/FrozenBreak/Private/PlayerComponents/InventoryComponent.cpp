@@ -25,8 +25,18 @@ void UInventoryComponent::BeginPlay()
 		EventSystem->Chraracter.OnGetPickupItem.AddDynamic(this, &UInventoryComponent::AddItem);
 		EventSystem->Chraracter.OnRequestInventoryInit.AddDynamic(this, &UInventoryComponent::InitInventoryUI);
 		EventSystem->Chraracter.OnTrashItem.AddDynamic(this, &UInventoryComponent::TrashItem);
+
+		EventSystem->Chraracter.OnRequestIventoryItems.AddDynamic(this, &UInventoryComponent::SendInventoryItems);
 	}
 
+}
+
+void UInventoryComponent::SendInventoryItems()
+{
+	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+	{
+		EventSystem->Chraracter.OnSendInventoryData.Broadcast(Items);
+	}
 }
 
 //우선은...중복 허용하지 않음

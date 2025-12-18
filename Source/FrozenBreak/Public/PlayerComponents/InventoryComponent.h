@@ -36,6 +36,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<UItemDataList> DataList;
 
+	UFUNCTION()
+	void SendInventoryItems();
+
 private:
 	TArray<UInventoryItem*> Items;
 

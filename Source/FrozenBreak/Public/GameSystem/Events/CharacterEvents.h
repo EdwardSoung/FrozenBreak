@@ -9,7 +9,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTestDeletage);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerDead);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStartCraft, float, InCraftAmount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStartCraft, float, InCraftAmount); // 캐릭터가 실제 작업을 시작하는 델리게이트
 
 //Inventory
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGetPickupItem, EItemType, InType, int32, Amount);
@@ -18,13 +18,17 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAddItemToInventoryUI, UInventoryI
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUpdateInventoryItem, EItemType, InType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRequestInventoryInit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTrashItem, UInventoryItem*, InItem);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSendInventoryData, TArray<UInventoryItem*>, InData);
 
-//CraftInventory
+//Craft
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRequestIventoryItems);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInitCraftUI, TArray<UInventoryItem*>, InData);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInitCraftInventoryUI, TArray<UInventoryItem*>, InData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAddItemToCraftInventoryUI, UInventoryItem*, InItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUpdateCraftItem, EItemType, InType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRemoveCraftItem, UInventoryItem*, InItem);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCraftRequested, UInventoryItem*, InItem); // 제작(요리) 버튼을 누를 시 날리는 델리게이트
 
 USTRUCT(BlueprintType)
 struct FCharacterEvents
@@ -50,9 +54,10 @@ struct FCharacterEvents
 	FOnUpdateInventoryItem OnUpdateInventoryItem;
 	FOnRequestInventoryInit OnRequestInventoryInit;
 	FOnTrashItem OnTrashItem;
+	FOnSendInventoryData OnSendInventoryData;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnInitCraftInventoryUI OnInitCraftInventoryUI;
+	FOnInitCraftUI OnInitCraftUI;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnAddItemToCraftInventoryUI OnAddItemToCraftInventoryUI;
@@ -62,4 +67,10 @@ struct FCharacterEvents
 
 	UPROPERTY(BlueprintAssignable)
 	FOnRemoveCraftItem OnRemoveCraftItem;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnCraftRequested OnCraftRequested;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnRequestIventoryItems OnRequestIventoryItems;
 };
