@@ -20,6 +20,12 @@
 
 #include "Interface/Interactable.h"
 #include "Player/Components/InteractionComponent.h"
+#include "PlayerComponents/CraftInventoryComponent.h"
+#include "PlayerComponents/InventoryComponent.h"
+#include "PlayerComponents/PlayerStatComponent.h"
+#include "CommonComponents/CraftComponent.h"
+#include "CommonComponents/HealthComponent.h"
+#include "CommonComponents/StatComponent.h"
 
 #include "Tools/AxeActor.h"
 #include "Kismet/GameplayStatics.h"
@@ -60,6 +66,14 @@ AActionCharacter::AActionCharacter()
 
 	// Interaction Component
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));
+
+	StatComponent = CreateDefaultSubobject<UStatComponent>(TEXT("Common Stat"));
+	PlayerStatComponent = CreateDefaultSubobject<UPlayerStatComponent>(TEXT("Player Stat"));
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health"));
+	CraftComponent = CreateDefaultSubobject<UCraftComponent>(TEXT("Crafting"));
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
+	CraftInventoryComponent = CreateDefaultSubobject<UCraftInventoryComponent>(TEXT("Craft Inventory"));
+
 
 	// 점프 높이, 공중에서 캐릭터 제어
 	GetCharacterMovement()->JumpZVelocity = 600.0f;

@@ -37,10 +37,10 @@ public:
 
 protected:
 	// ===== Camera =====
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<USpringArmComponent> CameraBoom = nullptr;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<UCameraComponent> FollowCamera = nullptr;
 
 	// ===== Enhanced Input =====
@@ -72,8 +72,23 @@ protected:
 	TObjectPtr<UInputMappingContext> IMC_Player = nullptr;
 
 	// Interaction Component
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player|Component")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Component")
 	TObjectPtr<class UInteractionComponent> InteractionComponent = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Component")
+	TObjectPtr<class UCraftComponent> CraftComponent = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Component")
+	TObjectPtr<class UHealthComponent> HealthComponent = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Component")
+	TObjectPtr<class UStatComponent> StatComponent = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Component")
+	TObjectPtr<class UCraftInventoryComponent> CraftInventoryComponent = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Component")
+	TObjectPtr<class UInventoryComponent> InventoryComponent = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Component")
+	TObjectPtr<class UPlayerStatComponent> PlayerStatComponent = nullptr;
 
 public: //랜딩
 	UPROPERTY(EditAnywhere, Category = "Landing")
