@@ -22,6 +22,7 @@
 #include "Player/Components/InteractionComponent.h"
 
 #include "Tools/AxeActor.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values
@@ -402,40 +403,82 @@ void AActionCharacter::OnInteration()
 void AActionCharacter::OnHarvestStarted()
 {
 
-	UE_LOG(LogTemp, Warning, TEXT("[Harvest] Clicked"));
+	if (GetCharacterMovement()->IsFalling())
+		return;
 
 	if (bIsHarvesting)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[Harvest] Already harvesting"));
 		return;
-	}
 
-	if (!HarvestMontage)
-	{
-		UE_LOG(LogTemp, Error, TEXT("[Harvest] HarvestMontage is NULL"));
+	if (!CurrentTools)
 		return;
-	}
 
-	UE_LOG(LogTemp, Warning, TEXT("[Harvest] Setting harvesting true"));
+	PendingHarvestTarget = nullptr;
+	PendingHarvestImpactPoint = FVector::ZeroVector;
+
+	const float Range = 250.0f;
+	const float Radius = 70.0f;
+	const float Up = 50.0f;
+	const float ForwardOffset = 60.0f;
+
+	const FVector Forward = GetActorForwardVector();
+	const FVector Start = GetActorLocation() + FVector(0, 0, Up) + Forward * ForwardOffset;
+	const FVector End = Start + Forward * Range;
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	Params.AddIgnoredActor(CurrentTools);
+
+	FHitResult Hit;
+	const bool bHit = GetWorld()->SweepSingleByChannel(
+		Hit,
+		Start,
+		End,
+		FQuat::Identity,
+		ECC_GameTraceChannel1,
+		FCollisionShape::MakeSphere(Radius),
+		Params
+	);
+
+
+	UE_LOG(LogTemp, Warning, TEXT("[HarvestStart] bHit=%d HitActor=%s"),
+		bHit,
+		Hit.GetActor() ? *Hit.GetActor()->GetName() : TEXT("None")
+	);
+
+	if (!bHit || !Hit.GetActor())
+		return;
+
+	AActor* HitActor = Hit.GetActor();
+	if (!HitActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+		return;
+
+	//  캐싱
+	PendingHarvestTarget = HitActor;
+	PendingHarvestImpactPoint = Hit.ImpactPoint;
+
+	// 여기서부터 수확 시작
 	bIsHarvesting = true;
 
 	if (GetCharacterMovement())
-	{
 		GetCharacterMovement()->MaxWalkSpeed = 0.0f;
-	}
 
-	UE_LOG(LogTemp, Warning, TEXT("[Harvest] Calling PlayAnimMontage"));
-	const float Len = PlayAnimMontage(HarvestMontage);
-	UE_LOG(LogTemp, Warning, TEXT("[Harvest] Montage Len = %f"), Len);
+	PlayAnimMontage(HarvestMontage);
+
+	//디버그용
+
+	DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1.0f, 0, 2.0f);
+	DrawDebugSphere(GetWorld(), Start, Radius, 12, FColor::Yellow, false, 1.0f);
+	DrawDebugSphere(GetWorld(), End, Radius, 12, FColor::Yellow, false, 1.0f);
+	
 }
 
 void AActionCharacter::EndHarvest()
 {
-
-	UE_LOG(LogTemp, Warning, TEXT("[Harvest] EndHarvest called"));
-
 	// 잠금 OFF
 	bIsHarvesting = false;
+
+	PendingHarvestTarget = nullptr;
+	PendingHarvestImpactPoint = FVector::ZeroVector;
 
 	// 이동 복구
 	if (GetCharacterMovement())
@@ -449,38 +492,17 @@ void AActionCharacter::EndHarvest()
 void AActionCharacter::OnHarvestHit()
 {
 	if (!bIsHarvesting) return;
-	if (!CurrentTools) return;
 
-	const float Range = 300.0f;
-	const float Radius = 55.0f;
+	AActor* Target = PendingHarvestTarget.Get();
+	if (!Target) return;
 
-	const FVector Start = CurrentTools->GetActorLocation();
-	const FVector End = Start + (CurrentTools->GetActorForwardVector() * Range);
-
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-	Params.AddIgnoredActor(CurrentTools);
-
-	FHitResult Hit;
-	const bool bHit = GetWorld()->SweepSingleByChannel(
-		Hit,
-		Start,
-		End,
-		FQuat::Identity,
-		ECollisionChannel::ECC_GameTraceChannel1,
-		FCollisionShape::MakeSphere(Radius),
-		Params
-	);
-
-	if (!bHit) return;
-
-	AActor* HitActor = Hit.GetActor();
-	if (!HitActor) return;
-
-	UE_LOG(LogTemp, Warning, TEXT("[AxeHit] Hit Actor : %s"), *HitActor->GetName());
-
-	if (HitActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+	if (Target->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
 	{
-		IInteractable::Execute_DoAction(HitActor);
+		if (AxeHitSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, AxeHitSound, PendingHarvestImpactPoint);
+		}
+		
+		IInteractable::Execute_DoAction(Target);
 	}
 }
