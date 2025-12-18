@@ -11,5 +11,5 @@ void UAxeHit::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animat
     AActionCharacter* Character = Cast<AActionCharacter>(MeshComp->GetOwner());
     if (!Character) return;
 
-    Character->OnHarvestHit(); // 타격시만 데미지 
+    Character->OnToolHit(); // 타격시만 데미지 
 }

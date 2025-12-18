@@ -66,7 +66,7 @@ protected:
 	TObjectPtr<UInputAction> IA_Interaction = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
-	TObjectPtr<UInputAction> IA_Harvest = nullptr; // 나무 캐기 전용
+	TObjectPtr<UInputAction> IA_ToolAction= nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> IMC_Player = nullptr;
@@ -184,5 +184,9 @@ public:
 	//도끼질
 	void EndHarvest();
 	void OnHarvestHit();
+
+	void OnToolHit();
+	void OnToolEnd();
+
 
 };
