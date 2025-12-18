@@ -413,11 +413,13 @@ void AActionCharacter::OnInteration()
 
 void AActionCharacter::OnHarvestStarted()
 {
-
 	if (GetCharacterMovement()->IsFalling())
 		return;
 
 	if (bIsHarvesting)
+		return;
+
+	if (CurrentHeldItemType != EItemType::Axe)
 		return;
 
 	if (!CurrentTools)
@@ -488,6 +490,7 @@ void AActionCharacter::OnHarvestStarted()
 	
 }
 
+
 void AActionCharacter::EndHarvest()
 {
 	// 잠금 OFF
@@ -522,6 +525,135 @@ void AActionCharacter::OnHarvestHit()
 		IInteractable::Execute_DoAction(Target);
 	}
 }
+
+
+void AActionCharacter::OnPickaxeStarted() // 곡괭이 전용
+{
+
+	if (GetCharacterMovement()->IsFalling())
+		return;
+
+	if (bIsMining)
+		return;
+
+	if (CurrentHeldItemType != EItemType::Pickaxe) //곡괭이 들고 있을때만
+		return;
+
+	if (!CurrentTools)
+		return;
+
+	PendingMiningTarget = nullptr;
+	PendingMiningImpactPoint = FVector::ZeroVector;
+
+	const float Range = 250.0f; // 일단 도끼랑 범위를 같게 세팅할게용
+	const float Radius = 70.0f;
+	const float Up = 50.0f;
+	const float ForwardOffset = 60.0f;
+
+	const FVector Forward = GetActorForwardVector();
+	const FVector Start = GetActorLocation() + FVector(0, 0, Up) + Forward * ForwardOffset;
+	const FVector End = Start + Forward * Range;
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this); // 액션 케릭터 무시
+	Params.AddIgnoredActor(CurrentTools); // 자기 자신(툴, 무기) 무시
+
+	FHitResult Hit;
+	const bool bHit = GetWorld()->SweepSingleByChannel(
+		Hit,
+		Start,
+		End,
+		FQuat::Identity,
+		ECC_GameTraceChannel1,
+		FCollisionShape::MakeSphere(Radius),
+		Params
+	);
+
+	UE_LOG(LogTemp, Warning, TEXT("[MiningStart] bHit=%d HitActor=%s"),
+		bHit,
+		Hit.GetActor() ? *Hit.GetActor()->GetName() : TEXT("None")
+	);
+
+	if (!bHit || !Hit.GetActor())
+	{
+		return;
+	}
+
+	AActor* HitActor = Hit.GetActor();
+
+	if (!HitActor->ActorHasTag("Stone")) // 곡괭이는 돌만 캠
+	{
+		return;
+	}
+
+	if (!HitActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))  // 돌인지 테스트 
+	{
+		return;
+	}
+
+	PendingMiningTarget = HitActor;
+	PendingMiningImpactPoint = Hit.ImpactPoint;
+
+	bIsMining = true;
+
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 0.0f; // 채굴시 움직이지 못하게 
+	}
+
+	PlayAnimMontage(PickaxeMontage);
+
+	// 디버그
+	DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1.0f, 0, 2.0f);
+	DrawDebugSphere(GetWorld(), Start, Radius, 12, FColor::Yellow, false, 1.0f);
+	DrawDebugSphere(GetWorld(), End, Radius, 12, FColor::Yellow, false, 1.0f);
+
+}
+
+void AActionCharacter::OnPickaxeHit()
+{
+
+	if (!bIsMining)
+	{
+		return;
+	}
+	if (CurrentHeldItemType != EItemType::Pickaxe) // 안전장치 나중에  도구 바꿀때 쓸꺼
+	{
+		return;
+	}
+
+	AActor* Target = PendingMiningTarget.Get();
+	if (!Target)
+	{
+		return;
+	}
+
+	if (Target->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+	{
+		if (PickaxeHitSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, PickaxeHitSound, PendingMiningImpactPoint);
+		}
+
+		//테스트용 주석처리 쌉가능
+		IInteractable::Execute_DoAction(Target);
+	}
+}
+
+void AActionCharacter::EndMining()
+{
+	bIsMining = false;
+
+	PendingMiningTarget = nullptr;
+	PendingMiningImpactPoint = FVector::ZeroVector;
+
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		GetCharacterMovement()->MaxWalkSpeed = 200.0f;
+	}
+}
+
 
 void AActionCharacter::SetHeldItemType(EItemType NewType) // 지금 뭐들고 있는지 
 {
