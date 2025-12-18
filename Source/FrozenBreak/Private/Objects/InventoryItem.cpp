@@ -15,3 +15,8 @@ void UInventoryItem::AddAmount(int32 InAmount)
 {
 	Amount += InAmount;
 }
+
+void UInventoryItem::SetAmount(int32 InAmount)
+{
+	Amount = InAmount;
+}

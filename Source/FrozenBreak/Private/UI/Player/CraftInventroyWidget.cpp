@@ -1,0 +1,73 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "UI/Player/CraftInventroyWidget.h"
+#include "Objects/InventoryItem.h"
+#include "Components/TileView.h"
+#include "Components/TextBlock.h"
+#include "Components/Button.h"
+#include <UI/Player/CraftableItemSlot.h>
+#include <GameSystem/EventSubSystem.h>
+
+void UCraftInventroyWidget::NativeConstruct()
+{
+	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+	{
+		EventSystem->Chraracter.OnInitCraftInventoryUI.AddDynamic(this, &UCraftInventroyWidget::InitCraftableData);
+		EventSystem->Chraracter.OnAddItemToCraftInventoryUI.AddDynamic(this, &UCraftInventroyWidget::AddCraftItem);
+		EventSystem->Chraracter.OnUpdateCraftItem.AddDynamic(this, &UCraftInventroyWidget::UpdateCraftItemByType);
+		EventSystem->Chraracter.OnRemoveCraftItem.AddDynamic(this, &UCraftInventroyWidget::RemoveCraftItem);
+	}
+
+	//최초에 생성되면..초기화 요청
+	//EventSystem->Chraracter.OnRequestInventoryInit.Broadcast();
+}
+
+void UCraftInventroyWidget::UpdateCraftItemByType(EItemType InType)
+{
+	for (auto Item : CraftItemDataList)
+	{
+		if (Item->GetData()->ItemType == InType)
+		{
+			auto itemWidget = CarftInventoryList->GetEntryWidgetFromItem(Item);
+			if (UCraftableItemSlot* slot = Cast<UCraftableItemSlot>(itemWidget))
+			{
+				slot->NativeOnListItemObjectSet(Item);
+			}
+			break;
+		}
+	}
+}
+
+void UCraftInventroyWidget::AddCraftItem(UInventoryItem* InItem)
+{
+	CraftItemDataList.Add(InItem);
+	CarftInventoryList->AddItem(InItem);
+}
+
+void UCraftInventroyWidget::InitCraftableData(TArray<class UInventoryItem*> InData)
+{
+	CraftItemDataList = InData;
+	for (auto data : CraftItemDataList)
+	{
+		CarftInventoryList->AddItem(data);
+	}
+}
+
+void UCraftInventroyWidget::RemoveCraftItem(UInventoryItem* InItem)
+{
+	if (!InItem || !CarftInventoryList) return;
+
+	// 1) 내 캐시 배열에서 제거
+	CraftItemDataList.RemoveSingle(InItem);
+
+	// 2) TileView에서 제거
+	CarftInventoryList->RemoveItem(InItem);
+
+	// 3) (선택) 화면 즉시 갱신이 필요하면
+	CarftInventoryList->RequestRefresh();
+
+	// 4) (선택) 로그
+	UE_LOG(LogTemp, Log, TEXT("[CraftUI] Removed craft item. Type=%d"),
+		(int32)InItem->GetData()->ItemType);
+}
