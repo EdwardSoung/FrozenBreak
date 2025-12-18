@@ -7,6 +7,7 @@
 #include "GameSystem/EventSubSystem.h"
 #include "GameSystem/ItemFactorySubSystem.h"
 #include "GameSystem/TimeOfDaySubSystem.h"
+#include "GameSystem/UISubSystem.h"
 
 #include "CommonComponents/StatComponent.h"
 #include "Components/SceneComponent.h"
@@ -107,6 +108,13 @@ void AWorldProp::DoAction_Implementation()
 		{
 			// HUD : 제작대 UI를 띄워야 한다.
 			// 중복실행을 막아야 함
+
+		
+			if (UUISubSystem* UISystem = UUISubSystem::Get(this))
+			{
+				UISystem->ShowWidget(EWidgetType::CraftInventory);
+			}
+
 			UE_LOG(LogTemp, Log, TEXT("제작대와 상호작용"));
 			return;
 		}

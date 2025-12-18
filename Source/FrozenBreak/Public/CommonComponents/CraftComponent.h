@@ -17,7 +17,7 @@ class FROZENBREAK_API UCraftComponent : public UStatComponent
 public:
 	UFUNCTION()
 	virtual void BeginPlay() override;
-	void BindStatSettingEvents();
+	void BindEvents();
 
 	UFUNCTION()
 	void SstCurrentCraftCost(float InCraftAmount);
@@ -38,7 +38,7 @@ protected:
 	float CurrentCraftCost = 0.0f;
 
 	// 제작에 사용되는 작업력(공격력과 비슷한 개념)
-	// 예) 100의 작업량을 가진 아이템을 초당 10의 작업력으로 작업 시 20초가 걸린다.
+	// 예) 100의 작업량을 가진 아이템을 초당 10의 작업력으로 작업 시 10초가 걸린다.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float CraftAmount = 10.0f;
 

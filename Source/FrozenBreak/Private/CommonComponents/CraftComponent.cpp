@@ -9,14 +9,15 @@ void UCraftComponent::BeginPlay()
 	Super::BeginPlay();
 
 	CurrentCraftCost = BaseCraftCost;
-	BindStatSettingEvents();
+	BindEvents();
 }
 
-void UCraftComponent::BindStatSettingEvents()
+void UCraftComponent::BindEvents()
 {
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
 		EventSystem->Chraracter.OnStartCraft.AddDynamic(this, &UCraftComponent::StartCraft);
+		//EventSystem->Chraracter.OnCraftRequested.AddDynamic(this, &UCraftComponent::StartCraft);
 	}
 }
 
