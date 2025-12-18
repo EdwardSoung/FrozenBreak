@@ -17,6 +17,7 @@ class FROZENBREAK_API UCraftableItemSlot : public UUserWidget, public IUserObjec
 
 protected:
 	virtual void NativeOnInitialized() override;
+
 public:
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 	virtual void NativeOnItemSelectionChanged(bool bIsSelected) override;

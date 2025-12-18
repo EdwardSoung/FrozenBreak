@@ -2,6 +2,7 @@
 #include "Objects/InventoryItem.h"
 #include "GameSystem/EventSubSystem.h"
 #include "Data/ItemDataList.h"
+#include <GameSystem/UISubSystem.h>
 
 UCraftInventoryComponent::UCraftInventoryComponent()
 {
@@ -267,12 +268,15 @@ void UCraftInventoryComponent::StartCrafting(UInventoryItem* ItemToCraft)
 		CurrentItemToCraft = ItemToCraft;
 		GetWorld()->GetTimerManager().ClearTimer(CraftHandle);
 
+		if (UUISubSystem* UISystem = UUISubSystem::Get(this))
+		{
+			UISystem->ShowWidget(EWidgetType::CraftProcessBar);
+		}
+
 		GetWorld()->GetTimerManager().SetTimer(
 			CraftHandle,
-			[this]()
-			{
-				SetCraftProcess();
-			},
+			this,
+			&UCraftInventoryComponent::SetCraftProcess,
 			CraftRate,
 			true
 		);
@@ -281,30 +285,115 @@ void UCraftInventoryComponent::StartCrafting(UInventoryItem* ItemToCraft)
 
 void UCraftInventoryComponent::SetCraftProcess()
 {
-	if (CraftAmount > 0 && MAxCraftCost > 0)
+	UEventSubSystem* EventSystem = UEventSubSystem::Get(this);
+	if (!EventSystem) return;
+
+	if (MAxCraftCost <= 0.f) return;
+
+	const float DeltaCost = CraftSpeedPerSecond * CraftRate;
+
+	CurrentCraftCost = FMath::Clamp(
+		CurrentCraftCost + DeltaCost,
+		0.0f,
+		MAxCraftCost
+	);
+
+	// UI 갱신 (0~1)
+	EventSystem->Status.OnCurrentCraftCostChanged.Broadcast(
+		CurrentCraftCost / MAxCraftCost
+	);
+
+	UE_LOG(LogTemp, Verbose, TEXT("Crafting... %.2f / %.2f"),
+		CurrentCraftCost, MAxCraftCost);
+
+	// 완료 체크
+	if (CurrentCraftCost >= MAxCraftCost)
 	{
-		if (CurrentCraftCost < MAxCraftCost)
+		FinishCraft();
+	}
+}
+
+void UCraftInventoryComponent::FinishCraft()
+{
+	UEventSubSystem* EventSystem = UEventSubSystem::Get(this);
+	if (!EventSystem) return;
+
+	UE_LOG(LogTemp, Log, TEXT("제작 완료!"));
+
+	const EItemType ResultType = CurrentItemToCraft->GetData()->ItemType;
+	const FCraftingRecipeRow* Recipe =
+		FindBestRecipeForResult(ResultType, ERecipeCategory::Crafting);
+
+	if (Recipe)
+	{
+		for (const FRecipeIngredient& Req : Recipe->Required)
 		{
-			CurrentCraftCost = FMath::Clamp(CurrentCraftCost + CraftAmount, 0.0f, MAxCraftCost);
-			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
-			{
-				EventSystem->Status.OnCurrentCraftCostChanged.Broadcast(CurrentCraftCost);
-			}
-			UE_LOG(LogTemp, Log, TEXT("Crafting... %.2f"), CurrentCraftCost);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Log, TEXT("제작 완료!"));
-			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
-			{
-				EventSystem->Chraracter.OnGetPickupItem.Broadcast(CurrentItemToCraft->GetData()->ItemType, CraftResultCount);
-			}
-			GetWorld()->GetTimerManager().ClearTimer(CraftHandle);
-			// TODO : Craft 완료 처리(이벤트 날리기 등)
+			EventSystem->Chraracter.OnGetPickupItem.Broadcast(
+				Req.ItemType, -Req.Count
+			);
 		}
 	}
-	else
+
+	EventSystem->Chraracter.OnGetPickupItem.Broadcast(
+		ResultType, CraftResultCount
+	);
+
+	if (UUISubSystem* UISystem = UUISubSystem::Get(this))
 	{
-		// TODO : Craft Amount(작업력) MaxCraftCost(작업량) 0일 경우 크래프트 실패 처리. 그냥 무시도 가능
+		UISystem->HideWidget(EWidgetType::CraftProcessBar);
+	}
+
+	// 초기화
+	CurrentCraftCost = 0.f;
+	CurrentItemToCraft = nullptr;
+	GetWorld()->GetTimerManager().ClearTimer(CraftHandle);
+}
+
+bool UCraftInventoryComponent::CanConsumeRecipeOnce(const FCraftingRecipeRow& R) const
+{
+	for (const FRecipeIngredient& Req : R.Required)
+	{
+		if (GetHave(Req.ItemType) < Req.Count)
+			return false;
+	}
+	return true;
+}
+
+// 현재 인벤에서 제작 가능 횟수가 가장 큰 레시피를 선택
+const FCraftingRecipeRow* UCraftInventoryComponent::FindBestRecipeForResult(EItemType ResultType, ERecipeCategory Category) const
+{
+	const FCraftingRecipeRow* Best = nullptr;
+	int32 BestTimes = -1;
+
+	for (const FCraftingRecipeRow& R : Recipes)
+	{
+		if (R.Category != Category) continue;
+		if (R.ResultItemType != ResultType) continue;
+
+		// 이 레시피 기준 가능 횟수
+		int32 Times = INT32_MAX;
+		for (const FRecipeIngredient& Req : R.Required)
+		{
+			if (Req.Count <= 0) continue;
+			const int32 Have = GetHave(Req.ItemType);
+			Times = FMath::Min(Times, Have / Req.Count);
+		}
+		if (Times == INT32_MAX) Times = 0;
+
+		if (Times > BestTimes)
+		{
+			BestTimes = Times;
+			Best = &R;
+		}
+	}
+	return Best;
+}
+
+void UCraftInventoryComponent::ConsumeRecipeOnce(const FCraftingRecipeRow& R)
+{
+	for (const FRecipeIngredient& Req : R.Required)
+	{
+		int32& Count = ItemCounts.FindOrAdd(Req.ItemType);
+		Count = FMath::Max(0, Count - Req.Count);
 	}
 }

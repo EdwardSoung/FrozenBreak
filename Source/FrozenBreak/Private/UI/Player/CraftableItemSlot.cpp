@@ -5,6 +5,7 @@
 #include "Objects/InventoryItem.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include <GameSystem/EventSubSystem.h>
 
 void UCraftableItemSlot::NativeOnInitialized()
 {
@@ -31,6 +32,7 @@ void UCraftableItemSlot::NativeOnListItemObjectSet(UObject* ListItemObject)
 
 void UCraftableItemSlot::NativeOnItemSelectionChanged(bool bIsSelected)
 {
+	UE_LOG(LogTemp, Log, TEXT("bIsSelected : %d"), bIsSelected);
 	if (CraftSelected)
 	{
 		CraftSelected->SetVisibility(bIsSelected ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
