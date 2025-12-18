@@ -120,7 +120,22 @@ protected: // 도끼질
 	UPROPERTY(EditAnywhere, Category = "Harvest")
 	FVector PendingHarvestImpactPoint = FVector::ZeroVector; // 시작때 맞춘 위치 와 사운드
 
+protected: // 곡괭이질
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mining")
+	bool bIsMining = false;
+
+	UPROPERTY(EditAnywhere, Category = "Mining")
+	TWeakObjectPtr<AActor> PendingMiningTarget;
+
+	UPROPERTY(EditAnywhere, Category = "Mining")
+	FVector PendingMiningImpactPoint = FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere, Category = "Mining")
+	UAnimMontage* PickaxeMontage = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Mining|Sound")
+	USoundBase* PickaxeHitSound = nullptr;
 
 protected: // 아이템 관련
 
@@ -140,18 +155,34 @@ protected: // 아이템 관련
 protected:
 	// ===== Input Functions =====
 	void OnMove(const FInputActionValue& Value);
+
 	void OnLook(const FInputActionValue& Value);
+
 	void OnJumpStarted();
 	void OnJumpStopped();
+
 	void OnCrouchHoldStarted();
 	void OnCrouchHoldCompleted();
 	void OnCrouchToggle();
+
 	void OnSprintStarted();
 	void OnSprintStopped();
+
 	void OnInteration();
+
+	//도끼질
 	void OnHarvestStarted();
 
+	//곡괭이질
+	void OnPickaxeStarted();
+
 public:
+	//곡괭이질
+	void EndMining();
+	void OnPickaxeHit();
+
+	//도끼질
 	void EndHarvest();
 	void OnHarvestHit();
+
 };
