@@ -15,9 +15,9 @@ void UCraftInventroyWidget::NativeConstruct()
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
 		EventSystem->Chraracter.OnInitCraftUI.AddDynamic(this, &UCraftInventroyWidget::InitCraftableData);
-		//EventSystem->Chraracter.OnAddItemToCraftInventoryUI.AddDynamic(this, &UCraftInventroyWidget::AddCraftItem);
-		//EventSystem->Chraracter.OnUpdateCraftItem.AddDynamic(this, &UCraftInventroyWidget::UpdateCraftItemByType);
-		//EventSystem->Chraracter.OnRemoveCraftItem.AddDynamic(this, &UCraftInventroyWidget::RemoveCraftItem);
+		EventSystem->Chraracter.OnAddItemToCraftInventoryUI.AddDynamic(this, &UCraftInventroyWidget::AddCraftItem);
+		EventSystem->Chraracter.OnUpdateCraftItem.AddDynamic(this, &UCraftInventroyWidget::UpdateCraftItemByType);
+		EventSystem->Chraracter.OnRemoveCraftItem.AddDynamic(this, &UCraftInventroyWidget::RemoveCraftItem);
 
 		EventSystem->Chraracter.OnRequestIventoryItems.Broadcast();
 
