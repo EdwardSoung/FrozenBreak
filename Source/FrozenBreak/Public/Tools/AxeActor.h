@@ -4,27 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Data/Enums.h"
+#include "Tools/ToolActor.h"
 #include "AxeActor.generated.h"
 
 UCLASS()
-class FROZENBREAK_API AAxeActor : public AActor
+class FROZENBREAK_API AAxeActor : public AToolActor
 {
-	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	AAxeActor();
+    GENERATED_BODY()
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-protected:
-	UPROPERTY(VisibleAnywhere)
-	USkeletalMeshComponent* ToolsMesh;
-
+public:
+    AAxeActor();
 };

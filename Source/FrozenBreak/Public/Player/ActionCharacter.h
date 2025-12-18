@@ -120,12 +120,22 @@ protected: // 도끼질
 	UPROPERTY(EditAnywhere, Category = "Harvest")
 	FVector PendingHarvestImpactPoint = FVector::ZeroVector; // 시작때 맞춘 위치 와 사운드
 
-public:
-	UPROPERTY(EditDefaultsOnly, Category = "Tools")
-	TSubclassOf<AAxeActor> DefaultToolsClass;
 
-	UPROPERTY()
-	AAxeActor* CurrentTools;
+
+protected: // 아이템 관련
+
+	UPROPERTY(EditDefaultsOnly, Category = "Tool")
+	TSubclassOf<class AToolActor> DefaultToolsClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tool")
+	AToolActor* CurrentTools = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+	EItemType CurrentHeldItemType = EItemType::None;
+
+	UFUNCTION(BlueprintCallable, Category = "Item")
+	void SetHeldItemType(EItemType NewType);
+
 
 protected:
 	// ===== Input Functions =====
