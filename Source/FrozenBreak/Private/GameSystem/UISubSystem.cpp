@@ -107,11 +107,11 @@ void UUISubSystem::HideWidget(EWidgetType InWidgetType)
 
 		if (OpenedWidgets.Num() == 0)
 		{
-			FInputModeGameAndUI InputMode;
+			FInputModeGameOnly InputMode;
 			//InputMode.SetWidgetToFocus();
 			CurrentPlayerController->bShowMouseCursor = false;
-			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-			InputMode.SetHideCursorDuringCapture(false);
+			//InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			//InputMode.SetHideCursorDuringCapture(false);
 			CurrentPlayerController->SetInputMode(InputMode);
 		}
 	}
