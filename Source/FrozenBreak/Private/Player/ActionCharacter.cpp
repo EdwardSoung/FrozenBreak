@@ -673,6 +673,7 @@ void AActionCharacter::EndMining()
 void AActionCharacter::SetHeldItemType(EItemType NewType) // 지금 뭐들고 있는지 
 {
 	CurrentHeldItemType = NewType;
+	InteractionComponent->SetPlayerCurrentTool(CurrentHeldItemType);
 }
 
 void AActionCharacter::OnToolHit() // 지금 들고있는 무기에 맞춰 행동

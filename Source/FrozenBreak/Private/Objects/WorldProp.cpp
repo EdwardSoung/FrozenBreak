@@ -77,30 +77,14 @@ void AWorldProp::DoAction_Implementation()
 	{
 		if (Data->PropType == EPropType::Tree)
 		{
-			// if (플레이어가 도끼를 들고 있을 때만)
-			// {
-				TreeAction();
-				return;
-			// }
-			// else (도끼를 들고 있지 않다)
-			// {
-			//	UE_LOG(LogTemp, Log, TEXT("플레이어가 도끼를 들고 있지 않습니다."));
-			//	맞지 않는 도구라는 위젯 애니메이션 가진 위젯 띄워도 괜찮을 듯
-			// }
-			
+			TreeAction();
+			return;
+
 		}
 		if (Data->PropType == EPropType::Rock)
 		{
-			// if (플레이어가 곡괭이를 들고 있을 때만)
-			// {
-				RockAction();
-				return;
-			// }
-			// else (곡괭이를 들고 있지 않다)
-			// {
-			//	UE_LOG(LogTemp, Log, TEXT("플레이어가 곡괭이를 들고 있지 않습니다."));
-			//  맞지 않는 도구라는 위젯 애니메이션 가진 위젯 띄워도 괜찮을 듯
-			// }
+			RockAction();
+			return;
 		}
 		if (Data->PropType == EPropType::Bed)
 		{
@@ -143,15 +127,15 @@ void AWorldProp::DoAction_Implementation()
 void AWorldProp::OnSelect_Implementation(bool bIsStarted)
 {
 	// 라인 트레이스에 맞은 시점에 위젯 텍스트를 업데이트 한 뒤, 보여준다.
-	
+
 	// 주석 : Todo
 	// if (플레이어의 CurrentWeapon->ItemType == Data->InteractableToolType 이라면)
 	// {
-		if (auto Widget = Cast<UInteractionWidget>(InteractionWidget->GetUserWidgetObject()))
-		{
-			Widget->UpdateInteraction(Data->PropType, Data->InteractionKey);
-			InteractionWidget->SetVisibility(bIsStarted);
-		}
+	if (auto Widget = Cast<UInteractionWidget>(InteractionWidget->GetUserWidgetObject()))
+	{
+		Widget->UpdateInteraction(Data->PropType, Data->InteractionKey);
+		InteractionWidget->SetVisibility(bIsStarted);
+	}
 	// }
 	// else (플레이어의 CurrentWeapon->ItemType != Data->InteractableToolType) 이라면
 	// {
@@ -229,26 +213,13 @@ void AWorldProp::RockAction()
 			? GetGameInstance()->GetSubsystem<UItemFactorySubSystem>()
 			: nullptr)
 		{
-			const FVector Range(50.f, 50.f, 150.f);
+			FVector SpawnLocation = GetActorLocation() + FVector(0, 0, 85);
 
-			// 랜덤한 위치에 Stone이 생성된다. (Z값은 좀 더 많이 넣었음)
-			for (int32 i = 0; i < Data->GenerateItemCount; ++i)
-			{
-				// 위치 랜덤 오프셋
-				const FVector RandomOffset(
-					FMath::FRandRange(-Range.X, Range.X),
-					FMath::FRandRange(-Range.Y, Range.Y),
-					FMath::FRandRange(-Range.Z, Range.Z));
-
-				const FVector SpawnLocation = GetActorLocation() + RandomOffset;
-
-				Factory->Spawn(Data->GenerateItemType, SpawnLocation, i);
-				StatComponent->CurrentHealth = StatComponent->MaxHealth;
-				CurrentSpawnCount++;
-				UE_LOG(LogTemp, Log, TEXT("Stone 생성. 생성된 수 : %d, 남은 생성 수 : %d"), 
-					CurrentSpawnCount, (MaxSpawnCount - CurrentSpawnCount));
-			}
-
+			Factory->Spawn(Data->GenerateItemType, SpawnLocation, Data->GenerateItemCount);
+			StatComponent->CurrentHealth = StatComponent->MaxHealth;
+			CurrentSpawnCount++;
+			UE_LOG(LogTemp, Log, TEXT("Stone 생성. 생성된 수 : %d, 남은 생성 수 : %d"),
+				CurrentSpawnCount, (MaxSpawnCount - CurrentSpawnCount));
 		}
 		else
 		{
@@ -261,8 +232,6 @@ void AWorldProp::RockAction()
 		SetActorHiddenInGame(true);
 		SetLifeSpan(0.001f);
 	}
-
-
 }
 
 void AWorldProp::BedAction()
@@ -295,4 +264,9 @@ void AWorldProp::IsBedTime()
 
 	// BedTimeStart와 BedTimeEnd 사이의 시간이여야만 잘 수 있다.
 	bIsBedTime = (Hour >= BedTimeStart) && (Hour < BedTimeEnd);
+}
+
+inline EItemType AWorldProp::GetInteractableToolType() const
+{
+	return Data->InteractableToolType;
 }

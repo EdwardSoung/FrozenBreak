@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Interface/Interactable.h"
+#include "Data/Enums.h"
 #include "InteractionComponent.generated.h"
 
 
@@ -26,6 +27,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void DoAction_Implementation();
+
+	inline void SetPlayerCurrentTool(EItemType InType) { PlayerCurrentTool = InType; }
 
 private:
 	// 라인 충돌지점에 뭐가 충돌했는지 알려줌
@@ -51,4 +54,8 @@ protected:
 
 	// 한번만 실행되게 만들기 위한 bool
 	bool bIsInteracting = false;
+
+	EItemType PlayerCurrentTool = EItemType::None;
+
+	EItemType HitActorInteractableToolType = EItemType::None;
 };

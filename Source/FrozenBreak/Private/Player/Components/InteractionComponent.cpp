@@ -4,6 +4,8 @@
 #include "Player/Components/InteractionComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Interface/Interactable.h"
+#include "Objects/WorldProp.h"
+#include "Objects/PickupItem.h"
 
 // Sets default values for this component's properties
 UInteractionComponent::UInteractionComponent()
@@ -25,7 +27,7 @@ void UInteractionComponent::BeginPlay()
 	Camera = ComponentOwner->FindComponentByClass<UCameraComponent>();
 	if (ComponentOwner && Camera)
 	{
-		
+
 	}
 	else
 	{
@@ -64,17 +66,45 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	// 뭔가 라인에 맞았다
 	if (bHit)
 	{
-		// 지금 상호작용 하고있지 않다면
-		if (!bIsInteracting)
+		// 지금 상호작용 하고있지 않고, 바라보고 있는 액터가 있다
+		if (!bIsInteracting && CurrentInteractionActor)
 		{
-			// 바라보고 있는 액터가 있다
-			if (CurrentInteractionActor)
+			if (const AWorldProp* Prop = Cast<AWorldProp>(CurrentInteractionActor))
 			{
-				// 바라보고 있는 액터에게 "너 지금 바라봐지고 있어" 라고 알림
+				HitActorInteractableToolType = Prop->GetInteractableToolType();
+
+				// 근데 바라보고 있는 액터의 Data->InteractableToolType 이 None 이거나
+				// Prop이 아닌 Item 이라면
+				if (HitActorInteractableToolType == EItemType::None)
+				{
+					// 바라보고 있는 액터에게 "너 지금 바라봐지고 있어" 라고 알림
+					IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
+					UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
+					UE_LOG(LogTemp, Warning, TEXT("이건 나무나 바위가 아닌데 Prop이긴 함"));
+					bIsInteracting = true;
+				}
+				// 바라보고 있는 액터의 Data->InteractableToolType 이 Player의 CurrentHeldItemType과 같다면
+				else if (PlayerCurrentTool == HitActorInteractableToolType)
+				{
+					
+					IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
+					UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
+					UE_LOG(LogTemp, Warning, TEXT("이건 나무나 바위임"));
+					bIsInteracting = true;
+				}
+				else
+				{
+					UE_LOG(LogTemp, Log, TEXT("플레이어의 도구는 바라보고 있는 액터에 상호작용 불가"));
+				}
+			}
+			else
+			{
 				IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
 				UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
+				UE_LOG(LogTemp, Warning, TEXT("이건 나무나 바위가 아니고, Item임"));
 				bIsInteracting = true;
 			}
+
 		}
 		// 바라보고 있는 액터와 마지막으로 바라본 액터가 다르다면
 		else if (CurrentInteractionActor != LastInteractionActor)
@@ -126,7 +156,7 @@ void UInteractionComponent::DoAction_Implementation() // 플레이어가 상호�
 		{
 			// "너가 할 수 있는거 하셈" 알림
 			UE_LOG(LogTemp, Log, TEXT("인컴 : 인터페이스 받고 바라보고 있는 액터에게 인터페이스 보냄"))
-			IInteractable::Execute_DoAction(CurrentInteractionActor);
+				IInteractable::Execute_DoAction(CurrentInteractionActor);
 
 			// 초기화
 			CurrentInteractionActor = nullptr;

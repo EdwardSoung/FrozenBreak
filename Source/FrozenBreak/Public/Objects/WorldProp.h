@@ -31,6 +31,8 @@ public:
 
 	void InitStat(float InAttack, float InHealth);
 
+	UFUNCTION(BlueprintPure, Category = "Prop|Data")
+	inline EItemType GetInteractableToolType() const;
 private:
 	const ECollisionChannel InteractableActorChannel = ECollisionChannel::ECC_GameTraceChannel1;
 	const float BedUsageHours = 4.0f;
