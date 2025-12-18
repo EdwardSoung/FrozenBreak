@@ -77,13 +77,29 @@ void AWorldProp::DoAction_Implementation()
 	{
 		if (Data->PropType == EPropType::Tree)
 		{
-			TreeAction();
-			return;
+			// if (플레이어가 도끼를 들고 있을 때만)
+			// {
+				TreeAction();
+				return;
+			// }
+			// else (도끼를 들고 있지 않다)
+			// {
+			//		UE_LOG(LogTemp, Log, TEXT("플레이어가 도끼를 들고 있지 않습니다."));
+			// }
+			
 		}
 		if (Data->PropType == EPropType::Rock)
 		{
-			RockAction();
-			return;
+			// if (플레이어가 곡괭이를 들고 있을 때만)
+			// {
+				RockAction();
+				return;
+			// }
+			// else (곡괭이를 들고 있지 않다)
+			// {
+			//		UE_LOG(LogTemp, Log, TEXT("플레이어가 곡괭이를 들고 있지 않습니다."));
+			// }
+			
 		}
 		if (Data->PropType == EPropType::Bed)
 		{
@@ -126,11 +142,20 @@ void AWorldProp::DoAction_Implementation()
 void AWorldProp::OnSelect_Implementation(bool bIsStarted)
 {
 	// 라인 트레이스에 맞은 시점에 위젯 텍스트를 업데이트 한 뒤, 보여준다.
-	if (auto Widget = Cast<UInteractionWidget>(InteractionWidget->GetUserWidgetObject()))
-	{
-		Widget->UpdateInteraction(Data->PropType, Data->InteractionKey);
-		InteractionWidget->SetVisibility(bIsStarted);
-	}
+	// if (플레이어의 CurrentWeapon == Data->InteractableToolType 이라면)
+	// {
+		if (auto Widget = Cast<UInteractionWidget>(InteractionWidget->GetUserWidgetObject()))
+		{
+			Widget->UpdateInteraction(Data->PropType, Data->InteractionKey);
+			InteractionWidget->SetVisibility(bIsStarted);
+		}
+	// }
+	// else (플레이어의 CurrentWeapon != Data->InteractableToolType) 이라면
+	// {
+	//	UE_LOG(LogTemp, Log, TEXT("플레이어가 들고 있는 도구는 이 프롭과 상호작용 불가능"));
+	//  혹은 상호작용이 불가능 하다는 위젯을 띄운다.
+	//  return;
+	// }
 }
 
 void AWorldProp::TreeAction()

@@ -35,6 +35,8 @@ protected:
 	// 상호작용 입력 받기
 	void OnInteractionInput(const FInputActionValue& Invale);
 
+	void OnInventoryInput(const FInputActionValue& Invale);
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player|Camera")
 	TObjectPtr<class USpringArmComponent> SpringArm = nullptr;
@@ -42,6 +44,8 @@ protected:
 	TObjectPtr<class UCameraComponent> PlayerCamera = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player|Component")
 	TObjectPtr<class UInteractionComponent> InteractionComponent = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player|Component")
+	TObjectPtr<class UInventoryComponent> InventoryComponent = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<class UInputAction> IA_Move = nullptr;
@@ -49,6 +53,9 @@ protected:
 	TObjectPtr<class UInputAction> IA_Camera = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<class UInputAction> IA_Interaction = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<class UInputAction> IA_Inventory = nullptr;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player|Movement")
 	float WalkSpeed = 600.0f;
