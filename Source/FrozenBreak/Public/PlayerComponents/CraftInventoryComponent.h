@@ -12,12 +12,6 @@ class UDataTable;
 class UInventoryItem;
 class UItemDataList;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
-	FOnCraftablesChanged,
-	const TArray<EItemType>&, CraftablesCrafting,
-	const TArray<EItemType>&, CraftablesCooking
-);
-
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class FROZENBREAK_API UCraftInventoryComponent : public UActorComponent
 {
@@ -36,10 +30,6 @@ protected:
 	}
 
 public:
-	// UI 구독용 (목록 변화 알림)
-	UPROPERTY(BlueprintAssignable)
-	FOnCraftablesChanged OnCraftablesChanged;
-
 	// ===== Data =====
 	UPROPERTY(EditDefaultsOnly, Category = "Craft|Data")
 	TObjectPtr<UDataTable> RecipeTable = nullptr;
@@ -75,6 +65,11 @@ private:
 	void StartCrafting(UInventoryItem* ItemToCraft);
 
 	void SetCraftProcess();
+	void FinishCraft();
+
+	const FCraftingRecipeRow* FindBestRecipeForResult(EItemType ResultType, ERecipeCategory Category) const;
+	bool CanConsumeRecipeOnce(const FCraftingRecipeRow& R) const;
+	void ConsumeRecipeOnce(const FCraftingRecipeRow& R);
 
 private:
 	// ===== 레시피 =====
@@ -117,7 +112,8 @@ private:
 
 	// 제작 타이머 관련 변수
 	FTimerHandle CraftHandle;
-	float CraftRate = 1.0f;
+	float CraftRate = 0.1f;
+	float CraftSpeedPerSecond = 10.0f;
 
 	// 작업량 : 기본 0(0일 시 작업 실패)
 	float MAxCraftCost = 0.0f;

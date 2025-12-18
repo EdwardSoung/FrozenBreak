@@ -10,6 +10,7 @@ enum class EWidgetType : uint8
 	HUD,
 	Inventory,
 	CraftInventory,
+	CraftProcessBar,
 	CharacterState,
 	QuitMenu,
 };
