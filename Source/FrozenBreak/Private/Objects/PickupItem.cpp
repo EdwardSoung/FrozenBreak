@@ -64,7 +64,6 @@ void APickupItem::BeginPlay()
 			float Attack = 0.f;
 			if (const float* AttackStats = Data->Stats.Find(EItemStatType::Attack))
 			{
-				// 이 아이템에게 Attack Stats이 설정되어 있다 (에디터에서 설정된)
 				Attack = *AttackStats;
 			}
 			else

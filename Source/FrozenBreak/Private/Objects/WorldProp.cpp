@@ -2,21 +2,21 @@
 
 
 #include "Objects/WorldProp.h"
-#include "GameSystem/Events/StatusEvents.h"
 
-#include "Components/SceneComponent.h"
+#include "GameSystem/Events/StatusEvents.h"
+#include "GameSystem/EventSubSystem.h"
+#include "GameSystem/ItemFactorySubSystem.h"
+#include "GameSystem/TimeOfDaySubSystem.h"
+
 #include "CommonComponents/StatComponent.h"
+#include "Components/SceneComponent.h"
 #include "Components/WidgetComponent.h"
 
 #include "Objects/PickupItem.h"
 
-#include "GameSystem/EventSubSystem.h"
-#include "GameSystem/ItemFactorySubSystem.h"
-
 #include "UI/Prop/InteractionWidget.h"
 #include "Data/PropData.h"
 #include "Interface/Interactable.h"
-#include "GameSystem/TimeOfDaySubSystem.h"
 
 // Sets default values
 AWorldProp::AWorldProp()
@@ -84,7 +84,8 @@ void AWorldProp::DoAction_Implementation()
 			// }
 			// else (도끼를 들고 있지 않다)
 			// {
-			//		UE_LOG(LogTemp, Log, TEXT("플레이어가 도끼를 들고 있지 않습니다."));
+			//	UE_LOG(LogTemp, Log, TEXT("플레이어가 도끼를 들고 있지 않습니다."));
+			//	맞지 않는 도구라는 위젯 애니메이션 가진 위젯 띄워도 괜찮을 듯
 			// }
 			
 		}
@@ -97,9 +98,9 @@ void AWorldProp::DoAction_Implementation()
 			// }
 			// else (곡괭이를 들고 있지 않다)
 			// {
-			//		UE_LOG(LogTemp, Log, TEXT("플레이어가 곡괭이를 들고 있지 않습니다."));
+			//	UE_LOG(LogTemp, Log, TEXT("플레이어가 곡괭이를 들고 있지 않습니다."));
+			//  맞지 않는 도구라는 위젯 애니메이션 가진 위젯 띄워도 괜찮을 듯
 			// }
-			
 		}
 		if (Data->PropType == EPropType::Bed)
 		{
@@ -142,7 +143,9 @@ void AWorldProp::DoAction_Implementation()
 void AWorldProp::OnSelect_Implementation(bool bIsStarted)
 {
 	// 라인 트레이스에 맞은 시점에 위젯 텍스트를 업데이트 한 뒤, 보여준다.
-	// if (플레이어의 CurrentWeapon == Data->InteractableToolType 이라면)
+	
+	// 주석 : Todo
+	// if (플레이어의 CurrentWeapon->ItemType == Data->InteractableToolType 이라면)
 	// {
 		if (auto Widget = Cast<UInteractionWidget>(InteractionWidget->GetUserWidgetObject()))
 		{
@@ -150,7 +153,7 @@ void AWorldProp::OnSelect_Implementation(bool bIsStarted)
 			InteractionWidget->SetVisibility(bIsStarted);
 		}
 	// }
-	// else (플레이어의 CurrentWeapon != Data->InteractableToolType) 이라면
+	// else (플레이어의 CurrentWeapon->ItemType != Data->InteractableToolType) 이라면
 	// {
 	//	UE_LOG(LogTemp, Log, TEXT("플레이어가 들고 있는 도구는 이 프롭과 상호작용 불가능"));
 	//  혹은 상호작용이 불가능 하다는 위젯을 띄운다.
@@ -169,6 +172,7 @@ void AWorldProp::TreeAction()
 		EventSystem->Status.OnSetFatigue.Broadcast(FatigueCostPerWork);
 
 		// 임시. StatComponent->CurrentHealth에 데미지 주기
+		// 플레이어가 들고있는 무기의 Stats->Attack을 가져와야 한다.
 		StatComponent->OnPropDamaged(25.f);
 
 		UE_LOG(LogTemp, Log, TEXT("나무를 베었다. 나무 Durability : %.1f"), StatComponent->CurrentHealth);
@@ -183,6 +187,8 @@ void AWorldProp::TreeAction()
 			: nullptr)
 		{
 			const float ZGap = 75.f;
+
+			// Timber가 ZGap 만큼 Z축으로 벌어져서 스폰시키게 함 (꼴랑 하나만 나오는 것이 아니니까)
 			for (int32 i = 0; i < Data->GenerateItemCount; ++i)
 			{
 				const FVector SpawnLocation = GetActorLocation() + FVector(0.f, 0.f, ZGap * i);
@@ -224,6 +230,8 @@ void AWorldProp::RockAction()
 			: nullptr)
 		{
 			const FVector Range(50.f, 50.f, 150.f);
+
+			// 랜덤한 위치에 Stone이 생성된다. (Z값은 좀 더 많이 넣었음)
 			for (int32 i = 0; i < Data->GenerateItemCount; ++i)
 			{
 				// 위치 랜덤 오프셋
