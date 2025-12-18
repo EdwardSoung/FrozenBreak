@@ -111,6 +111,15 @@ protected: // 도끼질
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Harvest")
 	bool bIsHarvesting = false;
 
+	UPROPERTY(EditAnywhere, Category = "Harvest|Sound")
+	USoundBase* AxeHitSound = nullptr; // 도끼질 사운드
+
+	UPROPERTY(EditAnywhere, Category = "Harvest")
+	TWeakObjectPtr<AActor> PendingHarvestTarget; // 시작때 잡아둔 수확대상
+
+	UPROPERTY(EditAnywhere, Category = "Harvest")
+	FVector PendingHarvestImpactPoint = FVector::ZeroVector; // 시작때 맞춘 위치 와 사운드
+
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Tools")
 	TSubclassOf<AAxeActor> DefaultToolsClass;
