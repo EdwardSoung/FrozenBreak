@@ -19,6 +19,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUpdateInventoryItem, EItemType, I
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRequestInventoryInit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTrashItem, UInventoryItem*, InItem);
 
+//CraftInventory
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInitCraftInventoryUI, TArray<UInventoryItem*>, InData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAddItemToCraftInventoryUI, UInventoryItem*, InItem);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUpdateCraftItem, EItemType, InType);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRemoveCraftItem, UInventoryItem*, InItem);
+
 
 USTRUCT(BlueprintType)
 struct FCharacterEvents
@@ -44,4 +50,16 @@ struct FCharacterEvents
 	FOnUpdateInventoryItem OnUpdateInventoryItem;
 	FOnRequestInventoryInit OnRequestInventoryInit;
 	FOnTrashItem OnTrashItem;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnInitCraftInventoryUI OnInitCraftInventoryUI;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAddItemToCraftInventoryUI OnAddItemToCraftInventoryUI;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnUpdateCraftItem OnUpdateCraftItem;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnRemoveCraftItem OnRemoveCraftItem;
 };

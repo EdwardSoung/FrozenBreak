@@ -21,6 +21,7 @@ public:
 	inline int32 GetAmount() { return Amount; }
 
 	void AddAmount(int32 InAmount);	
+	void SetAmount(int32 InAmount);
 private:
 	TObjectPtr<UItemData> Data;
 	int32 Amount = 0;
