@@ -28,7 +28,6 @@ void UInventoryComponent::BeginPlay()
 
 		EventSystem->Chraracter.OnRequestIventoryItems.AddDynamic(this, &UInventoryComponent::SendInventoryItems);
 	}
-
 }
 
 void UInventoryComponent::SendInventoryItems()

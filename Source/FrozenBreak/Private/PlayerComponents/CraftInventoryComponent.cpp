@@ -19,7 +19,8 @@ void UCraftInventoryComponent::BeginPlay()
 	{
 		EventSystem->Chraracter.OnSendInventoryData.AddDynamic(
 			this, &UCraftInventoryComponent::OnReceiveInventoryData);
-
+		EventSystem->Chraracter.OnCraftRequested.AddDynamic(this, &UCraftInventoryComponent::StartCrafting);
+;
 		EventSystem->Chraracter.OnRequestIventoryItems.Broadcast();
 	}
 }
@@ -252,4 +253,58 @@ UInventoryItem* UCraftInventoryComponent::GetItem(EItemType Type)
 			return Item;
 	}
 	return nullptr;
+}
+
+void UCraftInventoryComponent::StartCrafting(UInventoryItem* ItemToCraft)
+{
+	UE_LOG(LogTemp, Log, TEXT("StartCrafting : %d"), ItemToCraft->GetData()->ItemType);
+	
+	MAxCraftCost = ItemToCraft->GetData()->CraftCost;
+	UE_LOG(LogTemp, Log, TEXT("StartCrafting cost : %.2f"), MAxCraftCost);
+
+	if (MAxCraftCost > 0)
+	{
+		CurrentItemToCraft = ItemToCraft;
+		GetWorld()->GetTimerManager().ClearTimer(CraftHandle);
+
+		GetWorld()->GetTimerManager().SetTimer(
+			CraftHandle,
+			[this]()
+			{
+				SetCraftProcess();
+			},
+			CraftRate,
+			true
+		);
+	}
+}
+
+void UCraftInventoryComponent::SetCraftProcess()
+{
+	if (CraftAmount > 0 && MAxCraftCost > 0)
+	{
+		if (CurrentCraftCost < MAxCraftCost)
+		{
+			CurrentCraftCost = FMath::Clamp(CurrentCraftCost + CraftAmount, 0.0f, MAxCraftCost);
+			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+			{
+				EventSystem->Status.OnCurrentCraftCostChanged.Broadcast(CurrentCraftCost);
+			}
+			UE_LOG(LogTemp, Log, TEXT("Crafting... %.2f"), CurrentCraftCost);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("제작 완료!"));
+			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+			{
+				EventSystem->Chraracter.OnGetPickupItem.Broadcast(CurrentItemToCraft->GetData()->ItemType, CraftResultCount);
+			}
+			GetWorld()->GetTimerManager().ClearTimer(CraftHandle);
+			// TODO : Craft 완료 처리(이벤트 날리기 등)
+		}
+	}
+	else
+	{
+		// TODO : Craft Amount(작업력) MaxCraftCost(작업량) 0일 경우 크래프트 실패 처리. 그냥 무시도 가능
+	}
 }
