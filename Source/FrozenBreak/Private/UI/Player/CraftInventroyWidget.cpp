@@ -26,9 +26,6 @@ void UCraftInventroyWidget::NativeConstruct()
 
 	CraftButton->OnClicked.AddDynamic(this, &UCraftInventroyWidget::StartCraft);
 	CloseCraftButton->OnClicked.AddDynamic(this, &UCraftInventroyWidget::CloseCraft);
-
-	//최초에 생성되면..초기화 요청
-	//EventSystem->Chraracter.OnRequestInventoryInit.Broadcast();
 }
 
 void UCraftInventroyWidget::StartCraft()
@@ -41,6 +38,7 @@ void UCraftInventroyWidget::StartCraft()
 		{
 			UInventoryItem* ItemToCraft = Cast<UInventoryItem>(Selected);
 			EventSystem->Chraracter.OnCraftRequested.Broadcast(ItemToCraft);
+			CloseCraft();
 		}
 	}
 	else
@@ -110,12 +108,8 @@ void UCraftInventroyWidget::RemoveCraftItem(UInventoryItem* InItem)
 	// 2) TileView에서 제거
 	CarftInventoryList->RemoveItem(InItem);
 
-	// 3) (선택) 화면 즉시 갱신이 필요하면
+	// 3) 화면 즉시 갱신
 	CarftInventoryList->RequestRefresh();
-
-	// 4) (선택) 로그
-	UE_LOG(LogTemp, Log, TEXT("[CraftUI] Removed craft item. Type=%d"),
-		(int32)InItem->GetData()->ItemType);
 }
 
 void UCraftInventroyWidget::CloseCraft()

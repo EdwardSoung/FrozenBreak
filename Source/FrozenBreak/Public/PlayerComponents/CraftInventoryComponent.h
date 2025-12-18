@@ -29,6 +29,12 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	inline void SetCraftAmount(float InAmount) 
+	{ 
+		CraftAmount = DefaultCraftAmount;
+		CraftAmount += InAmount;
+	}
+
 public:
 	// UI 구독용 (목록 변화 알림)
 	UPROPERTY(BlueprintAssignable)
@@ -40,6 +46,35 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Craft|Data")
 	TObjectPtr<UItemDataList> DataList = nullptr;
+
+private:
+	// ===== 전체 인벤 데이터 수신 =====
+	UFUNCTION()
+	void OnReceiveInventoryData(TArray<UInventoryItem*> InData);
+
+	// ===== 계산 =====
+	void LoadRecipesFromTable();
+	void BuildRecipeIndex();
+	void InitializeRecipeStates();
+	void RecomputeAllFromItemCounts();
+
+	int32 GetHave(EItemType Type) const;
+	int32 CalcCraftableTimesForRecipe(const FCraftingRecipeRow& R);
+
+	// ===== UI 갱신 =====
+	void RebuildCraftableCachesAndBroadcastIfChanged();
+	void SetCraftableItemCount(EItemType Type, int32 NewCount);
+	void RemoveNonCraftablesFromUI();
+
+	// util
+	bool AreMapsEqual(const TMap<EItemType, int32>& A, const TMap<EItemType, int32>& B);
+	UInventoryItem* GetItem(EItemType Type);
+
+	// 제작 시작
+	UFUNCTION()
+	void StartCrafting(UInventoryItem* ItemToCraft);
+
+	void SetCraftProcess();
 
 private:
 	// ===== 레시피 =====
@@ -76,26 +111,22 @@ private:
 	// UI용 아이템
 	TArray<UInventoryItem*> CraftableItems;
 
-private:
-	// ===== 전체 인벤 데이터 수신 =====
-	UFUNCTION()
-	void OnReceiveInventoryData(TArray<UInventoryItem*> InData);
+	// 작업력 : 기본 10
+	const float DefaultCraftAmount = 10.0f;
+	float CraftAmount = 10.0f;
 
-	// ===== 계산 =====
-	void LoadRecipesFromTable();
-	void BuildRecipeIndex();
-	void InitializeRecipeStates();
-	void RecomputeAllFromItemCounts();
+	// 제작 타이머 관련 변수
+	FTimerHandle CraftHandle;
+	float CraftRate = 1.0f;
 
-	int32 GetHave(EItemType Type) const;
-	int32 CalcCraftableTimesForRecipe(const FCraftingRecipeRow& R);
+	// 작업량 : 기본 0(0일 시 작업 실패)
+	float MAxCraftCost = 0.0f;
 
-	// ===== UI 갱신 =====
-	void RebuildCraftableCachesAndBroadcastIfChanged();
-	void SetCraftableItemCount(EItemType Type, int32 NewCount);
-	void RemoveNonCraftablesFromUI();
+	// 현재 작업량(0 ~ MAxCraftCost)
+	float CurrentCraftCost = 0.0f;
 
-	// util
-	bool AreMapsEqual(const TMap<EItemType, int32>& A, const TMap<EItemType, int32>& B);
-	UInventoryItem* GetItem(EItemType Type);
+	// 작업 아이템
+	TWeakObjectPtr<UInventoryItem> CurrentItemToCraft = nullptr;
+	// 작업 완료 시 아이템 수량(현재 시나리오에서는 무조건 1)
+	int32 CraftResultCount = 1;
 };
