@@ -713,23 +713,6 @@ void AActionCharacter::SetHeldItemType(EItemType NewType) // 지금 뭐들고 �
 	InteractionComponent->SetPlayerCurrentTool(CurrentHeldItemType);
 }
 
-
-void AActionCharacter::OnToolActionStarted()
-{
-	if (CurrentHeldItemType == EItemType::Axe)
-	{
-		OnHarvestStarted();
-		return;
-	}
-
-	if (CurrentHeldItemType == EItemType::Pickaxe)
-	{
-		OnPickaxeStarted();
-		return;
-	}
-}
-
-
 void AActionCharacter::OnToolActionStarted()
 {
 	if (CurrentHeldItemType == EItemType::Axe)

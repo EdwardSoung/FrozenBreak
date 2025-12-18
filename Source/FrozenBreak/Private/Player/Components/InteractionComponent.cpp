@@ -49,16 +49,20 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	const FVector CameraForward = Camera->GetForwardVector();
 	const FVector TargetLocation = CameraLocation + (CameraForward * InteractionDistance);
 
-	const bool bHit = GetWorld()->LineTraceSingleByChannel
-	(
-		InteractionHitResult,		// 라인에 블록된 액터
+	const float SweepRadius = 30.0f; // 값 키우면 더 잘 맞음
+
+	const bool bHit = GetWorld()->SweepSingleByChannel(
+		InteractionHitResult,
 		CameraLocation,
 		TargetLocation,
-		InteractableActorChannel	// InteractableActorChannel이 Block으로 되어있는 액터만
+		FQuat::Identity,
+		InteractableActorChannel,
+		FCollisionShape::MakeSphere(SweepRadius)
 	);
 
 #if WITH_EDITOR
 	DrawDebugLine(GetWorld(), CameraLocation, TargetLocation, FColor::Green, false, -1.f, 0, 0.25f);
+	DrawDebugSphere(GetWorld(), TargetLocation, SweepRadius, 12, FColor::Yellow, false, 0.05f);
 #endif
 
 	CurrentInteractionActor = InteractionHitResult.GetActor();
@@ -73,8 +77,7 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			{
 				HitActorInteractableToolType = Prop->GetInteractableToolType();
 
-				// 근데 바라보고 있는 액터의 Data->InteractableToolType 이 None 이거나
-				// Prop이 아닌 Item 이라면
+				// 바라보고 있는 액터의 Data->InteractableToolType 이 None 아면
 				if (HitActorInteractableToolType == EItemType::None)
 				{
 					// 바라보고 있는 액터에게 "너 지금 바라봐지고 있어" 라고 알림
@@ -86,7 +89,6 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 				// 바라보고 있는 액터의 Data->InteractableToolType 이 Player의 CurrentHeldItemType과 같다면
 				else if (PlayerCurrentTool == HitActorInteractableToolType)
 				{
-					
 					IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
 					UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
 					UE_LOG(LogTemp, Warning, TEXT("이건 나무나 바위임"));
@@ -97,6 +99,7 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 					UE_LOG(LogTemp, Log, TEXT("플레이어의 도구는 바라보고 있는 액터에 상호작용 불가"));
 				}
 			}
+			// 바라보고 있는 액터가 Item 이면
 			else
 			{
 				IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
