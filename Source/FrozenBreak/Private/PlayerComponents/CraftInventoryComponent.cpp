@@ -331,18 +331,18 @@ void UCraftInventoryComponent::FinishCraft()
 		}
 	}
 
-	EventSystem->Chraracter.OnGetPickupItem.Broadcast(
-		ResultType, CraftResultCount
-	);
+	// 초기화
+	CurrentCraftCost = 0.0f;
+	CurrentItemToCraft = nullptr;
+
+	EventSystem->Chraracter.OnGetPickupItem.Broadcast(ResultType, CraftResultCount);
+	EventSystem->Status.OnCurrentCraftCostChanged.Broadcast(CurrentCraftCost);
 
 	if (UUISubSystem* UISystem = UUISubSystem::Get(this))
 	{
 		UISystem->HideWidget(EWidgetType::CraftProcessBar);
 	}
 
-	// 초기화
-	CurrentCraftCost = 0.f;
-	CurrentItemToCraft = nullptr;
 	GetWorld()->GetTimerManager().ClearTimer(CraftHandle);
 }
 
