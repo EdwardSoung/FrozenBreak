@@ -78,12 +78,12 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 				HitActorInteractableToolType = Prop->GetInteractableToolType();
 
 				// 바라보고 있는 액터의 Data->InteractableToolType 이 None 아면
-				if (HitActorInteractableToolType == EItemType::None)
+				if (HitActorInteractableToolType == EItemType::None || HitActorInteractableToolType == EItemType::Campfire)
 				{
 					// 바라보고 있는 액터에게 "너 지금 바라봐지고 있어" 라고 알림
 					IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
 					UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
-					UE_LOG(LogTemp, Warning, TEXT("이건 나무나 바위가 아닌데 Prop이긴 함"));
+					UE_LOG(LogTemp, Warning, TEXT("이건 나무나 바위가 아닌데 Prop이긴 함 혹은 캠프파이어"));
 					bIsInteracting = true;
 				}
 				// 바라보고 있는 액터의 Data->InteractableToolType 이 Player의 CurrentHeldItemType과 같다면

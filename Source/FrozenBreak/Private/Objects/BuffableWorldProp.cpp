@@ -3,9 +3,12 @@
 
 #include "Objects/BuffableWorldProp.h"
 #include "Components/SphereComponent.h"
+#include "Components/WidgetComponent.h"
 #include "GameSystem/StatusCalculationSubSystem.h"
+#include "GameSystem/EventSubSystem.h"
 #include "Data/StatBuffValueData.h"
 #include "Data/PropData.h"
+#include "UI/Prop/InteractionWidget.h"
 
 ABuffableWorldProp::ABuffableWorldProp()
 {
@@ -15,12 +18,28 @@ ABuffableWorldProp::ABuffableWorldProp()
 	BuffArea->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 
+void ABuffableWorldProp::OnSelect_Implementation(bool bIsStarted)
+{
+	if (Meets.IsEmpty() || Meets[0]->GetAmount() <= 0)
+	{
+		return;
+	}
+	Super::OnSelect_Implementation(bIsStarted);
+}
+
 void ABuffableWorldProp::BeginPlay()
 {
+	Super::BeginPlay();
+
 	StatusCalculater = GetWorld()->GetSubsystem<UStatusCalculationSubSystem>();
 
 	BuffArea->OnComponentBeginOverlap.AddDynamic(this, &ABuffableWorldProp::BeginBuff);
 	BuffArea->OnComponentEndOverlap.AddDynamic(this, &ABuffableWorldProp::EndBuff);
+
+	if (EventSystem)
+	{
+		EventSystem->Chraracter.OnSendRawMeet.AddDynamic(this, &ABuffableWorldProp::SetMeets);
+	}
 }
 
 void ABuffableWorldProp::BeginBuff(
@@ -36,6 +55,7 @@ void ABuffableWorldProp::BeginBuff(
 	if (PropType == EPropType::Campfire && CampfireBuffValues)
 	{
 		GiveCampFireBuff();
+		ReadyToCook();
 	}
 }
 
@@ -51,11 +71,53 @@ void ABuffableWorldProp::EndBuff(
 	}
 }
 
+void ABuffableWorldProp::CampfireAction()
+{
+	if (!Meets.IsEmpty() && Meets[0]->GetAmount() > 0)
+	{
+		EventSystem->Chraracter.OnCookRequested.Broadcast(Meets[0]);
+	}
+	IsCookValid();
+}
+
+void ABuffableWorldProp::IsCookValid()
+{
+	if (auto Widget = Cast<UInteractionWidget>(InteractionWidget->GetUserWidgetObject()))
+	{
+		Widget->UpdateInteraction(Data->PropType, Data->InteractionKey);
+		InteractionWidget->SetVisibility(!Meets.IsEmpty() && Meets[0]->GetAmount() > 0);
+	}
+}
+
 void ABuffableWorldProp::GiveCampFireBuff()
 {
 	StatusCalculater->IncreaseTemperature(CampfireBuffValues->TemperatureBuffValue);
 	StatusCalculater->IncreaseFatigue(CampfireBuffValues->FatigueBuffValue);
 	StatusCalculater->IncreaseHunger(CampfireBuffValues->HungerBuffValue);
+}
+
+void ABuffableWorldProp::ReadyToCook()
+{
+	if (EventSystem)
+	{
+		EventSystem->Chraracter.OnRequestIventoryRawMeet.Broadcast();
+	}
+}
+
+void ABuffableWorldProp::SetMeets(TArray<UInventoryItem*> InData)
+{
+	if (!InData.IsEmpty())
+	{
+		for (auto& SingleMeet : InData)
+		{
+			Meets.Add(SingleMeet);
+		}
+
+		if (Meets[0]->GetAmount() > 0)
+		{
+
+		}
+	}
 }
 
 void ABuffableWorldProp::FinishCamFireBuff()

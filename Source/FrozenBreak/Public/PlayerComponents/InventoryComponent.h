@@ -39,6 +39,9 @@ protected:
 	UFUNCTION()
 	void SendInventoryItems();
 
+	UFUNCTION()
+	void SendRawMeetData();
+
 private:
 	TArray<UInventoryItem*> Items;
 

@@ -16,7 +16,8 @@ class FROZENBREAK_API ABuffableWorldProp : public AWorldProp
 	
 public:
 	ABuffableWorldProp();
-	virtual ~ABuffableWorldProp() {};
+
+	virtual void OnSelect_Implementation(bool bIsStarted) override;
 
 protected:
 	// Called when the game starts or when spawned
@@ -38,8 +39,15 @@ protected:
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex);
 
+	virtual void CampfireAction() override;
+
+	void IsCookValid();
+
 private:
 	void GiveCampFireBuff();
+	void ReadyToCook();
+	UFUNCTION()
+	void SetMeets(TArray<UInventoryItem*> InData);
 	void FinishCamFireBuff();
 
 protected:
@@ -57,4 +65,6 @@ protected:
 private:
 	class UStatusCalculationSubSystem* StatusCalculater;
 	EPropType PropType = EPropType::None;
+
+	TArray<UInventoryItem*> Meets;
 };

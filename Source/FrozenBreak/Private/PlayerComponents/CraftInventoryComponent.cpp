@@ -20,7 +20,8 @@ void UCraftInventoryComponent::BeginPlay()
 	{
 		EventSystem->Chraracter.OnSendInventoryData.AddDynamic(this, &UCraftInventoryComponent::OnReceiveInventoryData);
 		EventSystem->Chraracter.OnCraftRequested.AddDynamic(this, &UCraftInventoryComponent::StartCrafting);
-;	}
+		EventSystem->Chraracter.OnCookRequested.AddDynamic(this, &UCraftInventoryComponent::StartCooking);
+	}
 }
 
 // ==================== Inventory ====================
@@ -280,6 +281,148 @@ void UCraftInventoryComponent::StartCrafting(UInventoryItem* ItemToCraft)
 	}
 }
 
+void UCraftInventoryComponent::StartCooking(UInventoryItem* InIngredient)
+{
+	if (!InIngredient || !InIngredient->GetData() || InIngredient->GetAmount() <= 0 ) return;
+
+	const EItemType Type = InIngredient->GetData()->ItemType;
+	const int32 Amount = InIngredient->GetAmount();
+	if (Type == EItemType::None || Amount <= 0) return;
+
+	// 요리 입력 재료 누적
+	CookingInputCounts.FindOrAdd(Type) += Amount;
+
+	// 첫 번째 가능한 요리 레시피가 생겼는지 체크
+	const FCraftingRecipeRow* FirstRecipe = FindFirstCookableRecipeFromInputs();
+	if (!FirstRecipe)
+	{
+		UE_LOG(LogTemp, Log, TEXT("[Cooking] No cookable recipe yet."));
+		return;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("[Cooking] First cookable recipe found. Result=%d"),
+		(int32)FirstRecipe->ResultItemType);
+
+	// 결과 아이템을 만들어서 StartCrafting으로 넘긴다
+	if (UInventoryItem* ResultItem = GetOrCreateCraftableItem(FirstRecipe->ResultItemType))
+	{
+		//InIngredient->AddAmount(-1);
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		{
+			EventSystem->Chraracter.OnGetPickupItem.Broadcast(InIngredient->GetData()->ItemType, -1);
+		}
+		StartCrafting(ResultItem);
+	}
+}
+
+int32 UCraftInventoryComponent::GetHaveCookingInput(EItemType Type) const
+{
+	if (const int32* Found = CookingInputCounts.Find(Type))
+		return *Found;
+	return 0;
+}
+
+const FCraftingRecipeRow* UCraftInventoryComponent::FindFirstCookableRecipeFromInputs() const
+{
+	for (const FCraftingRecipeRow& SingleRecipe : Recipes)
+	{
+		if (SingleRecipe.Category != ERecipeCategory::Cooking) continue;
+		if (SingleRecipe.ResultItemType == EItemType::None) continue;
+
+		int32 Times = INT32_MAX;
+
+		for (const FRecipeIngredient& Req : SingleRecipe.Required)
+		{
+			if (Req.Count <= 0) continue;
+			const int32 Have = GetHaveCookingInput(Req.ItemType);
+			Times = FMath::Min(Times, Have / Req.Count);
+		}
+
+		if (Times == INT32_MAX) Times = 0;
+
+		if (Times > 0)
+		{
+			return &SingleRecipe; // 첫 번째 매칭 레시피
+		}
+	}
+	return nullptr;
+}
+
+UInventoryItem* UCraftInventoryComponent::GetOrCreateCraftableItem(EItemType ResultType)
+{
+	if (UInventoryItem* Existing = GetItem(ResultType))
+		return Existing;
+
+	if (!DataList) return nullptr;
+
+	auto* DataPtr = DataList->ItemAssetData.Find(ResultType);
+	if (!DataPtr || !DataPtr->Get()) return nullptr;
+
+	UInventoryItem* NewItem = NewObject<UInventoryItem>(this);
+	NewItem->Initialize(DataPtr->Get());
+	NewItem->SetAmount(1); // 의미없으면 0/1 아무거나. (StartCrafting엔 타입만 필요)
+
+	CraftableItems.Add(NewItem);
+
+	return NewItem;
+}
+
+void UCraftInventoryComponent::RecomputeCookingFromInputs()
+{
+	// 새로 계산한 요리 가능 맵
+	TMap<EItemType, int32> NewCookingTimes;
+	NewCookingTimes.Reserve(32);
+
+	for (const FCraftingRecipeRow& SingleRecipe : Recipes)
+	{
+		if (SingleRecipe.Category != ERecipeCategory::Cooking) continue;
+		if (SingleRecipe.ResultItemType == EItemType::None) continue;
+
+		int32 Times = INT32_MAX;
+
+		for (const FRecipeIngredient& Req : SingleRecipe.Required)
+		{
+			if (Req.Count <= 0) continue;
+			const int32 Have = GetHaveCookingInput(Req.ItemType);
+			Times = FMath::Min(Times, Have / Req.Count);
+		}
+
+		if (Times == INT32_MAX) Times = 0;
+
+		if (Times > 0)
+		{
+			// 같은 결과 아이템을 만드는 레시피가 여러 개면 "최대 가능 횟수"
+			int32& Cur = NewCookingTimes.FindOrAdd(SingleRecipe.ResultItemType);
+			Cur = FMath::Max(Cur, Times);
+		}
+	}
+
+	// 요리쪽만 변경 여부 판단
+	const bool bCookingChanged = !AreMapsEqual(NewCookingTimes, LastCraftableTimesCooking);
+	if (!bCookingChanged) return;
+
+	// 캐시 갱신
+	CraftableTimesCooking = MoveTemp(NewCookingTimes);
+	LastCraftableTimesCooking = CraftableTimesCooking;
+
+	// UI 반영 (요리 결과만 Set)
+	for (const auto& SingleValue : CraftableTimesCooking)
+	{
+		SetCraftableItemCount(SingleValue.Key, SingleValue.Value);
+	}
+
+	//“요리 가능 목록”에 없는 애들은 UI에서 제거하고 싶다면
+	// (주의: 지금 RemoveNonCraftablesFromUI는 Crafting+Cooking 합집합 기준으로 제거하므로,
+	// Crafting도 함께 유지되는 구조면 그대로 호출해도 OK)
+	RemoveNonCraftablesFromUI();
+}
+
+void UCraftInventoryComponent::ClearCookingInputs()
+{
+	CookingInputCounts.Reset();
+	RecomputeCookingFromInputs();
+}
+
 void UCraftInventoryComponent::SetCraftProcess()
 {
 	UEventSubSystem* EventSystem = UEventSubSystem::Get(this);
@@ -317,32 +460,35 @@ void UCraftInventoryComponent::FinishCraft()
 
 	UE_LOG(LogTemp, Log, TEXT("제작 완료!"));
 
-	const EItemType ResultType = CurrentItemToCraft->GetData()->ItemType;
-	const FCraftingRecipeRow* Recipe =
-		FindBestRecipeForResult(ResultType, ERecipeCategory::Crafting);
-
-	if (Recipe)
+	if (CurrentItemToCraft.IsValid() && CurrentItemToCraft->GetData())
 	{
-		for (const FRecipeIngredient& Req : Recipe->Required)
+		const EItemType ResultType = CurrentItemToCraft->GetData()->ItemType;
+		const FCraftingRecipeRow* Recipe =
+			FindBestRecipeForResult(ResultType, ERecipeCategory::Crafting);
+
+		if (Recipe)
 		{
-			EventSystem->Chraracter.OnGetPickupItem.Broadcast(
-				Req.ItemType, -Req.Count
-			);
+			for (const FRecipeIngredient& Req : Recipe->Required)
+			{
+				EventSystem->Chraracter.OnGetPickupItem.Broadcast(
+					Req.ItemType, -Req.Count
+				);
+			}
+		}
+
+
+		// 초기화
+		CurrentCraftCost = 0.0f;
+		CurrentItemToCraft = nullptr;
+
+		EventSystem->Chraracter.OnGetPickupItem.Broadcast(ResultType, CraftResultCount);
+		EventSystem->Status.OnCurrentCraftCostChanged.Broadcast(CurrentCraftCost);
+
+		if (UUISubSystem* UISystem = UUISubSystem::Get(this))
+		{
+			UISystem->HideWidget(EWidgetType::CraftProcessBar);
 		}
 	}
-
-	// 초기화
-	CurrentCraftCost = 0.0f;
-	CurrentItemToCraft = nullptr;
-
-	EventSystem->Chraracter.OnGetPickupItem.Broadcast(ResultType, CraftResultCount);
-	EventSystem->Status.OnCurrentCraftCostChanged.Broadcast(CurrentCraftCost);
-
-	if (UUISubSystem* UISystem = UUISubSystem::Get(this))
-	{
-		UISystem->HideWidget(EWidgetType::CraftProcessBar);
-	}
-
 	GetWorld()->GetTimerManager().ClearTimer(CraftHandle);
 }
 

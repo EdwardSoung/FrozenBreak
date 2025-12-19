@@ -27,6 +27,8 @@ void UInventoryComponent::BeginPlay()
 		EventSystem->Chraracter.OnTrashItem.AddDynamic(this, &UInventoryComponent::TrashItem);
 
 		EventSystem->Chraracter.OnRequestIventoryItems.AddDynamic(this, &UInventoryComponent::SendInventoryItems);
+
+		EventSystem->Chraracter.OnRequestIventoryRawMeet.AddDynamic(this, &UInventoryComponent::SendRawMeetData);
 	}
 }
 
@@ -35,6 +37,25 @@ void UInventoryComponent::SendInventoryItems()
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
 		EventSystem->Chraracter.OnSendInventoryData.Broadcast(Items);
+	}
+}
+
+void UInventoryComponent::SendRawMeetData()
+{
+	if (!Items.IsEmpty())
+	{
+		TArray<UInventoryItem*> Meets;
+		for (auto& SingleItem : Items)
+		{
+			if (SingleItem->GetData()->ItemType == EItemType::RawMeat)
+			{
+				Meets.Add(SingleItem);
+			}
+		}
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		{
+			EventSystem->Chraracter.OnSendRawMeet.Broadcast(Meets);
+		}
 	}
 }
 

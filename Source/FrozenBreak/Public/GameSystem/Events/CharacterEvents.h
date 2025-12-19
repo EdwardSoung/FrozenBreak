@@ -20,15 +20,21 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRequestInventoryInit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTrashItem, UInventoryItem*, InItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSendInventoryData, TArray<UInventoryItem*>, InData);
 
+
 //Craft
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRequestIventoryItems);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInitCraftUI, TArray<UInventoryItem*>, InData);
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInitCraftInventoryUI, TArray<UInventoryItem*>, InData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAddItemToCraftInventoryUI, UInventoryItem*, InItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUpdateCraftItem, EItemType, InType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRemoveCraftItem, UInventoryItem*, InItem);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCraftRequested, UInventoryItem*, InItem); // 제작(요리) 버튼을 누를 시 날리는 델리게이트
+
+//Cook
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRequestIventoryRawMeet);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSendRawMeet, TArray<UInventoryItem*>, InData);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCraftRequested, UInventoryItem*, InItem); // 제작 버튼을 누를 시 날리는 델리게이트
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCookRequested, UInventoryItem*, InItem); // 요리 버튼을 누를 시 날리는 델리게이트
 
 USTRUCT(BlueprintType)
 struct FCharacterEvents
@@ -69,8 +75,17 @@ struct FCharacterEvents
 	FOnRemoveCraftItem OnRemoveCraftItem;
 
 	UPROPERTY(BlueprintAssignable)
+	FOnRequestIventoryItems OnRequestIventoryItems;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnRequestIventoryRawMeet OnRequestIventoryRawMeet;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnSendRawMeet OnSendRawMeet;
+
+	UPROPERTY(BlueprintAssignable)
 	FOnCraftRequested OnCraftRequested;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnRequestIventoryItems OnRequestIventoryItems;
+	FOnCookRequested OnCookRequested;
 };

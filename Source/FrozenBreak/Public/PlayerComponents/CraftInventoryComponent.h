@@ -64,6 +64,28 @@ private:
 	UFUNCTION()
 	void StartCrafting(UInventoryItem* ItemToCraft);
 
+	// 요리 시작
+	UFUNCTION()
+	void StartCooking(UInventoryItem* InIngredient);
+
+	// ===== Cooking 입력 재료(투입된 재료) =====
+	TMap<EItemType, int32> CookingInputCounts;
+
+	// 첫 번째 가능한 Cooking 레시피(Recipes 배열 순서 기준)
+	const FCraftingRecipeRow* FindFirstCookableRecipeFromInputs() const;
+
+	// 결과 타입으로 UInventoryItem 확보(없으면 생성)
+	UInventoryItem* GetOrCreateCraftableItem(EItemType ResultType);
+
+	// 요리 입력 기반으로 가능한 레시피(요리) 재계산
+	void RecomputeCookingFromInputs();
+
+	// 요리 입력에서 특정 아이템 보유량 조회
+	int32 GetHaveCookingInput(EItemType Type) const;
+
+	// 요리 입력 초기화
+	void ClearCookingInputs();
+
 	void SetCraftProcess();
 	void FinishCraft();
 
