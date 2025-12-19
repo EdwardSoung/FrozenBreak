@@ -33,6 +33,8 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Prop|Data")
 	inline EItemType GetInteractableToolType() const;
+	
+	virtual void CampfireAction() {};
 private:
 	const ECollisionChannel InteractableActorChannel = ECollisionChannel::ECC_GameTraceChannel1;
 	const float BedUsageHours = 4.0f;

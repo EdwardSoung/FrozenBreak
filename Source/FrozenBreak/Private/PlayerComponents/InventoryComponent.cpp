@@ -27,6 +27,8 @@ void UInventoryComponent::BeginPlay()
 		EventSystem->Chraracter.OnTrashItem.AddDynamic(this, &UInventoryComponent::TrashItem);
 
 		EventSystem->Chraracter.OnRequestIventoryItems.AddDynamic(this, &UInventoryComponent::SendInventoryItems);
+
+		EventSystem->Chraracter.OnRequestIventoryRawMeet.AddDynamic(this, &UInventoryComponent::SendRawMeetData);
 	}
 
 	//임시로 가방 강제 장착. 나중에 캐릭터 장착 쪽에 가방도 두면 좋을 것 같음..
@@ -47,7 +49,7 @@ void UInventoryComponent::SendInventoryItems()
 	}
 }
 
-void UInventoryComponent::RefreshWeight()
+	void UInventoryComponent::RefreshWeight()
 {
 	CurrentWeight = 0;
 	for (auto Item : Items)
@@ -57,6 +59,25 @@ void UInventoryComponent::RefreshWeight()
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
 		EventSystem->Chraracter.OnUpdateInventoryWeight.Broadcast(CurrentWeight, InventoryMaxWeight);
+	}
+}
+
+void UInventoryComponent::SendRawMeetData()
+{
+	if (!Items.IsEmpty())
+	{
+		TArray<UInventoryItem*> Meets;
+		for (auto& SingleItem : Items)
+		{
+			if (SingleItem->GetData()->ItemType == EItemType::RawMeat)
+			{
+				Meets.Add(SingleItem);
+			}
+		}
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		{
+			EventSystem->Chraracter.OnSendRawMeet.Broadcast(Meets);
+		}
 	}
 }
 

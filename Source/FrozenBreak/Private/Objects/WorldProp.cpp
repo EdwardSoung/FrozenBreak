@@ -125,6 +125,7 @@ void AWorldProp::DoAction_Implementation()
 		{
 			// HUD : 요리 UI를 띄워야 한다.
 			// 중복실행을 막아야 함
+			CampfireAction();
 			UE_LOG(LogTemp, Log, TEXT("모닥불과 상호작용"));
 			return;
 		}

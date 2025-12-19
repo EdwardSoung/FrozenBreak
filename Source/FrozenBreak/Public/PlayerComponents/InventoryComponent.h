@@ -43,6 +43,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data|Bag")
 	TObjectPtr<UItemData> BagData;
 
+	UFUNCTION()
+	void SendRawMeetData();
+
 private:
 	TArray<UInventoryItem*> Items;
 
