@@ -2,6 +2,7 @@
 
 
 #include "CommonComponents/StatComponent.h"
+#include "Interface/Damageable.h"
 
 // Sets default values for this component's properties
 UStatComponent::UStatComponent()
@@ -45,8 +46,11 @@ void UStatComponent::OnDamaged(float InDamage)
 	}
 	else
 	{
-		// TODO : 캐릭터 사망
-		//체력 0 될 때 Owner에게 전달 (GetOwner())
+		//뭔지몰라도 사망
+		if (GetOwner()->Implements<UDamageable>())
+		{
+			IDamageable::Execute_OnDead(GetOwner());
+		}
 	}
 }
 

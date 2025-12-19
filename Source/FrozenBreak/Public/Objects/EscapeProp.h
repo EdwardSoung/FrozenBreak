@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interface/Damageable.h"
+#include "Interface/Interactable.h"
 #include "EscapeProp.generated.h"
 
 UCLASS()
-class FROZENBREAK_API AEscapeProp : public AActor
+class FROZENBREAK_API AEscapeProp : public AActor, public IDamageable, public IInteractable
 {
 	GENERATED_BODY()
 	
@@ -22,10 +24,29 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<class UHealthComponent> HealthComponent = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<class UStaticMeshComponent> MeshComponent = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Data")
+	TObjectPtr<class UPropData> Data;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Prop|Widget")
+	TObjectPtr<class UWidgetComponent> InteractionWidget = nullptr;
 public:
-	void OnDamage(float InDamage)
-	{
+	void OnDamage(float InDamage);
+	void RockAction();
 
-	}
+	UFUNCTION(BlueprintCallable)
+	void OnDead_Implementation() override ;
+
+	UFUNCTION(BlueprintCallable)
+	void DoAction_Implementation() override ;
+	UFUNCTION(BlueprintCallable)
+	void OnSelect_Implementation(bool bIsStart) override;
+
+private:
+	const float FatigueCostPerWork = -0.5f;
+
+	float ToolAtkPower = 0.f;
+
 };
