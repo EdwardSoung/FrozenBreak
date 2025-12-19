@@ -263,14 +263,7 @@ void AActionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 			&AActionCharacter::OnInteration
 		);
 	}
-	if (IA_ToolAction)
-	{
-		EnhancedInput->BindAction(
-			IA_ToolAction,
-			ETriggerEvent::Started, 
-			this, 
-			&AActionCharacter::OnToolActionStarted);
-	}
+	
 }
 
 
@@ -422,6 +415,13 @@ void AActionCharacter::OnSprintStopped()
 
 void AActionCharacter::OnInteration()
 {
+	if (bLandingLocked)
+		return;
+
+	const bool bToolStarted = OnToolActionStarted();
+	if (bToolStarted)
+		return;
+
 	IInteractable::Execute_DoAction(InteractionComponent);
 }
 
@@ -520,6 +520,13 @@ void AActionCharacter::OnHarvestStarted()
 	if (GetCharacterMovement())
 		GetCharacterMovement()->MaxWalkSpeed = 0.0f;
 
+	if (!bToolYawLocked)
+	{
+		bSavedUseControllerRotationYaw = bUseControllerRotationYaw;
+		bUseControllerRotationYaw = false;      // 몽타주가 재생중일때 캐릭터가 마우스에 안 돌아감
+		bToolYawLocked = true;
+	}
+
 	PlayAnimMontage(HarvestMontage);
 
 	//디버그용
@@ -545,6 +552,11 @@ void AActionCharacter::EndHarvest()
 		 GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 
 		 GetCharacterMovement()->MaxWalkSpeed = 200.0f;
+	}
+	if (bToolYawLocked)
+	{
+		bUseControllerRotationYaw = bSavedUseControllerRotationYaw;
+		bToolYawLocked = false;
 	}
 }
 
@@ -648,11 +660,18 @@ void AActionCharacter::OnPickaxeStarted() // 곡괭이 전용
 	{
 		GetCharacterMovement()->MaxWalkSpeed = 0.0f; // 채굴시 움직이지 못하게 
 	}
+	if (!bToolYawLocked)
+	{
+		bSavedUseControllerRotationYaw = bUseControllerRotationYaw;
+		bUseControllerRotationYaw = false;      // 캐릭터가 마우스에 안 돌아감
+		bToolYawLocked = true;
+	}
+
 
 	float Len = PlayAnimMontage(PickaxeMontage);
 	UE_LOG(LogTemp, Warning, TEXT("[Pickaxe] Play Len=%.3f"), Len);
 
-	PlayAnimMontage(PickaxeMontage);
+	
 
 	// 디버그
 	DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1.0f, 0, 2.0f);
@@ -704,6 +723,12 @@ void AActionCharacter::EndMining()
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		GetCharacterMovement()->MaxWalkSpeed = 200.0f;
 	}
+
+	if (bToolYawLocked)
+	{
+		bUseControllerRotationYaw = bSavedUseControllerRotationYaw;
+		bToolYawLocked = false;
+	}
 }
 
 
@@ -713,19 +738,24 @@ void AActionCharacter::SetHeldItemType(EItemType NewType) // 지금 뭐들고 �
 	InteractionComponent->SetPlayerCurrentTool(CurrentHeldItemType);
 }
 
-void AActionCharacter::OnToolActionStarted()
+
+bool AActionCharacter::OnToolActionStarted()
 {
 	if (CurrentHeldItemType == EItemType::Axe)
 	{
+		const bool bPrev = bIsHarvesting;
 		OnHarvestStarted();
-		return;
+		return (!bPrev && bIsHarvesting);
 	}
 
 	if (CurrentHeldItemType == EItemType::Pickaxe)
 	{
+		const bool bPrev = bIsMining;
 		OnPickaxeStarted();
-		return;
+		return (!bPrev && bIsMining);
 	}
+
+	return false;
 }
 
 void AActionCharacter::OnToolHit() // 지금 들고있는 무기에 맞춰 행동
