@@ -158,7 +158,7 @@ protected: // 아이템 관련
 	TSubclassOf<class AToolActor> DefaultToolsClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tool")
-	AToolActor* CurrentTools = nullptr;
+	TObjectPtr<AToolActor> CurrentTools = nullptr;
 
 
 
@@ -192,7 +192,10 @@ protected:
 
 	//통합버전 
 
-	void OnToolActionStarted();
+	bool OnToolActionStarted();
+
+	bool bSavedUseControllerRotationYaw = true;
+	bool bToolYawLocked = false;
 
 public:
 	//곡괭이질
@@ -203,11 +206,28 @@ public:
 	void EndHarvest();
 	void OnHarvestHit();
 
+	//BP에서 바로 호출할 용도
+	UFUNCTION(BlueprintCallable, Category = "ToolAction")
 	void OnToolHit();
+	UFUNCTION(BlueprintCallable, Category = "ToolAction")
 	void OnToolEnd();
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
 	EItemType CurrentHeldItemType = EItemType::None;
 
+public:
+	//사운드용
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
+	TArray<USoundBase*> FootstepSounds_L; // 왼발
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
+	TArray<USoundBase*> FootstepSounds_R; // 오른발
+
+	//발소리 중복 방지용
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = "Sound")
+	int32 LastFootstepIndex_L = -1;
+
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = "Sound")
+	int32 LastFootstepIndex_R = -1;
 };

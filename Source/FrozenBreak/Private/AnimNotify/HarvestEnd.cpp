@@ -23,5 +23,5 @@ void UHarvestEnd::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* An
 		return;
 	}
 
-	Character->EndHarvest();
+	Character->OnToolEnd();
 }
