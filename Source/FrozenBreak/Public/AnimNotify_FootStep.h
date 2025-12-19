@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
+
 #include "AnimNotify_FootStep.generated.h"
 
 /**
@@ -26,6 +27,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FootStep")
 	EFootstepSide FootstepSide = EFootstepSide::Left;
 
-	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)override;
+	virtual void Notify(
+		USkeletalMeshComponent* MeshComp,
+		UAnimSequenceBase* Animation,
+		const FAnimNotifyEventReference& EventReference
+	) override;
 	
 };
