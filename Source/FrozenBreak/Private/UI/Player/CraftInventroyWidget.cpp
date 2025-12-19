@@ -71,6 +71,7 @@ void UCraftInventroyWidget::RequestInventoryData()
 		{
 			EventSystem->Chraracter.OnRequestIventoryItems.Broadcast();
 		}
+		CarftInventoryList->ClearSelection();
 	}
 }
 
