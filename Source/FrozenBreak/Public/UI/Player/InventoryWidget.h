@@ -18,7 +18,6 @@ class FROZENBREAK_API UInventoryWidget : public UUserWidget, public IOpenable
 
 private:
 	TArray<class UInventoryItem*> ItemDataList;
-	float Weight = 0.0f;
 	
 protected:
 	UPROPERTY(meta = (BindWidget))
@@ -36,6 +35,7 @@ protected:
 
 protected:
 	virtual void NativeConstruct() override;
+	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 private:
 	UFUNCTION()
 	void UpdateItemByType(EItemType InType);
@@ -49,8 +49,8 @@ private:
 	void TrashItem();
 	UFUNCTION()
 	void HideWidget();
-
-	void UpdateWeight();
+	UFUNCTION()
+	void UpdateWeight(float InWeight, float InMaxWeight);
 
 public:
 	void OpenWidget_Implementation();

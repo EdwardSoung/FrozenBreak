@@ -28,6 +28,15 @@ void UInventoryComponent::BeginPlay()
 
 		EventSystem->Chraracter.OnRequestIventoryItems.AddDynamic(this, &UInventoryComponent::SendInventoryItems);
 	}
+
+	//임시로 가방 강제 장착. 나중에 캐릭터 장착 쪽에 가방도 두면 좋을 것 같음..
+	if (BagData && BagData->ItemType == EItemType::Bag)
+	{
+		if (BagData->Stats.Contains(EItemStatType::Weight))
+		{
+			InventoryMaxWeight = BagData->Stats[EItemStatType::Weight];
+		}
+	}
 }
 
 void UInventoryComponent::SendInventoryItems()
@@ -38,9 +47,26 @@ void UInventoryComponent::SendInventoryItems()
 	}
 }
 
+void UInventoryComponent::RefreshWeight()
+{
+	CurrentWeight = 0;
+	for (auto Item : Items)
+	{
+		CurrentWeight += Item->GetWeight();
+	}
+	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+	{
+		EventSystem->Chraracter.OnUpdateInventoryWeight.Broadcast(CurrentWeight, InventoryMaxWeight);
+	}
+}
+
 //우선은...중복 허용하지 않음
 void UInventoryComponent::AddItem(EItemType Type, int32 Amount)
-{
+{	
+	if (CurrentWeight >= InventoryMaxWeight)
+	{
+		return;
+	}
 	UInventoryItem* AddedItem = nullptr;
 	if (UInventoryItem* TargetItem = GetItem(Type))
 	{
@@ -65,11 +91,13 @@ void UInventoryComponent::AddItem(EItemType Type, int32 Amount)
 			EventSystem->Chraracter.OnAddItemToInventoryUI.Broadcast(AddedItem);
 		}
 	}
+	RefreshWeight();
 }
 
 void UInventoryComponent::TrashItem(UInventoryItem* InItem)
 {
 	Items.Remove(InItem);
+	RefreshWeight();
 }
 
 UInventoryItem* UInventoryComponent::GetItem(EItemType Type)
@@ -94,4 +122,5 @@ void UInventoryComponent::InitInventoryUI()
 			EventSystem->Chraracter.OnInitInventoryUI.Broadcast(Items);
 		}
 	}
+	RefreshWeight();
 }

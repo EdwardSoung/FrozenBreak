@@ -31,7 +31,8 @@ enum class EItemType : uint8
 	CookedMeat,	// 구운 고기
 	Fruit,		// 과일?
 	Jaket,		// 자켓
-	Campfire	// 모닥불 (모닥불은 Prop 이면서 동시에 인벤토리에 들어갈 수 있는 아이템으로 분류 : 제작 아이템)
+	Campfire,	// 모닥불 (모닥불은 Prop 이면서 동시에 인벤토리에 들어갈 수 있는 아이템으로 분류 : 제작 아이템)
+	Bag,
 };
 
 UENUM(BlueprintType)
@@ -62,6 +63,7 @@ enum class EItemStatType : uint8
 	Fatigue,		//피로
 	Temperature,
 	ColdResistance,
+	Weight,
 };
 
 UENUM(BlueprintType)

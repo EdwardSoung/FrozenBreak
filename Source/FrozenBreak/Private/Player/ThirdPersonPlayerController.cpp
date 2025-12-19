@@ -25,9 +25,13 @@ void AThirdPersonPlayerController::SetupInputComponent()
 	{
 		// IA_Pause 바인딩
 		if (IA_Pause)
-		{
 			EnhancedInputComponent->BindAction(IA_Pause, ETriggerEvent::Started, this, &AThirdPersonPlayerController::OnPauseTriggered);
-		}
+		
+		if (IA_Inventory)		
+			EnhancedInputComponent->BindAction(IA_Inventory, ETriggerEvent::Started, this, &AThirdPersonPlayerController::OnInventoryTriggered);
+		
+		if(IA_PlayerStatus)
+			EnhancedInputComponent->BindAction(IA_PlayerStatus, ETriggerEvent::Started, this, &AThirdPersonPlayerController::OnPlayerStatusTriggered);
 	}
 }
 
@@ -54,5 +58,21 @@ void AThirdPersonPlayerController::OnPauseTriggered(const FInputActionValue& Val
 		FInputModeGameAndUI InputMode;
 		SetInputMode(InputMode);
 		UGameplayStatics::SetGamePaused(this, true);
+	}
+}
+
+void AThirdPersonPlayerController::OnInventoryTriggered(const FInputActionValue& Value)
+{
+	if (UUISubSystem* UISystem = UUISubSystem::Get(this))
+	{
+		UISystem->ShowWidget(EWidgetType::Inventory);
+	}
+}
+
+void AThirdPersonPlayerController::OnPlayerStatusTriggered(const FInputActionValue& Value)
+{
+	if (UUISubSystem* UISystem = UUISubSystem::Get(this))
+	{
+		UISystem->ShowWidget(EWidgetType::CharacterState);
 	}
 }

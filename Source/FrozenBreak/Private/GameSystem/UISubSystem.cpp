@@ -75,7 +75,7 @@ UUserWidget* UUISubSystem::ShowWidget(EWidgetType InWidgetType)
 		//기본 HUD가 아닐 때 처음 열어주는거면 인풋모드 변경
 		if (OpenedWidgets.Num() == 0)
 		{
-			FInputModeUIOnly InputMode;
+			FInputModeGameAndUI InputMode;
 			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 			CurrentPlayerController->SetInputMode(InputMode);
 			CurrentPlayerController->bShowMouseCursor = true;

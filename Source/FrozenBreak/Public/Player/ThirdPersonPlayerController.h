@@ -7,6 +7,7 @@
 #include <InputActionValue.h>
 #include "ThirdPersonPlayerController.generated.h"
 
+class UInputAction;
 /**
  * 
  */
@@ -18,6 +19,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	void OnPauseTriggered(const FInputActionValue& Value);
+	void OnInventoryTriggered(const FInputActionValue& Value);
+	void OnPlayerStatusTriggered(const FInputActionValue& Value);
 
 public:
 	virtual void SetupInputComponent() override;
@@ -25,7 +28,11 @@ public:
 protected:
     // [설정] Pause 입력 액션
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-    TObjectPtr<class UInputAction> IA_Pause;
+    TObjectPtr<UInputAction> IA_Pause;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+    TObjectPtr<UInputAction> IA_Inventory;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+    TObjectPtr<UInputAction> IA_PlayerStatus;
 
 private:
 	bool bIsMenuOpen = false;

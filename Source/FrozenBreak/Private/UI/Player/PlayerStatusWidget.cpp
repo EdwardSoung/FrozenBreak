@@ -3,7 +3,9 @@
 
 #include "UI/Player/PlayerStatusWidget.h"
 #include "Components/TextBlock.h"
+#include "Components/Button.h"
 #include "GameSystem/EventSubSystem.h"
+#include "GameSystem/UISubSystem.h"
 #include "UI/Player/EquipmentSlotWidget.h"
 #include "Data/ItemData.h"
 
@@ -19,6 +21,7 @@ void UPlayerStatusWidget::NativeConstruct()
 		statusEvent->Status.OnHandEquipmentChanged.AddDynamic(this, &UPlayerStatusWidget::SetHandEquipment);
 		statusEvent->Status.OnBodyEquipmentChanged.AddDynamic(this, &UPlayerStatusWidget::SetBodyEquipment);
 	}
+	CloseStatButton->OnClicked.AddDynamic(this, &UPlayerStatusWidget::HideWidget);
 }
 
 void UPlayerStatusWidget::SetInGameTime(FText InTimeValue)
@@ -53,3 +56,22 @@ void UPlayerStatusWidget::SetBodyEquipment(UItemData* InBodyItem)
 	}
 }
 
+void UPlayerStatusWidget::HideWidget()
+{
+	if (UUISubSystem* UISystem = UUISubSystem::Get(this))
+	{
+		UISystem->HideWidget(EWidgetType::CharacterState);
+	}
+}
+
+
+void UPlayerStatusWidget::OpenWidget_Implementation()
+{
+	SetVisibility(ESlateVisibility::Visible);
+
+}
+
+void UPlayerStatusWidget::CloseWidget_Implementation()
+{
+	SetVisibility(ESlateVisibility::Collapsed);
+}

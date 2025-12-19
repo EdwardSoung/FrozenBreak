@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Interface/UI/Openable.h"
 #include "PlayerStatusWidget.generated.h"
 
 class UItemData;
@@ -11,7 +12,7 @@ class UItemData;
  * 
  */
 UCLASS()
-class FROZENBREAK_API UPlayerStatusWidget : public UUserWidget
+class FROZENBREAK_API UPlayerStatusWidget : public UUserWidget, public IOpenable
 {
 	GENERATED_BODY()
 
@@ -29,6 +30,12 @@ protected:
 
 	UFUNCTION()
 	void SetBodyEquipment(UItemData* InBodyItem);
+	UFUNCTION()
+	void HideWidget();
+
+public:
+	void OpenWidget_Implementation();
+	void CloseWidget_Implementation();
 
 protected:
 	UPROPERTY(meta = (BindWidget))
@@ -43,6 +50,8 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> TemperatureDefence = nullptr;
 
+	UPROPERTY(meta = (BindWidget))	
+	TObjectPtr<class UButton> CloseStatButton = nullptr;
 private:
 	// 초기화용 기본 아이콘 : null
 	UTexture2D* DefaultItemIcon = nullptr;

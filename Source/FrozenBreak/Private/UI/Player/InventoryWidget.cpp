@@ -19,6 +19,7 @@ void UInventoryWidget::NativeConstruct()
 		EventSystem->Chraracter.OnInitInventoryUI.AddDynamic(this, &UInventoryWidget::InitData);
 		EventSystem->Chraracter.OnAddItemToInventoryUI.AddDynamic(this, &UInventoryWidget::AddItem);
 		EventSystem->Chraracter.OnUpdateInventoryItem.AddDynamic(this, &UInventoryWidget::UpdateItemByType);
+		EventSystem->Chraracter.OnUpdateInventoryWeight.AddDynamic(this, &UInventoryWidget::UpdateWeight);
 
 		//최초에 생성되면..초기화 요청
 		EventSystem->Chraracter.OnRequestInventoryInit.Broadcast();
@@ -26,6 +27,19 @@ void UInventoryWidget::NativeConstruct()
 
 	TrashButton->OnClicked.AddDynamic(this, &UInventoryWidget::TrashItem);
 	CloseButton->OnClicked.AddDynamic(this, &UInventoryWidget::HideWidget);
+}
+
+FReply UInventoryWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{
+	if (InKeyEvent.GetKey() == EKeys::I)
+	{		
+		//음..굳이..? 포커스도 맞추기 힘든..
+		//HideWidget();
+		return FReply::Handled();
+	}
+
+	// 다른 키는 부모 클래스 루틴 따름 (Unhandled 반환)
+	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
 }
 
 void UInventoryWidget::UpdateItemByType(EItemType InType)
@@ -42,14 +56,12 @@ void UInventoryWidget::UpdateItemByType(EItemType InType)
 			break;
 		}
 	}
-	UpdateWeight();
 }
 
 void UInventoryWidget::AddItem(UInventoryItem* InItem)
 {
 	ItemDataList.Add(InItem);
 	InventoryList->AddItem(InItem);
-	UpdateWeight();
 }
 
 void UInventoryWidget::InitData(TArray<class UInventoryItem*> InData)
@@ -58,11 +70,10 @@ void UInventoryWidget::InitData(TArray<class UInventoryItem*> InData)
 	for (auto data : ItemDataList)
 	{
 		InventoryList->AddItem(data);
-		Weight += data->GetWeight();
 	}
 
-	FString weightValue = FString::Printf(TEXT("%.2f"), Weight);
-	WeightText->SetText(FText::FromString(weightValue));
+	//FString weightValue = FString::Printf(TEXT("%.2f"), Weight);
+	//WeightText->SetText(FText::FromString(weightValue));
 }
 
 void UInventoryWidget::RemoveItem(UInventoryItem* InItem)
@@ -86,7 +97,6 @@ void UInventoryWidget::TrashItem()
 			EventSystem->Chraracter.OnTrashItem.Broadcast(selectedItem);
 		}
 	}
-	UpdateWeight();
 }
 
 void UInventoryWidget::HideWidget()
@@ -97,14 +107,9 @@ void UInventoryWidget::HideWidget()
 	}
 }
 
-void UInventoryWidget::UpdateWeight()
+void UInventoryWidget::UpdateWeight(float InWeight, float InMaxWeight)
 {
-	Weight = 0;
-	for (auto Item : ItemDataList)
-	{
-		Weight += Item->GetWeight();
-	}
-	FString weightValue = FString::Printf(TEXT("%.2f"), Weight);
+	FString weightValue = FString::Printf(TEXT("%.2f/%.2f"), InWeight, InMaxWeight);
 	WeightText->SetText(FText::FromString(weightValue));
 }
 

@@ -25,21 +25,27 @@ public:
 	void InitInventoryUI();
 
 protected:
+	// Called when the game starts
+	virtual void BeginPlay() override;
 	UFUNCTION()
 	void AddItem(EItemType Type, int32 Amount);
 	UFUNCTION()
 	void TrashItem(UInventoryItem* InItem);
 
-	// Called when the game starts
-	virtual void BeginPlay() override;
+	UFUNCTION()
+	void SendInventoryItems();
 
+	void RefreshWeight();
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<UItemDataList> DataList;
 
-	UFUNCTION()
-	void SendInventoryItems();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data|Bag")
+	TObjectPtr<UItemData> BagData;
 
 private:
 	TArray<UInventoryItem*> Items;
 
+	float InventoryMaxWeight = 50.0f;
+	float CurrentWeight = 0.0f;
 };
