@@ -55,7 +55,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Prop|Widget")
 	TObjectPtr<class UWidgetComponent> InteractionWidget = nullptr;
 
-	// ==== 테스트 ====
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class APickupItem> GenerateItemClass = nullptr;
 

@@ -67,8 +67,6 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 	CurrentInteractionActor = InteractionHitResult.GetActor();
 
-
-
 	// 뭔가 라인에 맞았다 (상호작용 가능한 무언가)
 	if (bHit && CurrentInteractionActor)
 	{
@@ -118,15 +116,6 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 					bIsInteracting = true;
 				}
 			}
-			else
-			{
-				// 범위 밖이면 표시하지 않음
-				if (LastInteractionActor)
-				{
-					IInteractable::Execute_OnSelect(LastInteractionActor, false);
-					LastInteractionActor = nullptr;
-				}
-			}
 		}
 		// 바라보고 있는 액터와 마지막으로 바라본 액터가 다르다면
 		else if (CurrentInteractionActor != LastInteractionActor)
@@ -153,6 +142,7 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			}
 		}
 
+		// 바라보고 있는 액터가 있는데, 상호작용 가능한 거리에서 벗어난다면
 		if (bIsInteracting && (BetweenDistance > ActivateInteractDistance))
 		{
 			IInteractable::Execute_OnSelect(CurrentInteractionActor, false);
