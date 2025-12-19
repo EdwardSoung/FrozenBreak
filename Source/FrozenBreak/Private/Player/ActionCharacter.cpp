@@ -795,4 +795,9 @@ void AActionCharacter::Attack()
 	PlayAttackMontage();
 }
 
+void AActionCharacter::PlayAttackMontage()
+{
+
+}
+
 
