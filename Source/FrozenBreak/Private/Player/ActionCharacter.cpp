@@ -782,4 +782,17 @@ void AActionCharacter::OnToolEnd()
 	}
 }
 
+void AActionCharacter::Attack()
+{
+	// 칼 없으면 공격 불가
+	if (!CurrentKnife) return;
+
+	// 중복 실행 방지
+	if (bIsAttacking) return;
+
+	bIsAttacking = true;
+
+	PlayAttackMontage();
+}
+
 
