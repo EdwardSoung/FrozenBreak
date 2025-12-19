@@ -18,12 +18,9 @@ void UCraftInventoryComponent::BeginPlay()
 
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
-		EventSystem->Chraracter.OnSendInventoryData.AddDynamic(
-			this, &UCraftInventoryComponent::OnReceiveInventoryData);
+		EventSystem->Chraracter.OnSendInventoryData.AddDynamic(this, &UCraftInventoryComponent::OnReceiveInventoryData);
 		EventSystem->Chraracter.OnCraftRequested.AddDynamic(this, &UCraftInventoryComponent::StartCrafting);
-;
-		EventSystem->Chraracter.OnRequestIventoryItems.Broadcast();
-	}
+;	}
 }
 
 // ==================== Inventory ====================
