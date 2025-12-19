@@ -52,6 +52,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float InteractionDistance = 600.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ActivateInteractDistance = 150.f;
+
+	// 플레이어와 상호작용 할 액터 사이의 거리
+	UPROPERTY(VisibleAnywhere)
+	float BetweenDistance = 0.f;
+
 	// 한번만 실행되게 만들기 위한 bool
 	bool bIsInteracting = false;
 
