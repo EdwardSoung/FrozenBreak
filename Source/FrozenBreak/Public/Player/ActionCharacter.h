@@ -8,6 +8,7 @@
 #include "Engine/EngineTypes.h" 
 #include "Sound/SoundBase.h"
 #include "Tools/AxeActor.h"
+#include "Animation/AnimMontage.h"
 #include "ActionCharacter.generated.h"
 
 // ===== Forward Declarations =====
@@ -15,6 +16,8 @@ class UCameraComponent;
 class USpringArmComponent;
 class UInputAction;
 class UInputMappingContext;
+class UAnimMontage;
+
 struct FInputActionValue;
 
 USTRUCT(BlueprintType)
@@ -79,7 +82,7 @@ protected:
 	TObjectPtr<UInputAction> IA_Interaction = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
-	TObjectPtr<UInputAction> IA_ToolAction = nullptr;
+	TObjectPtr<UInputAction> IA_Attack = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> IMC_Player = nullptr;
@@ -225,8 +228,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ToolAction")
 	void OnToolEnd();
 
-	void Attack(); // 공격 
-	void PlayAttackMontage();
+	void OnAttackPressed(); // 공격 
+	
 
 
 public:
@@ -258,11 +261,8 @@ public:
 	TEnumAsByte<EPhysicalSurface> LastFootSurface = SurfaceType_Default; // 공중에 잠깐뜰때나 계단 같은 곳에서의 설정
 
 public: // 무기쪽
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
-	class AKnifeActor* CurrentKnife;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	bool bIsAttacking;
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|Montage")
+	TObjectPtr<class UAnimMontage> UnarmedAttackMontage;
 
 
 };

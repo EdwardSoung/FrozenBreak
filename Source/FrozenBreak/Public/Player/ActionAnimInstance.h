@@ -50,7 +50,7 @@ protected: // 옆으로 걷기
 	float RightAmount = 0.0f; // -1 은 왼쪽으로 가고 ~ +1은 오른쪽으로가게 됨
 
 	UPROPERTY(BlueprintReadOnly, Category = "Movement|Strafe")
-	float StrafeRunAlpha; // 옆 걷기 속도에 따른 애니메이션 변화
+	float StrafeRunAlpha = 0.0f; // 옆 걷기 속도에 따른 애니메이션 변화
 
 	UPROPERTY(BlueprintReadOnly, Category = "Anim")
 	bool bIsStrafing = false;

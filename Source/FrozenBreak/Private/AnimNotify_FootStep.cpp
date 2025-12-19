@@ -53,7 +53,6 @@ void UAnimNotify_FootStep::Notify(
 	const FAnimNotifyEventReference& EventReference
 )
 {
-	UE_LOG(LogTemp, Error, TEXT("🔥🔥 FOOTSTEP NOTIFY FIRED"));
 
 	if (!MeshComp)
 	{
@@ -136,32 +135,6 @@ void UAnimNotify_FootStep::Notify(
 	const FString OwnerName = Character ? Character->GetName() : TEXT("None");
 	const FString AnimName = Animation ? Animation->GetName() : TEXT("None");
 	const FString HitActorName = Hit.GetActor() ? Hit.GetActor()->GetName() : TEXT("None");
-
-	UE_LOG(LogTemp, Warning, TEXT("[Footstep] Owner=%s Anim=%s Side=%s"),
-		*OwnerName,
-		*AnimName,
-		(FootstepSide == EFootstepSide::Left) ? TEXT("L") : TEXT("R"));
-
-	UE_LOG(LogTemp, Warning, TEXT("[Footstep] Socket=%s Loc=%s Start=%s End=%s"),
-		*FootSocketName.ToString(),
-		*SoundLocation.ToString(),
-		*Start.ToString(),
-		*End.ToString());
-
-	UE_LOG(LogTemp, Warning, TEXT("[Footstep] TraceHit=%d HitActor=%s PhysMat=%s Surface=%d"),
-		bHit ? 1 : 0,
-		*HitActorName,
-		Hit.PhysMaterial.IsValid() ? *Hit.PhysMaterial->GetName() : TEXT("None"),
-		(int32)Surface);
-
-	UE_LOG(LogTemp, Warning, TEXT(
-		"[Footstep] HitComp=%s CompPhysMat=%s"),
-		Hit.GetComponent() ? *Hit.GetComponent()->GetName() : TEXT("None"),
-		(Hit.GetComponent() && Hit.GetComponent()->GetBodyInstance())
-		? *GetNameSafe(Hit.GetComponent()->GetBodyInstance()->GetSimplePhysicalMaterial())
-		: TEXT("None")
-	);
-
 
 
 	const FFootstepSoundList* Found = nullptr;

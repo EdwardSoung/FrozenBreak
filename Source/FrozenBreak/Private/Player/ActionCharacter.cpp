@@ -27,6 +27,8 @@
 #include "CommonComponents/HealthComponent.h"
 #include "CommonComponents/StatComponent.h"
 
+#include "Animation/AnimMontage.h"
+
 #include "Tools/AxeActor.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -262,6 +264,14 @@ void AActionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 			this,
 			&AActionCharacter::OnInteration
 		);
+	}
+	if (IA_Attack)
+	{
+		EnhancedInput->BindAction(
+			IA_Attack, 
+			ETriggerEvent::Started, 
+			this, 
+			&AActionCharacter::OnAttackPressed);
 	}
 	
 }
@@ -782,22 +792,45 @@ void AActionCharacter::OnToolEnd()
 	}
 }
 
-void AActionCharacter::Attack()
-{
-	// 칼 없으면 공격 불가
-	if (!CurrentKnife) return;
-
-	// 중복 실행 방지
-	if (bIsAttacking) return;
-
-	bIsAttacking = true;
-
-	PlayAttackMontage();
-}
-
-void AActionCharacter::PlayAttackMontage()
+void AActionCharacter::OnAttackPressed()
 {
 
+	UE_LOG(LogTemp, Warning, TEXT("[Attack] Pressed"));
+
+	
+
+	if (GetCharacterMovement() && GetCharacterMovement()->IsFalling())
+		return;
+
+	if (!UnarmedAttackMontage)
+		return;
+
+	USkeletalMeshComponent* MeshComp = GetMesh();
+	if (!MeshComp)
+		return;
+
+	UAnimInstance* Anim = MeshComp->GetAnimInstance();
+	if (!Anim)
+		return;
+
+	// 중복 재생 금지
+	if (Anim->Montage_IsPlaying(UnarmedAttackMontage))
+		return;
+
+	Anim->Montage_Play(UnarmedAttackMontage, 1.0f);
+
+	
+	UE_LOG(LogTemp, Warning, TEXT("[Attack] Mesh=%s"), MeshComp ? *MeshComp->GetName() : TEXT("NULL"));
+
+	
+	UE_LOG(LogTemp, Warning, TEXT("[Attack] AnimInstance=%s"), Anim ? *Anim->GetClass()->GetName() : TEXT("NULL"));
+
+	float Len = Anim->Montage_Play(UnarmedAttackMontage, 1.0f);
+	UE_LOG(LogTemp, Warning, TEXT("[Attack] MontagePlay Len=%.3f Montage=%s"),
+		Len,
+		UnarmedAttackMontage ? *UnarmedAttackMontage->GetName() : TEXT("NULL"));
 }
+
+
 
 
