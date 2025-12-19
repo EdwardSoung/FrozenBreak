@@ -11,7 +11,7 @@ void UPropDurabilityWidget::NativeConstruct()
 
 	if (UEventSubSystem* statusEvent = UEventSubSystem::Get(this))
 	{
-		statusEvent->Status.OnHealthPointChanged.AddDynamic(this, &UPropDurabilityWidget::SetDurabilityProgress);
+		statusEvent->Status.OnHealthPointChanged.AddUniqueDynamic(this, &UPropDurabilityWidget::SetDurabilityProgress);
 	}
 }
 
