@@ -23,8 +23,6 @@ protected:
 public:
 	void InitStat(float InHealth, float InAttack = 0);
 	void OnDamaged(float InDamage);
-
-	// ==== 프롭 상호작용 테스트용 입니다 ====
 	void OnPropDamaged(float InDamage);
 public:	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")

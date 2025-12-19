@@ -74,6 +74,8 @@ protected:
 
 	bool bIsBedTime = false;
 
+	float ToolAtkPower = 0.f;
+
 	// Rock 용 StoneSpawnCount
 	// Stone 을 몇번 생성 시켰냐
 	int32 CurrentSpawnCount = 0;

@@ -49,7 +49,7 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	const FVector CameraForward = Camera->GetForwardVector();
 	const FVector TargetLocation = CameraLocation + (CameraForward * InteractionDistance);
 
-	const float SweepRadius = 30.0f; // 값 키우면 더 잘 맞음
+	const float SweepRadius = 15.0f; // 값 키우면 더 잘 맞음
 
 	const bool bHit = GetWorld()->SweepSingleByChannel(
 		InteractionHitResult,
@@ -158,8 +158,8 @@ void UInteractionComponent::DoAction_Implementation() // 플레이어가 상호�
 		if (CurrentInteractionActor) // 바라보고 있는 액터에게
 		{
 			// "너가 할 수 있는거 하셈" 알림
-			UE_LOG(LogTemp, Log, TEXT("인컴 : 인터페이스 받고 바라보고 있는 액터에게 인터페이스 보냄"))
-				IInteractable::Execute_DoAction(CurrentInteractionActor);
+			UE_LOG(LogTemp, Log, TEXT("인컴 : 인터페이스 받고 바라보고 있는 액터에게 인터페이스 보냄"));
+			IInteractable::Execute_DoAction(CurrentInteractionActor);
 
 			// 초기화
 			CurrentInteractionActor = nullptr;

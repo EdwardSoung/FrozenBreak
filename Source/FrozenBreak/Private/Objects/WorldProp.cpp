@@ -2,6 +2,7 @@
 
 
 #include "Objects/WorldProp.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "GameSystem/Events/StatusEvents.h"
 #include "GameSystem/EventSubSystem.h"
@@ -13,7 +14,9 @@
 #include "Components/SceneComponent.h"
 #include "Components/WidgetComponent.h"
 
+#include "Player/ActionCharacter.h"
 #include "Objects/PickupItem.h"
+#include "Tools/ToolActor.h"
 
 #include "UI/Prop/InteractionWidget.h"
 #include "Data/PropData.h"
@@ -160,14 +163,25 @@ void AWorldProp::TreeAction()
 
 	if (EventSystem)
 	{
-		// 플레이어 피로도 감소? 시키기
-		EventSystem->Status.OnSetFatigue.Broadcast(FatigueCostPerWork);
+		if (AActionCharacter* Player = Cast<AActionCharacter>(UGameplayStatics::GetPlayerPawn(this, 0)))
+		{
+			ToolAtkPower = Player->GetCurrentToolAtkPower();
 
-		// 임시. StatComponent->CurrentHealth에 데미지 주기
-		// 플레이어가 들고있는 무기의 Stats->Attack을 가져와야 한다.
-		StatComponent->OnPropDamaged(25.f);
+			// 도구의 공격력 만큼 데미지 주기
+			StatComponent->OnPropDamaged(ToolAtkPower);
 
-		UE_LOG(LogTemp, Log, TEXT("나무를 베었다. 나무 Durability : %.1f"), StatComponent->CurrentHealth);
+			// 플레이어 피로도 감소? 시키기
+			EventSystem->Status.OnSetFatigue.Broadcast(FatigueCostPerWork);
+			UE_LOG(LogTemp, Log, TEXT("나무를 베었다. 나무 Durability : %.1f"), StatComponent->CurrentHealth);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("Player 캐스팅 실패"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("이벤트 시스템이 없다"));
 	}
 
 	// 나무의 Durability가 0 이하 일 때
@@ -206,12 +220,21 @@ void AWorldProp::RockAction()
 
 	if (EventSystem)
 	{
-		// 플레이어 피로도 감소? 시키기
-		EventSystem->Status.OnSetFatigue.Broadcast(FatigueCostPerWork);
+		if (AActionCharacter* Player = Cast<AActionCharacter>(UGameplayStatics::GetPlayerPawn(this, 0)))
+		{
+			ToolAtkPower = Player->GetCurrentToolAtkPower();
 
-		// 임시. StatComponent->CurrentHealth에 데미지 주기
-		StatComponent->OnPropDamaged(25.f);
-		UE_LOG(LogTemp, Log, TEXT("돌을 찍었다. 돌 Durability : %.1f"), StatComponent->CurrentHealth);
+			// 도구의 공격력 만큼 데미지 주기
+			StatComponent->OnPropDamaged(ToolAtkPower);
+
+			// 플레이어 피로도 감소? 시키기
+			EventSystem->Status.OnSetFatigue.Broadcast(FatigueCostPerWork);
+			UE_LOG(LogTemp, Log, TEXT("바위를 찍었다. 바위 Durability : %.1f"), StatComponent->CurrentHealth);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("Player 캐스팅 실패"));
+		}
 	}
 
 	if (StatComponent->CurrentHealth <= 0)

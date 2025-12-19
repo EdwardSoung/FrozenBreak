@@ -50,7 +50,7 @@ void UStatComponent::OnDamaged(float InDamage)
 	}
 }
 
-// ==== 프롭 상호작용 테스트용 입니다 ====
+// 프롭 상호작용
 void UStatComponent::OnPropDamaged(float InDamage)
 {
 	CurrentHealth -= InDamage;

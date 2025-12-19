@@ -35,6 +35,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
+public:
+	inline float GetCurrentToolAtkPower() const { return CurrentTools->GetToolAtkPower(); }
+
 protected:
 	// ===== Camera =====
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera")
