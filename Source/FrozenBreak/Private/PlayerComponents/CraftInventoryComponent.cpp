@@ -172,10 +172,6 @@ void UCraftInventoryComponent::RebuildCraftableCachesAndBroadcastIfChanged()
 	{
 		SetCraftableItemCount(KVP.Key, KVP.Value);
 	}
-	for (const auto& KVP : CraftableTimesCooking)
-	{
-		SetCraftableItemCount(KVP.Key, KVP.Value);
-	}
 
 	RemoveNonCraftablesFromUI();
 }

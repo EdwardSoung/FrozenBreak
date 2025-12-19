@@ -115,11 +115,6 @@ private:
 	TSet<EItemType> CraftingSet;
 	TSet<EItemType> CookingSet;
 
-	TArray<EItemType> CraftablesCrafting;
-	TArray<EItemType> CraftablesCooking;
-	TArray<EItemType> LastCraftablesCrafting;
-	TArray<EItemType> LastCraftablesCooking;
-
 	TMap<EItemType, int32> CraftableTimesCrafting;
 	TMap<EItemType, int32> CraftableTimesCooking;
 	TMap<EItemType, int32> LastCraftableTimesCrafting;
