@@ -18,7 +18,9 @@
 #include "Objects/PickupItem.h"
 #include "Tools/ToolActor.h"
 
+#include "UI/Prop/PropDurabilityWidget.h"
 #include "UI/Prop/InteractionWidget.h"
+
 #include "Data/PropData.h"
 #include "Interface/Interactable.h"
 
@@ -44,6 +46,11 @@ AWorldProp::AWorldProp()
 	InteractionWidget->SetWidgetSpace(EWidgetSpace::Screen);
 	InteractionWidget->SetVisibility(false);
 
+	DurabilityWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("DurabilityWidget"));
+	DurabilityWidget->SetupAttachment(RootComponent);
+	DurabilityWidget->SetRelativeLocation(FVector(0, 0, 50));
+	DurabilityWidget->SetWidgetSpace(EWidgetSpace::Screen);
+	DurabilityWidget->SetVisibility(false);
 }
 
 // Called when the game starts or when spawned
@@ -112,7 +119,7 @@ void AWorldProp::DoAction_Implementation()
 			// HUD : 제작대 UI를 띄워야 한다.
 			// 중복실행을 막아야 함
 
-		
+
 			if (UUISubSystem* UISystem = UUISubSystem::Get(this))
 			{
 				UISystem->ShowWidget(EWidgetType::CraftInventory);
@@ -140,21 +147,18 @@ void AWorldProp::OnSelect_Implementation(bool bIsStarted)
 {
 	// 라인 트레이스에 맞은 시점에 위젯 텍스트를 업데이트 한 뒤, 보여준다.
 
-	// 주석 : Todo
-	// if (플레이어의 CurrentWeapon->ItemType == Data->InteractableToolType 이라면)
-	// {
 	if (auto Widget = Cast<UInteractionWidget>(InteractionWidget->GetUserWidgetObject()))
 	{
 		Widget->UpdateInteraction(Data->PropType, Data->InteractionKey);
 		InteractionWidget->SetVisibility(bIsStarted);
+
 	}
-	// }
-	// else (플레이어의 CurrentWeapon->ItemType != Data->InteractableToolType) 이라면
-	// {
-	//	UE_LOG(LogTemp, Log, TEXT("플레이어가 들고 있는 도구는 이 프롭과 상호작용 불가능"));
-	//  혹은 상호작용이 불가능 하다는 위젯을 띄운다.
-	//  return;
-	// }
+	if (auto Durability = Cast<UPropDurabilityWidget>(DurabilityWidget->GetUserWidgetObject()))
+	{
+		EventSystem->Status.OnHealthPointChanged.Broadcast(GetDurabilityRadio());
+		DurabilityWidget->SetVisibility(bIsStarted);
+	}
+	
 }
 
 void AWorldProp::TreeAction()
@@ -170,6 +174,9 @@ void AWorldProp::TreeAction()
 
 			// 도구의 공격력 만큼 데미지 주기
 			StatComponent->OnPropDamaged(ToolAtkPower);
+
+			EventSystem->Status.OnHealthPointChanged.Broadcast(GetDurabilityRadio());
+
 
 			// 플레이어 피로도 감소? 시키기
 			EventSystem->Status.OnSetFatigue.Broadcast(FatigueCostPerWork);
@@ -227,6 +234,8 @@ void AWorldProp::RockAction()
 
 			// 도구의 공격력 만큼 데미지 주기
 			StatComponent->OnPropDamaged(ToolAtkPower);
+
+			EventSystem->Status.OnHealthPointChanged.Broadcast(GetDurabilityRadio());
 
 			// 플레이어 피로도 감소? 시키기
 			EventSystem->Status.OnSetFatigue.Broadcast(FatigueCostPerWork);
@@ -296,6 +305,21 @@ void AWorldProp::IsBedTime()
 
 	// BedTimeStart와 BedTimeEnd 사이의 시간이여야만 잘 수 있다.
 	bIsBedTime = (Hour >= BedTimeStart) && (Hour < BedTimeEnd);
+}
+
+float AWorldProp::GetDurabilityRadio() const
+{
+	if (StatComponent)
+	{
+		const float MaxDurability = StatComponent->MaxHealth;
+		const float CurrentDurability = StatComponent->CurrentHealth;
+		return FMath::Clamp(CurrentDurability / MaxDurability, 0.f, 1.f);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("StatComponent가 없다."));
+		return 0;
+	}
 }
 
 inline EItemType AWorldProp::GetInteractableToolType() const
