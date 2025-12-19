@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interface/Interactable.h"
+#include "Engine/EngineTypes.h" 
+#include "Sound/SoundBase.h"
 #include "Tools/AxeActor.h"
 #include "ActionCharacter.generated.h"
 
@@ -14,6 +16,15 @@ class USpringArmComponent;
 class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
+
+USTRUCT(BlueprintType)
+struct FFootstepSoundList
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<TObjectPtr<USoundBase>> Sounds;
+};
 
 UCLASS()
 class FROZENBREAK_API AActionCharacter : public ACharacter, public IInteractable
@@ -230,4 +241,13 @@ public:
 
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = "Sound")
 	int32 LastFootstepIndex_R = -1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
+	TMap<TEnumAsByte<EPhysicalSurface>, FFootstepSoundList> FootstepBySurface_L;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
+	TMap<TEnumAsByte<EPhysicalSurface>, FFootstepSoundList> FootstepBySurface_R;
+
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = "Sound")
+	TEnumAsByte<EPhysicalSurface> LastFootSurface = SurfaceType_Default; // 공중에 잠깐뜰때나 계단 같은 곳에서의 설정
 };
