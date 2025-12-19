@@ -199,7 +199,7 @@ void UAnimNotify_FootStep::Notify(
 
 	
 	const float BaseVolume = 0.25f;
-
+	
 	// 걷기/뛰기 가중치)
 	float Speed = Character->GetVelocity().Size();
 
@@ -213,6 +213,8 @@ void UAnimNotify_FootStep::Notify(
 	// 최종 안전 clamp
 	Volume = FMath::Clamp(Volume, 0.12f, 0.38f);
 	float Pitch = FMath::RandRange(0.95f, 1.05f); // 자연스럽게 
+
+	
 
 	UGameplayStatics::PlaySoundAtLocation(
 		Character,
