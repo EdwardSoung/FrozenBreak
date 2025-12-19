@@ -13,5 +13,19 @@ UCLASS()
 class FROZENBREAK_API UQuitMenuWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+protected:
+	virtual void NativeConstruct() override;
+
+	UFUNCTION()
+	void OnResumeClicked();
+	UFUNCTION()
+	void OnQuitClicked();
+protected:
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UButton> ResumeButton = nullptr;
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UButton> RecipeButton = nullptr;
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UButton> QuitButton = nullptr;
 };

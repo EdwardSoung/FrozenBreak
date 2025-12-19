@@ -6,6 +6,7 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "GameSystem/Events/CharacterEvents.h"
 #include "GameSystem/Events/StatusEvents.h"
+#include "GameSystem/Events/UIEvents.h"
 #include "EventSubSystem.generated.h"
 
 /**
@@ -24,6 +25,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Events")
 	FStatusEvents Status;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Events")
+	FUIEvents UI;
 
 public:
 	//임시..

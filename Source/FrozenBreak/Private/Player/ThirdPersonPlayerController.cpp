@@ -3,6 +3,7 @@
 
 #include "Player/ThirdPersonPlayerController.h"
 #include "GameSystem/UISubSystem.h"
+#include "GameSystem/EventSubSystem.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include <Kismet/GameplayStatics.h>
@@ -14,6 +15,11 @@ void AThirdPersonPlayerController::BeginPlay()
 	if (UUISubSystem* UISystem = UUISubSystem::Get(this))
 	{
 		UISystem->ShowWidget(EWidgetType::HUD);
+	}
+
+	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+	{
+		EventSystem->UI.OnToggleQuitMenu.AddDynamic(this, &AThirdPersonPlayerController::ToggleQuitMenu);
 	}
 }
 
@@ -35,7 +41,7 @@ void AThirdPersonPlayerController::SetupInputComponent()
 	}
 }
 
-void AThirdPersonPlayerController::OnPauseTriggered(const FInputActionValue& Value)
+void AThirdPersonPlayerController::ToggleQuitMenu()
 {
 	if (bIsMenuOpen)
 	{
@@ -43,7 +49,7 @@ void AThirdPersonPlayerController::OnPauseTriggered(const FInputActionValue& Val
 		{
 			UISystem->HideWidget(EWidgetType::QuitMenu);
 		}
-		
+
 		UGameplayStatics::SetGamePaused(this, false);
 
 		bIsMenuOpen = false;
@@ -59,6 +65,11 @@ void AThirdPersonPlayerController::OnPauseTriggered(const FInputActionValue& Val
 		SetInputMode(InputMode);
 		UGameplayStatics::SetGamePaused(this, true);
 	}
+}
+
+void AThirdPersonPlayerController::OnPauseTriggered(const FInputActionValue& Value)
+{
+	ToggleQuitMenu();
 }
 
 void AThirdPersonPlayerController::OnInventoryTriggered(const FInputActionValue& Value)

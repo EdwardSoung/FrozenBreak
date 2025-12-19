@@ -24,6 +24,8 @@ protected:
 
 public:
 	virtual void SetupInputComponent() override;
+	UFUNCTION()
+	void ToggleQuitMenu();
 
 protected:
     // [설정] Pause 입력 액션
