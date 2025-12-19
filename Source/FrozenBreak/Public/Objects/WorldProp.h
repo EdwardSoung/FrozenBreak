@@ -45,6 +45,8 @@ private:
 	void BedAction();
 	void IsBedTime();
 
+	// 내구도 비율 계산해주는 함수
+	float GetDurabilityRadio() const;
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Stat")
 	TObjectPtr<class UStatComponent> StatComponent;
@@ -56,6 +58,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Prop|Widget")
 	TObjectPtr<class UWidgetComponent> InteractionWidget = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Prop|Widget")
+	TObjectPtr<class UWidgetComponent> DurabilityWidget = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class APickupItem> GenerateItemClass = nullptr;

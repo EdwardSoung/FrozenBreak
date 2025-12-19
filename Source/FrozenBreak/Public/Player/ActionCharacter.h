@@ -48,7 +48,6 @@ public:
 
 public:
 	inline float GetCurrentToolAtkPower() const { return CurrentTools->GetToolAtkPower(); }
-
 protected:
 	// ===== Camera =====
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera")
@@ -80,7 +79,7 @@ protected:
 	TObjectPtr<UInputAction> IA_Interaction = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
-	TObjectPtr<UInputAction> IA_ToolAction= nullptr;
+	TObjectPtr<UInputAction> IA_ToolAction = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> IMC_Player = nullptr;
@@ -133,7 +132,7 @@ protected: // 달리기 조건 설정
 	float BackwardMaxSpeed = 200.0f;
 
 protected: // 도끼질
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Harvest")
 	UAnimMontage* HarvestMontage = nullptr;
 
@@ -226,6 +225,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ToolAction")
 	void OnToolEnd();
 
+	void Attack(); // 공격 
+	void PlayAttackMontage();
+
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
 	EItemType CurrentHeldItemType = EItemType::None;
@@ -253,4 +256,13 @@ public:
 
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = "Sound")
 	TEnumAsByte<EPhysicalSurface> LastFootSurface = SurfaceType_Default; // 공중에 잠깐뜰때나 계단 같은 곳에서의 설정
+
+public: // 무기쪽
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
+	class AKnifeActor* CurrentKnife;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bIsAttacking;
+
+
 };
