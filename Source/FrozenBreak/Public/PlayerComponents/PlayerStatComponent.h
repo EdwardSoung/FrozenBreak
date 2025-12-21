@@ -71,4 +71,9 @@ protected:
 	// Data Asset 형태의 상태 지속 증감값
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Status")
 	TObjectPtr<class UStatusDataAsset> StatusDataAsset = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment")
+	TObjectPtr<class UInventoryItem> HandEquip;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment")
+	TObjectPtr<class UInventoryItem> ArmorEquip;
 };

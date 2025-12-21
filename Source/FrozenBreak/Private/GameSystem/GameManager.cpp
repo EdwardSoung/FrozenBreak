@@ -46,3 +46,13 @@ TSubclassOf<APickupItem> UGameManager::GetPickupItemClass(EItemType InType)
     }
     return nullptr;
 }
+
+UItemData* UGameManager::GetItemData(EItemType InType)
+{
+    return ItemDataList->ItemAssetData.Find(InType)->Get();
+}
+
+uint32 UGameManager::GetUID()
+{
+    return CurrentUID++;
+}

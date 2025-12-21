@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "Data/Enums.h"
+#include "Objects/InventoryItem.h"
 #include "ItemFactorySubSystem.generated.h"
 
 class APickupItem;
@@ -20,5 +21,5 @@ public:
 	static UItemFactorySubSystem* Get(const UObject* WorldContextObject);
 
 	APickupItem* Spawn(EItemType InType, FVector Location, int32 Amount = 1);
-
+	UInventoryItem* Spawn(EItemType InType, int32 Amount = 1);
 };

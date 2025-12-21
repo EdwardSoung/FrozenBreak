@@ -3,8 +3,9 @@
 
 #include "Objects/InventoryItem.h"
 
-void UInventoryItem::Initialize(UItemData* InData)
+void UInventoryItem::Initialize(uint32 InUID, UItemData* InData)
 {
+	UID = InUID;
 	Data = InData;
 	Amount = 0;
 	MaxDurability = Data->Durability;

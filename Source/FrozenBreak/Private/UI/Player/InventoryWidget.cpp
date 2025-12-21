@@ -99,6 +99,17 @@ void UInventoryWidget::TrashItem()
 	}
 }
 
+void UInventoryWidget::UseItem()
+{
+	auto Selected = InventoryList->GetSelectedItem();
+
+	if (Selected)
+	{
+		UInventoryItem* selectedItem = Cast<UInventoryItem>(Selected);
+		
+	}
+}
+
 void UInventoryWidget::HideWidget()
 {	
 	if (UUISubSystem* UISystem = UUISubSystem::Get(this))

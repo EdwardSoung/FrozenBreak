@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "Data/Enums.h"
+#include "Data/ItemDataList.h"
 #include "GameSystem/EventSubSystem.h"
 #include "GameManager.generated.h"
 
@@ -24,6 +25,10 @@ public:
 
 	TSubclassOf<class APickupItem> GetPickupItemClass(EItemType InType);
 
+	UItemData* GetItemData(EItemType InType);
+
+	uint32 GetUID();
+
 	inline float GetInGameStartTime() { return InGameStartTime; }
 protected:
 
@@ -33,7 +38,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<class UDataTable> PickupItemTable;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
+	TObjectPtr<UItemDataList> ItemDataList;
+
 	// 인게임 시작 시간(0~1 : 0.25 = 6시, 0.5 = 12시, 0.75 = 18시, 1.0 = 00시)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	float InGameStartTime = 0.5f;
+
+private:
+	uint32 CurrentUID = 1;
 };

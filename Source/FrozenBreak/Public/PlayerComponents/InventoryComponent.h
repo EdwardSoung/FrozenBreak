@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Data/Enums.h"
-#include "Data/ItemDataList.h"
+#include "Data/ItemData.h"
 #include "InventoryComponent.generated.h"
 
 class UInventoryItem;
@@ -37,9 +37,6 @@ protected:
 
 	void RefreshWeight();
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
-	TObjectPtr<UItemDataList> DataList;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data|Bag")
 	TObjectPtr<UItemData> BagData;
 

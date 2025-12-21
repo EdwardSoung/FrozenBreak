@@ -3,6 +3,7 @@
 
 #include "PlayerComponents/InventoryComponent.h"
 #include "GameSystem/EventSubSystem.h"
+#include "GameSystem/ItemFactorySubSystem.h"
 #include "Objects/InventoryItem.h"
 
 // Sets default values for this component's properties
@@ -86,13 +87,14 @@ void UInventoryComponent::AddItem(EItemType Type, int32 Amount)
 {	
 	if (CurrentWeight >= InventoryMaxWeight)
 	{
+		//무게 초과라 안먹어져야 함
 		return;
 	}
-	UInventoryItem* AddedItem = nullptr;
+
 	if (UInventoryItem* TargetItem = GetItem(Type))
 	{
+		//장비류면 그냥 새로 추가해야.. uid 부여해서 장착 시 처리
 		TargetItem->AddAmount(Amount);
-		AddedItem = TargetItem;
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
 			EventSystem->Chraracter.OnUpdateInventoryItem.Broadcast(Type);
@@ -100,16 +102,15 @@ void UInventoryComponent::AddItem(EItemType Type, int32 Amount)
 	}
 	else
 	{
-		auto NewItem = NewObject<UInventoryItem>(this);
-		auto NewData = DataList->ItemAssetData.Find(Type)->Get();
-		NewItem->Initialize(NewData);
-		NewItem->AddAmount(Amount);
-		Items.Add(NewItem);
-		AddedItem = NewItem;
-
-		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		if (UItemFactorySubSystem* ItemFactory = UItemFactorySubSystem::Get(this))
 		{
-			EventSystem->Chraracter.OnAddItemToInventoryUI.Broadcast(AddedItem);
+			UInventoryItem* NewItem = ItemFactory->Spawn(Type, Amount);
+			Items.Add(NewItem);
+
+			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+			{
+				EventSystem->Chraracter.OnAddItemToInventoryUI.Broadcast(NewItem);
+			}
 		}
 	}
 	RefreshWeight();
@@ -120,9 +121,15 @@ void UInventoryComponent::TrashItem(UInventoryItem* InItem)
 	Items.Remove(InItem);
 	RefreshWeight();
 }
-
+//동일 타입의 아이템이 존재하는지...
 UInventoryItem* UInventoryComponent::GetItem(EItemType Type)
 {
+	if (Type == EItemType::Axe || Type == EItemType::Pickaxe || Type == EItemType::Knife)
+	{
+		//장비류는 동일아이템이 없다.
+		//TODO : 의복도 추가..이거 그냥 아이템 그룹을 나누는게 나을지
+		return nullptr;
+	}
 	for (auto Item : Items)
 	{
 		if (Item->GetData()->ItemType == Type)

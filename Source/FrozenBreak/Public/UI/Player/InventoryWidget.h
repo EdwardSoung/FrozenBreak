@@ -48,6 +48,8 @@ private:
 	UFUNCTION()
 	void TrashItem();
 	UFUNCTION()
+	void UseItem();
+	UFUNCTION()
 	void HideWidget();
 	UFUNCTION()
 	void UpdateWeight(float InWeight, float InMaxWeight);

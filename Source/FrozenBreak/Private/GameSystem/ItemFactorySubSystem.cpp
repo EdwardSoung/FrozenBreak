@@ -32,3 +32,15 @@ APickupItem* UItemFactorySubSystem::Spawn(EItemType InType, FVector Location, in
 
 	return nullptr;
 }
+
+UInventoryItem* UItemFactorySubSystem::Spawn(EItemType InType, int32 Amount)
+{
+	if (UGameManager* Manager = UGameManager::Get(this))
+	{
+		auto NewItem = NewObject<UInventoryItem>(this);
+		auto NewData = Manager->GetItemData(InType);
+		NewItem->Initialize(Manager->GetUID(), NewData);
+		NewItem->AddAmount(Amount);
+	}
+	return nullptr;
+}
