@@ -19,14 +19,12 @@ void UHealthComponent::SetPlayerHealth(float InHealthValue)
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
 			EventSystem->Status.OnHealthPointChanged.Broadcast(CurrentHealth / MaxHealth);
-		}
-	}
-	else
-	{
-		// TODO : 캐릭터 사망
-		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
-		{
-			EventSystem->Character.OnPlayerDead.Broadcast();
+
+			if (CurrentHealth <= 0)
+			{
+				EventSystem->Character.OnPlayerDead.Broadcast();
+
+			}
 		}
 	}
 }

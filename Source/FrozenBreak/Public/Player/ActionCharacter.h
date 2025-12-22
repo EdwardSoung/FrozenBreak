@@ -217,6 +217,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void HandEquip(UInventoryItem* InItem);
 
+	UFUNCTION(BlueprintCallable)
+	void PlayDead();
+
 public:
 	//곡괭이질
 	void EndMining();
@@ -264,9 +267,10 @@ public:
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = "Sound")
 	TEnumAsByte<EPhysicalSurface> LastFootSurface = SurfaceType_Default; // 공중에 잠깐뜰때나 계단 같은 곳에서의 설정
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dead|Montage")
+	TObjectPtr<class UAnimMontage> DeadAnimation = nullptr;
+
 public: // 무기쪽
 	UPROPERTY(EditDefaultsOnly, Category = "Combat|Montage")
 	TObjectPtr<class UAnimMontage> UnarmedAttackMontage;
-
-
 };
