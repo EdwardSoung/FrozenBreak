@@ -1,6 +1,7 @@
 #include "PlayerComponents/CraftInventoryComponent.h"
 #include "Objects/InventoryItem.h"
 #include "GameSystem/EventSubSystem.h"
+#include "GameSystem/ItemFactorySubSystem.h"
 #include "Data/ItemDataList.h"
 #include <GameSystem/UISubSystem.h>
 
@@ -192,19 +193,17 @@ void UCraftInventoryComponent::SetCraftableItemCount(EItemType Type, int32 NewCo
 
 	if (!DataList) return;
 
-	auto* DataPtr = DataList->ItemAssetData.Find(Type);
-	if (!DataPtr || !DataPtr->Get()) return;
-
-	UInventoryItem* NewItem = NewObject<UInventoryItem>(this);
-	NewItem->Initialize(DataPtr->Get());
-	NewItem->SetAmount(NewCount);
-
-	CraftableItems.Add(NewItem);
-
-	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+	if (UItemFactorySubSystem* ItemFactory = UItemFactorySubSystem::Get(this))
 	{
-		EventSystem->Chraracter.OnAddItemToCraftInventoryUI.Broadcast(NewItem);
-	}
+		UInventoryItem* NewItem = ItemFactory->Spawn(Type);
+
+		CraftableItems.Add(NewItem);
+
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		{
+			EventSystem->Chraracter.OnAddItemToCraftInventoryUI.Broadcast(NewItem);
+		}
+	}	
 }
 
 void UCraftInventoryComponent::RemoveNonCraftablesFromUI()
@@ -351,16 +350,17 @@ UInventoryItem* UCraftInventoryComponent::GetOrCreateCraftableItem(EItemType Res
 
 	if (!DataList) return nullptr;
 
-	auto* DataPtr = DataList->ItemAssetData.Find(ResultType);
-	if (!DataPtr || !DataPtr->Get()) return nullptr;
 
-	UInventoryItem* NewItem = NewObject<UInventoryItem>(this);
-	NewItem->Initialize(DataPtr->Get());
-	NewItem->SetAmount(1); // 의미없으면 0/1 아무거나. (StartCrafting엔 타입만 필요)
+	if (UItemFactorySubSystem* ItemFactory = UItemFactorySubSystem::Get(this))
+	{
+		UInventoryItem* NewItem = ItemFactory->Spawn(ResultType);
 
-	CraftableItems.Add(NewItem);
+		CraftableItems.Add(NewItem);
 
-	return NewItem;
+		return NewItem;
+	}
+
+	return nullptr;
 }
 
 void UCraftInventoryComponent::RecomputeCookingFromInputs()
