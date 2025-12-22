@@ -53,6 +53,7 @@ void UPlayerStatComponent::BindStatSettingEvents()
 		EventSystem->Status.OnSetHunger.AddDynamic(this, &UPlayerStatComponent::SetPlayerHunger);
 
 		//Add
+		EventSystem->Character.OnEquipInventoryItem.AddDynamic(this, &UPlayerStatComponent::EquipItem);
 	}
 }
 
