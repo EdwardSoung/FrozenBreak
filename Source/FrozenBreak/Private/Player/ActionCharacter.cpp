@@ -273,13 +273,21 @@ void AActionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 			&AActionCharacter::OnInteration
 		);
 	}
-	if (IA_Attack)
+	if (IA_Defense)
 	{
 		EnhancedInput->BindAction(
-			IA_Attack, 
+			IA_Defense, 
 			ETriggerEvent::Started, 
 			this, 
-			&AActionCharacter::OnAttackPressed);
+			&AActionCharacter::OnActionPressed);
+	}
+	if (IA_Defense)
+	{
+		EnhancedInput->BindAction(
+			IA_Defense,
+			ETriggerEvent::Completed,
+			this,
+			&AActionCharacter::OnActionReleased);
 	}
 	
 }
@@ -305,6 +313,8 @@ void AActionCharacter::Landed(const FHitResult& Hit) // 착지
 		PlayAnimMontage(HardLandMontage);
 	}
 }
+
+
 
 
 // ===== Movement =====
@@ -848,45 +858,82 @@ void AActionCharacter::OnToolEnd()
 	}
 }
 
-void AActionCharacter::OnAttackPressed()
+void AActionCharacter::OnActionPressed()
 {
 
-	UE_LOG(LogTemp, Warning, TEXT("[Attack] Pressed"));
+	UE_LOG(LogTemp, Warning, TEXT("[INPUT] Pressed!"));
+	bIsActionHeld = true;
 
-	
-
-	if (GetCharacterMovement() && GetCharacterMovement()->IsFalling())
-		return;
-
-	if (!UnarmedAttackMontage)
-		return;
-
-	USkeletalMeshComponent* MeshComp = GetMesh();
-	if (!MeshComp)
-		return;
-
-	UAnimInstance* Anim = MeshComp->GetAnimInstance();
-	if (!Anim)
-		return;
-
-	// 중복 재생 금지
-	if (Anim->Montage_IsPlaying(UnarmedAttackMontage))
-		return;
-
-	Anim->Montage_Play(UnarmedAttackMontage, 1.0f);
-
-	
-	UE_LOG(LogTemp, Warning, TEXT("[Attack] Mesh=%s"), MeshComp ? *MeshComp->GetName() : TEXT("NULL"));
-
-	
-	UE_LOG(LogTemp, Warning, TEXT("[Attack] AnimInstance=%s"), Anim ? *Anim->GetClass()->GetName() : TEXT("NULL"));
-
-	float Len = Anim->Montage_Play(UnarmedAttackMontage, 1.0f);
-	UE_LOG(LogTemp, Warning, TEXT("[Attack] MontagePlay Len=%.3f Montage=%s"),
-		Len,
-		UnarmedAttackMontage ? *UnarmedAttackMontage->GetName() : TEXT("NULL"));
+	// 누르면 Start부터 재생 시작
+	PlayActionMontage_Start();
 }
 
+void AActionCharacter::OnActionReleased()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[INPUT] Released!"));
+	bIsActionHeld = false;
 
+	// 떼면 End로 빠져나감
+	JumpToEndSection_IfPlaying();
+}
+
+UAnimInstance* AActionCharacter::GetMyAnimInstance() const
+{
+	USkeletalMeshComponent* MeshComp = GetMesh();
+	if (!MeshComp)
+	{
+		return nullptr;
+	}
+
+	return MeshComp->GetAnimInstance();
+}
+
+void AActionCharacter::PlayActionMontage_Start()
+{
+	if (!ActionMontage)
+	{
+		return;
+	}
+
+	UAnimInstance* Anim = GetMyAnimInstance();
+	if (!Anim)
+	{
+		return;
+	}
+
+	// 이미 재생중이면 중복 방지
+	if (Anim->Montage_IsPlaying(ActionMontage))
+	{
+		return;
+	}
+
+	// 재생
+	Anim->Montage_Play(ActionMontage, 1.0f);
+
+	// Start 섹션으로 시작
+	Anim->Montage_JumpToSection(SectionStart, ActionMontage);
+}
+
+void AActionCharacter::JumpToEndSection_IfPlaying()
+{
+	if (!ActionMontage)
+	{
+		return;
+	}
+
+	UAnimInstance* Anim = GetMyAnimInstance();
+	if (!Anim)
+	{
+		return;
+	}
+
+	if (!Anim->Montage_IsPlaying(ActionMontage))
+	{
+		return;
+	}
+
+	// End 섹션으로 점프해서 루프 탈출
+	Anim->Montage_JumpToSection(SectionEnd, ActionMontage);
+}
 
 
