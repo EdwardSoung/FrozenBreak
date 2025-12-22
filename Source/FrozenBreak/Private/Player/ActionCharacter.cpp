@@ -164,11 +164,7 @@ void AActionCharacter::BeginPlay()
 	//	}
 	//}
 
-	if (bForceAxeForTest) // 테스트 용입니다 나중에 지워주세요 
-    {
-        CurrentHeldItemType = ForceToolType;  // << 이 한 줄로 AnimBP가 Axe 로코모션으로 바뀜
-        UE_LOG(LogTemp, Warning, TEXT("[TEST] ForceToolType=%d"), (int32)CurrentHeldItemType);
-    }
+
 }
 
 

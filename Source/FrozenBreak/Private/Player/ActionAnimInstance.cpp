@@ -52,6 +52,15 @@ void UActionAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	CurrentToolType = OwnerCharacter->GetCurrentToolsType();
 
+	if (bForceAxeLocomotion)
+	{
+		CurrentToolType = EItemType::Axe;
+	}
+	else
+	{
+		CurrentToolType = OwnerCharacter->CurrentHeldItemType; // 또는 Getter
+	}
+
 	if (Vel2D.SizeSquared() < 1.0f)
 	{
 		RightAmount = 0.0f;
