@@ -96,8 +96,8 @@ AActionCharacter::AActionCharacter()
 	if (UEventSubSystem* Event = UEventSubSystem::Get(this))
 	{
 		Event->Character.OnEquipInventoryItem.AddDynamic(this, &AActionCharacter::HandEquip);
+		Event->Character.OnPlayerDead.AddDynamic(this, &AActionCharacter::PlayDead);
 	}
-
 }
 
 
@@ -776,6 +776,38 @@ void AActionCharacter::HandEquip(UInventoryItem* InItem)
 		else
 		{
 			SetHeldItemType(EItemType::None);
+		}
+	}
+}
+
+void AActionCharacter::PlayDead()
+{
+	UE_LOG(LogTemp, Log, TEXT("Player is Dead!"));
+	if (DeadAnimation)
+	{
+		if (USkeletalMeshComponent* MeshComp = GetMesh())
+		{
+			if (UAnimInstance* Anim = MeshComp->GetAnimInstance())
+			{
+
+				UE_LOG(LogTemp, Log, TEXT("Play Animation!"));
+				Anim->Montage_Play(DeadAnimation);
+
+				APlayerController* PC = Cast<APlayerController>(GetController());
+				if (!PC) return;
+
+				// 1) 입력 차단
+				PC->UnPossess();
+				//PC->SetIgnoreMoveInput(true);
+				//PC->SetIgnoreLookInput(true);
+
+				//// 2) 캐릭터 이동 멈춤
+				//if (UCharacterMovementComponent* Move = GetCharacterMovement())
+				//{
+				//	Move->StopMovementImmediately();
+				//	Move->DisableMovement();                 // 또는 Move->SetMovementMode(MOVE_None);
+				//}
+			}
 		}
 	}
 }
