@@ -25,7 +25,6 @@
 #include "Data/PropData.h"
 #include "Interface/Interactable.h"
 
-// Sets default values
 AWorldProp::AWorldProp()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -54,7 +53,6 @@ AWorldProp::AWorldProp()
 	DurabilityWidget->SetVisibility(false);
 }
 
-// Called when the game starts or when spawned
 void AWorldProp::BeginPlay()
 {
 	Super::BeginPlay();
@@ -165,15 +163,22 @@ void AWorldProp::TreeAction()
 		{
 			if (auto Durability = Cast<UPropDurabilityWidget>(DurabilityWidget->GetUserWidgetObject()))
 			{
-				ToolAtkPower = Player->GetCurrentToolAtkPower();
+				//if (Player->GetCurrentTool() != nullptr)
+				//{
+					ToolAtkPower = Player->GetCurrentToolAtkPower();
 
-				CurrentDurability -= ToolAtkPower;
+					CurrentDurability -= ToolAtkPower;
 
-				Durability->SetDurabilityProgress(GetDurabilityRadio());
+					Durability->SetDurabilityProgress(GetDurabilityRadio());
 
-				// 플레이어 피로도 감소? 시키기
-				EventSystem->Status.OnSetFatigue.Broadcast(FatigueCostPerWork);
-				UE_LOG(LogTemp, Log, TEXT("나무를 베었다. 나무 Durability : %.1f"), CurrentDurability);
+					// 플레이어 피로도 감소? 시키기
+					EventSystem->Status.OnSetFatigue.Broadcast(FatigueCostPerWork);
+					UE_LOG(LogTemp, Log, TEXT("나무를 베었다. 나무 Durability : %.1f"), CurrentDurability);
+				//}
+				//else
+				//{
+				//	UE_LOG(LogTemp, Log, TEXT("플레이어가 장비를 들고있지 않다."));
+				//}
 			}
 		}
 		else
@@ -226,15 +231,22 @@ void AWorldProp::RockAction()
 		{
 			if (auto Durability = Cast<UPropDurabilityWidget>(DurabilityWidget->GetUserWidgetObject()))
 			{
-				ToolAtkPower = Player->GetCurrentToolAtkPower();
+				//if (Player->GetCurrentTool() != nullptr)
+				//{
+					ToolAtkPower = Player->GetCurrentToolAtkPower();
 
-				CurrentDurability -= ToolAtkPower;
+					CurrentDurability -= ToolAtkPower;
 
-				Durability->SetDurabilityProgress(GetDurabilityRadio());
+					Durability->SetDurabilityProgress(GetDurabilityRadio());
 
-				// 플레이어 피로도 감소? 시키기
-				EventSystem->Status.OnSetFatigue.Broadcast(FatigueCostPerWork);
-				UE_LOG(LogTemp, Log, TEXT("바위를 찍었다. 바위 Durability : %.1f"), CurrentDurability);
+					// 플레이어 피로도 감소? 시키기
+					EventSystem->Status.OnSetFatigue.Broadcast(FatigueCostPerWork);
+					UE_LOG(LogTemp, Log, TEXT("바위를 찍었다. 바위 Durability : %.1f"), CurrentDurability);
+				//}
+				//else
+				//{
+				//	UE_LOG(LogTemp, Log, TEXT("플레이어가 장비를 들고있지 않다."));
+				//}
 			}
 		}
 		else
@@ -322,9 +334,10 @@ void AWorldProp::BedAction()
 				BedActionWidgetInstance->OnBedActionWidgetStart.AddDynamic(this, &AWorldProp::BedActionWidgetStarted);
 				BedActionWidgetInstance->OnBedActionWidgetEnd.AddDynamic(this, &AWorldProp::BedActionWidgetFinished);
 
-
+				DayCount++;
+				BedActionWidgetInstance->SetDayCountText(DayCount);
 				BedActionWidgetInstance->SetVisibility(ESlateVisibility::Visible);
-				BedActionWidgetInstance->AddToViewport();
+				BedActionWidgetInstance->AddToViewport(200);
 			}
 		}
 	}
@@ -344,10 +357,10 @@ void AWorldProp::IsBedTime()
 
 	// 24시간제 사용
 	// 이 시간부터 잘 수 있다. (테스트용 임시값)
-	const int32 BedTimeStart = 12;
+	const int32 BedTimeStart = 1;
 
 	// 이 시간부터 잘 수 없다. (테스트용 임시값)
-	const int32 BedTimeEnd = 13;
+	const int32 BedTimeEnd = 23;
 
 	// BedTimeStart와 BedTimeEnd 사이의 시간이여야만 잘 수 있다.
 	bIsBedTime = (Hour >= BedTimeStart) && (Hour < BedTimeEnd);

@@ -19,11 +19,15 @@ class FROZENBREAK_API UBedActionWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+	void SetDayCountText(int32 InCount);
+
 protected:
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
 	void SleepAnimationFinished();
+
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnBedActionWidgetStart OnBedActionWidgetStart;
@@ -34,5 +38,8 @@ protected:
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
 	TObjectPtr<class UWidgetAnimation> SleepAnim = nullptr;
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UTextBlock> SleepText = nullptr;
+	TObjectPtr<class UTextBlock> DayCountText = nullptr;
+
+private:
+	int32 DayCount = 0;
 };
