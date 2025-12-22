@@ -80,40 +80,8 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			// 플레이어와 상호작용 할 액터의 거리가 ActivateInteractDistance 이하이면
 			if (BetweenDistance <= ActivateInteractDistance)
 			{
-				if (const AWorldProp* Prop = Cast<AWorldProp>(CurrentInteractionActor))
-				{
-					HitActorInteractableToolType = Prop->GetInteractableToolType();
-
-					// 바라보고 있는 액터의 Data->InteractableToolType 이 None 아면
-					if (HitActorInteractableToolType == EItemType::None || HitActorInteractableToolType == EItemType::Campfire)
-					{
-						// 바라보고 있는 액터에게 "너 지금 바라봐지고 있어" 라고 알림
-						IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
-						UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
-						UE_LOG(LogTemp, Warning, TEXT("이건 나무나 바위가 아닌데 Prop이긴 함"));
-						bIsInteracting = true;
-					}
-					// 바라보고 있는 액터의 Data->InteractableToolType 이 Player의 CurrentHeldItemType과 같다면
-					else if (PlayerCurrentTool == HitActorInteractableToolType)
-					{
-						IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
-						UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
-						UE_LOG(LogTemp, Warning, TEXT("이건 나무나 바위임"));
-						bIsInteracting = true;
-					}
-					else
-					{
-						UE_LOG(LogTemp, Log, TEXT("플레이어의 도구는 바라보고 있는 액터에 상호작용 불가"));
-					}
-				}
-				// 바라보고 있는 액터가 Item 이면
-				else
-				{
-					IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
-					UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
-					UE_LOG(LogTemp, Warning, TEXT("이건 나무나 바위가 아니고, Item임"));
-					bIsInteracting = true;
-				}
+				// 바라본 대상이 WorldProp / Item 인지 구분해주는 함수
+				ProcessInteractableTarget();
 			}
 
 			else
@@ -140,10 +108,8 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			// 스위치 대상이 범위 내일 때만 새로 표시
 			if (BetweenDistance <= ActivateInteractDistance)
 			{
-
-				IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
-				UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *CurrentInteractionActor->GetName());
-				bIsInteracting = true;
+				// 바라본 대상이 WorldProp / Item 인지 구분해주는 함수
+				ProcessInteractableTarget();
 			}
 			// 범위 밖이면 상호작용 종료
 			else
@@ -205,6 +171,44 @@ void UInteractionComponent::DoAction_Implementation() // 플레이어가 상호�
 			UE_LOG(LogTemp, Log, TEXT("대상이 없거나 상호작용을 할 수 없는 대상"));
 			return;
 		}
+	}
+}
+
+void UInteractionComponent::ProcessInteractableTarget()
+{
+	if (const AWorldProp* Prop = Cast<AWorldProp>(CurrentInteractionActor))
+	{
+		HitActorInteractableToolType = Prop->GetInteractableToolType();
+
+		// 바라보고 있는 액터의 Data->InteractableToolType 이 None 아면
+		if (HitActorInteractableToolType == EItemType::None || HitActorInteractableToolType == EItemType::Campfire)
+		{
+			// 바라보고 있는 액터에게 "너 지금 바라봐지고 있어" 라고 알림
+			IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
+			UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
+			UE_LOG(LogTemp, Warning, TEXT("이건 나무나 바위가 아닌데 Prop이긴 함"));
+			bIsInteracting = true;
+		}
+		// 바라보고 있는 액터의 Data->InteractableToolType 이 Player의 CurrentHeldItemType과 같다면
+		else if (PlayerCurrentTool == HitActorInteractableToolType)
+		{
+			IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
+			UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
+			UE_LOG(LogTemp, Warning, TEXT("이건 나무나 바위임"));
+			bIsInteracting = true;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("플레이어의 도구는 바라보고 있는 액터에 상호작용 불가"));
+		}
+	}
+	// 바라보고 있는 액터가 Item 이면
+	else
+	{
+		IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
+		UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("이건 나무나 바위가 아니고, Item임"));
+		bIsInteracting = true;
 	}
 }
 

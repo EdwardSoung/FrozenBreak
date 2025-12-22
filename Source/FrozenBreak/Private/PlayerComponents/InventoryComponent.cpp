@@ -26,6 +26,7 @@ void UInventoryComponent::BeginPlay()
 		EventSystem->Character.OnGetPickupItem.AddDynamic(this, &UInventoryComponent::AddItem);
 		EventSystem->Character.OnRequestInventoryInit.AddDynamic(this, &UInventoryComponent::InitInventoryUI);
 		EventSystem->Character.OnTrashItem.AddDynamic(this, &UInventoryComponent::TrashItem);
+		EventSystem->Character.OnRemoveItem.AddDynamic(this, &UInventoryComponent::TrashItem);
 
 		EventSystem->Character.OnRequestIventoryItems.AddDynamic(this, &UInventoryComponent::SendInventoryItems);
 		EventSystem->Character.OnUsableItemUsed.AddDynamic(this, &UInventoryComponent::UseUsableItem);

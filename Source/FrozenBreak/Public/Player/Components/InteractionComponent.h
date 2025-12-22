@@ -30,6 +30,9 @@ public:
 
 	inline void SetPlayerCurrentTool(EItemType InType) { PlayerCurrentTool = InType; }
 
+private:
+	// 바라본 대상이 WorldProp / Item 인지 구분해주는 함수
+	void ProcessInteractableTarget();
 
 private:
 	// 라인 충돌지점에 뭐가 충돌했는지 알려줌

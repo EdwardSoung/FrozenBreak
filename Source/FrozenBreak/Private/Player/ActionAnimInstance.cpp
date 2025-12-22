@@ -3,7 +3,6 @@
 
 
 #include "Player/ActionAnimInstance.h"
-
 #include "Player/ActionCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -40,6 +39,8 @@ void UActionAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	const FVector2D Vel2D(Velocity.X, Velocity.Y);
 	Speed = FVector(Velocity.X, Velocity.Y, 0.0f).Size();
 
+	Direction = CalculateDirection(Velocity, OwnerCharacter->GetActorRotation());
+
 	const float AccelSize2D = MovementComp->GetCurrentAcceleration().Size2D();
 	const bool hasInput = (AccelSize2D > 5.0f);
 
@@ -48,6 +49,17 @@ void UActionAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bIsCrouching = OwnerCharacter->bIsCrouched;// 앉기 애니메이션
 
 	bIsSprinting = (Speed > 520.0f) && !bIsCrouching;
+
+	CurrentToolType = OwnerCharacter->GetCurrentToolsType();
+
+	if (bForceAxeLocomotion)
+	{
+		CurrentToolType = EItemType::Axe;
+	}
+	else
+	{
+		CurrentToolType = OwnerCharacter->CurrentHeldItemType; // 또는 Getter
+	}
 
 	if (Vel2D.SizeSquared() < 1.0f)
 	{

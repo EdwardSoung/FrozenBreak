@@ -279,6 +279,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
 	EItemType CurrentHeldItemType = EItemType::None;
 
+	EItemType GetCurrentToolsType() const { return CurrentHeldItemType; }
+
 public:
 	//사운드용
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
@@ -309,4 +311,6 @@ public:
 public: // 무기쪽
 	UPROPERTY(EditDefaultsOnly, Category = "Combat|Montage")
 	TObjectPtr<class UAnimMontage> UnarmedAttackMontage;
+
+
 };
