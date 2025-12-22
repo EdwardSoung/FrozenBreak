@@ -54,7 +54,12 @@ UItemData* UGameManager::GetItemData(EItemType InType)
 
 TSubclassOf<class AToolActor> UGameManager::GetToolClass(EItemType InType)
 {
-    return EquipItemData->ToolData.Find(InType)->Get();
+    if (auto Tool = EquipItemData->ToolData.Find(InType))
+    {
+        return Tool->Get();
+    }
+
+    return nullptr;
 }
 
 uint32 UGameManager::GetUID()

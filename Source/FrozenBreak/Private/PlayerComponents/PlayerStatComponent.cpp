@@ -67,14 +67,15 @@ void UPlayerStatComponent::EquipItem(UInventoryItem* InItem)
 	case EItemType::Knife:
 		if (HandEquip)
 		{
+			//현재 아이템 있으면 현재 아이템은 인벤토리로
 			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 			{
 				EventSystem->Character.OnAddItemToInventoryUI.Broadcast(HandEquip);
 			}
-
-			HandEquip = InItem;
-			//업데이트
 		}
+		HandEquip = InItem;
+		//공격력은..?
+
 		break;
 	case EItemType::Jaket:
 		if (BodyEquip)
@@ -83,10 +84,15 @@ void UPlayerStatComponent::EquipItem(UInventoryItem* InItem)
 			{
 				EventSystem->Character.OnAddItemToInventoryUI.Broadcast(BodyEquip);
 			}
-
-			BodyEquip = InItem;
-			//업데이트
 		}
+		BodyEquip = InItem;
+
+		if (auto coldStat = BodyEquip->GetData()->Stats.Find(EItemStatType::ColdResistance))
+		{
+			UStatusCalculationSubSystem* StatusCalculater = GetWorld()->GetSubsystem<UStatusCalculationSubSystem>();
+			StatusCalculater->SetTemperatureDefence(*coldStat);
+		}
+		
 		break;
 	default:
 		UE_LOG(LogTemp, Warning, TEXT("장착할 수 없는 아이템 장착 시도"));

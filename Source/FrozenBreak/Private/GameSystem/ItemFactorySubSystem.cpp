@@ -54,9 +54,12 @@ AToolActor* UItemFactorySubSystem::SpawnTool(EItemType InType)
 	{
 		auto spawnClass = Manager->GetToolClass(InType);
 
-		AToolActor* EquipItem = GetWorld()->SpawnActor<AToolActor>(spawnClass);
+		if (spawnClass)
+		{
+			AToolActor* EquipItem = GetWorld()->SpawnActor<AToolActor>(spawnClass);
 
-		return EquipItem;
+			return EquipItem;
+		}
 	}
 
 	return nullptr;
