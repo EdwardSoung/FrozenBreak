@@ -23,7 +23,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUpdateInventoryWeight, float, In
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUseInventoryItem, UInventoryItem*, InData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEquipInventoryItem, UInventoryItem*, InData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEquippedItemUsed);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUsableItemUsed, EItemType, InType);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUsableItemUsed, UItemData*, InType);
 
 
 //Craft

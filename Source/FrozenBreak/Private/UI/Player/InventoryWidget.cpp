@@ -140,7 +140,7 @@ void UInventoryWidget::UseItem()
 				EventSystem->Character.OnUseInventoryItem.Broadcast(selectedItem);
 
 				//개수 감소
-				EventSystem->Character.OnUsableItemUsed.Broadcast(selectedItem->GetType());
+				EventSystem->Character.OnUsableItemUsed.Broadcast(selectedItem->GetData());
 			}
 			break;
 		default:

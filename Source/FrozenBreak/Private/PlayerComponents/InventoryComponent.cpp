@@ -51,11 +51,11 @@ void UInventoryComponent::SendInventoryItems()
 	}
 }
 
-void UInventoryComponent::UseUsableItem(EItemType InType)
+void UInventoryComponent::UseUsableItem(UItemData* InData)
 {
 	for (auto Item : Items)
 	{
-		if (Item->GetType() == InType)
+		if (Item->GetType() == InData->ItemType)
 		{
 			Item->AddAmount(-1);
 			break;
