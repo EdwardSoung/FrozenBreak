@@ -20,7 +20,7 @@ void UInventoryItem::AddAmount(int32 InAmount)
 	{
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			EventSystem->Character.OnTrashItem.Broadcast(this);
+			EventSystem->Character.OnRemoveItem.Broadcast(this);
 		}
 	}
 }
