@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "EquipmentSlotWidget.generated.h"
 
-class UItemData;
+class UInventoryItem;
 
 /**
  * 
@@ -18,7 +18,7 @@ class FROZENBREAK_API UEquipmentSlotWidget : public UUserWidget
 
 public:
 	UFUNCTION()
-	void RefreshSlot(UItemData* InItemData);
+	void RefreshSlot(UInventoryItem* InItem);
 
 protected:
 	virtual void NativeConstruct() override;

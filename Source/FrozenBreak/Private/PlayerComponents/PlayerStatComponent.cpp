@@ -51,6 +51,57 @@ void UPlayerStatComponent::BindStatSettingEvents()
 		EventSystem->Status.OnSetTemperature.AddDynamic(this, &UPlayerStatComponent::SetPlayerTemperature);
 		EventSystem->Status.OnSetFatigue.AddDynamic(this, &UPlayerStatComponent::SetPlayerFatigue);
 		EventSystem->Status.OnSetHunger.AddDynamic(this, &UPlayerStatComponent::SetPlayerHunger);
+
+		//Add
+	}
+}
+
+void UPlayerStatComponent::EquipItem(UInventoryItem* InItem)
+{
+	switch (InItem->GetType())
+	{
+	case EItemType::Axe:
+	case EItemType::Pickaxe:
+	case EItemType::Knife:
+		if (HandEquip)
+		{
+			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+			{
+				EventSystem->Character.OnAddItemToInventoryUI.Broadcast(HandEquip);
+			}
+
+			HandEquip = InItem;
+			//업데이트
+		}
+		break;
+	case EItemType::Jaket:
+		if (BodyEquip)
+		{
+			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+			{
+				EventSystem->Character.OnAddItemToInventoryUI.Broadcast(BodyEquip);
+			}
+
+			BodyEquip = InItem;
+			//업데이트
+		}
+		break;
+	default:
+		UE_LOG(LogTemp, Warning, TEXT("장착할 수 없는 아이템 장착 시도"));
+		break;
+	}
+}
+
+void UPlayerStatComponent::UseEquippedHandItem()
+{
+	//내구도 감소
+
+	if (HandEquip)
+	{
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		{
+			EventSystem->Character.OnEquippedItemUsed.Broadcast();
+		}
 	}
 }
 

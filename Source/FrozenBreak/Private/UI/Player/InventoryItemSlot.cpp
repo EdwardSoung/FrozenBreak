@@ -3,17 +3,19 @@
 
 #include "UI/Player/InventoryItemSlot.h"
 #include "Objects/InventoryItem.h"
+#include "GameSystem/EventSubSystem.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 
 void UInventoryItemSlot::NativeOnInitialized()
 {
 	Selected->SetVisibility(ESlateVisibility::Hidden);
+	ItemData = nullptr;
 }
 
 void UInventoryItemSlot::NativeOnListItemObjectSet(UObject* ListItemObject)
 {
-	if (UInventoryItem* ItemData = Cast<UInventoryItem>(ListItemObject))
+	if (ItemData = Cast<UInventoryItem>(ListItemObject))
 	{
 		if (ItemData->GetData()->ItemIcon)
 		{
@@ -35,5 +37,12 @@ void UInventoryItemSlot::NativeOnItemSelectionChanged(bool bIsSelected)
 	if (Selected)
 	{
 		Selected->SetVisibility(bIsSelected ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		if (bIsSelected && ItemData)
+		{
+			if (UEventSubSystem* Event = UEventSubSystem::Get(this))
+			{
+				Event->UI.OnInventoryItemSelected.Broadcast(ItemData->GetData()->ItemType);
+			}
+		}
 	}
 }

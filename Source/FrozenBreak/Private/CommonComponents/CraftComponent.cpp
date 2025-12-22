@@ -16,7 +16,7 @@ void UCraftComponent::BindEvents()
 {
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
-		EventSystem->Chraracter.OnStartCraft.AddDynamic(this, &UCraftComponent::StartCraft);
+		EventSystem->Character.OnStartCraft.AddDynamic(this, &UCraftComponent::StartCraft);
 		//EventSystem->Chraracter.OnCraftRequested.AddDynamic(this, &UCraftComponent::StartCraft);
 	}
 }
@@ -50,7 +50,7 @@ void UCraftComponent::TestCraft(float InCraftAmount)
 {
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
-		EventSystem->Chraracter.OnStartCraft.Broadcast(InCraftAmount);
+		EventSystem->Character.OnStartCraft.Broadcast(InCraftAmount);
 	}
 }
 

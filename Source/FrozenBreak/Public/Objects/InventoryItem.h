@@ -17,11 +17,13 @@ class FROZENBREAK_API UInventoryItem : public UObject
 public:
 	void Initialize(uint32 InUID, UItemData* InData);
 	inline UItemData* GetData() { return Data.Get(); }
-	inline float GetWeight() { return Data->ItemWeight * Amount; }
+	inline float GetWeight() { return Data.Get()->ItemWeight * Amount; }
 	inline int32 GetAmount() { return Amount; }
+	inline EItemType GetType() { return Data.Get()->ItemType; }
 
 	void AddAmount(int32 InAmount);	
 	void SetAmount(int32 InAmount);
+	void Use();
 private:
 	uint32 UID = 0;
 

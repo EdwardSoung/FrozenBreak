@@ -19,9 +19,9 @@ void UCraftInventoryComponent::BeginPlay()
 
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
-		EventSystem->Chraracter.OnSendInventoryData.AddDynamic(this, &UCraftInventoryComponent::OnReceiveInventoryData);
-		EventSystem->Chraracter.OnCraftRequested.AddDynamic(this, &UCraftInventoryComponent::StartCrafting);
-		EventSystem->Chraracter.OnCookRequested.AddDynamic(this, &UCraftInventoryComponent::StartCooking);
+		EventSystem->Character.OnSendInventoryData.AddDynamic(this, &UCraftInventoryComponent::OnReceiveInventoryData);
+		EventSystem->Character.OnCraftRequested.AddDynamic(this, &UCraftInventoryComponent::StartCrafting);
+		EventSystem->Character.OnCookRequested.AddDynamic(this, &UCraftInventoryComponent::StartCooking);
 	}
 }
 
@@ -186,7 +186,7 @@ void UCraftInventoryComponent::SetCraftableItemCount(EItemType Type, int32 NewCo
 		Item->SetAmount(NewCount);
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			EventSystem->Chraracter.OnUpdateCraftItem.Broadcast(Type);
+			EventSystem->Character.OnUpdateCraftItem.Broadcast(Type);
 		}
 		return;
 	}
@@ -201,7 +201,7 @@ void UCraftInventoryComponent::SetCraftableItemCount(EItemType Type, int32 NewCo
 
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			EventSystem->Chraracter.OnAddItemToCraftInventoryUI.Broadcast(NewItem);
+			EventSystem->Character.OnAddItemToCraftInventoryUI.Broadcast(NewItem);
 		}
 	}	
 }
@@ -219,7 +219,7 @@ void UCraftInventoryComponent::RemoveNonCraftablesFromUI()
 		{
 			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 			{
-				EventSystem->Chraracter.OnRemoveCraftItem.Broadcast(Item);
+				EventSystem->Character.OnRemoveCraftItem.Broadcast(Item);
 			}
 			CraftableItems.RemoveAtSwap(i);
 		}
@@ -309,7 +309,7 @@ void UCraftInventoryComponent::StartCooking(UInventoryItem* InIngredient)
 		//InIngredient->AddAmount(-1);
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			EventSystem->Chraracter.OnGetPickupItem.Broadcast(InIngredient->GetData()->ItemType, -1);
+			EventSystem->Character.OnGetPickupItem.Broadcast(InIngredient->GetData()->ItemType, -1);
 		}
 		StartCrafting(ResultItem);
 	}
@@ -471,7 +471,7 @@ void UCraftInventoryComponent::FinishCraft()
 		{
 			for (const FRecipeIngredient& Req : Recipe->Required)
 			{
-				EventSystem->Chraracter.OnGetPickupItem.Broadcast(
+				EventSystem->Character.OnGetPickupItem.Broadcast(
 					Req.ItemType, -Req.Count
 				);
 			}
@@ -482,7 +482,7 @@ void UCraftInventoryComponent::FinishCraft()
 		CurrentCraftCost = 0.0f;
 		CurrentItemToCraft = nullptr;
 
-		EventSystem->Chraracter.OnGetPickupItem.Broadcast(ResultType, CraftResultCount);
+		EventSystem->Character.OnGetPickupItem.Broadcast(ResultType, CraftResultCount);
 		EventSystem->Status.OnCurrentCraftCostChanged.Broadcast(CurrentCraftCost);
 
 		if (UUISubSystem* UISystem = UUISubSystem::Get(this))

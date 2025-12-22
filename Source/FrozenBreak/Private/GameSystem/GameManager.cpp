@@ -52,6 +52,11 @@ UItemData* UGameManager::GetItemData(EItemType InType)
     return ItemDataList->ItemAssetData.Find(InType)->Get();
 }
 
+TSubclassOf<class AToolActor> UGameManager::GetToolClass(EItemType InType)
+{
+    return EquipItemData->ToolData.Find(InType)->Get();
+}
+
 uint32 UGameManager::GetUID()
 {
     return CurrentUID++;

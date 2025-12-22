@@ -23,13 +23,13 @@ void UInventoryComponent::BeginPlay()
 
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
-		EventSystem->Chraracter.OnGetPickupItem.AddDynamic(this, &UInventoryComponent::AddItem);
-		EventSystem->Chraracter.OnRequestInventoryInit.AddDynamic(this, &UInventoryComponent::InitInventoryUI);
-		EventSystem->Chraracter.OnTrashItem.AddDynamic(this, &UInventoryComponent::TrashItem);
+		EventSystem->Character.OnGetPickupItem.AddDynamic(this, &UInventoryComponent::AddItem);
+		EventSystem->Character.OnRequestInventoryInit.AddDynamic(this, &UInventoryComponent::InitInventoryUI);
+		EventSystem->Character.OnTrashItem.AddDynamic(this, &UInventoryComponent::TrashItem);
 
-		EventSystem->Chraracter.OnRequestIventoryItems.AddDynamic(this, &UInventoryComponent::SendInventoryItems);
+		EventSystem->Character.OnRequestIventoryItems.AddDynamic(this, &UInventoryComponent::SendInventoryItems);
 
-		EventSystem->Chraracter.OnRequestIventoryRawMeet.AddDynamic(this, &UInventoryComponent::SendRawMeetData);
+		EventSystem->Character.OnRequestIventoryRawMeet.AddDynamic(this, &UInventoryComponent::SendRawMeetData);
 	}
 
 	//임시로 가방 강제 장착. 나중에 캐릭터 장착 쪽에 가방도 두면 좋을 것 같음..
@@ -46,11 +46,11 @@ void UInventoryComponent::SendInventoryItems()
 {
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
-		EventSystem->Chraracter.OnSendInventoryData.Broadcast(Items);
+		EventSystem->Character.OnSendInventoryData.Broadcast(Items);
 	}
 }
 
-	void UInventoryComponent::RefreshWeight()
+void UInventoryComponent::RefreshWeight()
 {
 	CurrentWeight = 0;
 	for (auto Item : Items)
@@ -59,7 +59,7 @@ void UInventoryComponent::SendInventoryItems()
 	}
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
-		EventSystem->Chraracter.OnUpdateInventoryWeight.Broadcast(CurrentWeight, InventoryMaxWeight);
+		EventSystem->Character.OnUpdateInventoryWeight.Broadcast(CurrentWeight, InventoryMaxWeight);
 	}
 }
 
@@ -77,7 +77,7 @@ void UInventoryComponent::SendRawMeetData()
 		}
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			EventSystem->Chraracter.OnSendRawMeet.Broadcast(Meets);
+			EventSystem->Character.OnSendRawMeet.Broadcast(Meets);
 		}
 	}
 }
@@ -97,7 +97,7 @@ void UInventoryComponent::AddItem(EItemType Type, int32 Amount)
 		TargetItem->AddAmount(Amount);
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			EventSystem->Chraracter.OnUpdateInventoryItem.Broadcast(Type);
+			EventSystem->Character.OnUpdateInventoryItem.Broadcast(Type);
 		}
 	}
 	else
@@ -109,7 +109,7 @@ void UInventoryComponent::AddItem(EItemType Type, int32 Amount)
 
 			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 			{
-				EventSystem->Chraracter.OnAddItemToInventoryUI.Broadcast(NewItem);
+				EventSystem->Character.OnAddItemToInventoryUI.Broadcast(NewItem);
 			}
 		}
 	}
@@ -147,7 +147,7 @@ void UInventoryComponent::InitInventoryUI()
 	{
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			EventSystem->Chraracter.OnInitInventoryUI.Broadcast(Items);
+			EventSystem->Character.OnInitInventoryUI.Broadcast(Items);
 		}
 	}
 	RefreshWeight();

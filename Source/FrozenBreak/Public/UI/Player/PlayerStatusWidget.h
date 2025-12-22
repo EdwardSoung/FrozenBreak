@@ -8,6 +8,7 @@
 #include "PlayerStatusWidget.generated.h"
 
 class UItemData;
+class UInventoryItem;
 /**
  * 
  */
@@ -26,10 +27,10 @@ protected:
 	void SetTemperatureDefence(FText InDefenceValue);
 
 	UFUNCTION()
-	void SetHandEquipment(UItemData* InHandItem);
+	void SetHandEquipment(UInventoryItem* InHandItem);
 
 	UFUNCTION()
-	void SetBodyEquipment(UItemData* InBodyItem);
+	void SetBodyEquipment(UInventoryItem* InBodyItem);
 	UFUNCTION()
 	void HideWidget();
 

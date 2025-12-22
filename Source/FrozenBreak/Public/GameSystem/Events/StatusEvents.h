@@ -13,8 +13,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFatiguePointChanged, float, InCur
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHungerPointChanged, float, InCurrentHunger);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInGameTimeChanged, FText, InTime);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTemperatureDefenceChanged, FText, InDefenceValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHandEquipmentChanged, UItemData*, InHandItem);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBodyEquipmentChanged, UItemData*, InBodyItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCurrentCraftCostChanged, float, InCurrentCraftCost);
 
 // 스테이터스 값 세팅 델리게이트
@@ -51,14 +49,6 @@ struct FStatusEvents
 	// 플레이어 방한도
 	UPROPERTY(BlueprintAssignable)
 	FOnTemperatureDefenceChanged OnTemperatureDefenceChanged;
-
-	// 플레이어 손 장비
-	UPROPERTY(BlueprintAssignable)
-	FOnHandEquipmentChanged OnHandEquipmentChanged;
-	
-	// 플레이어 몸통 장비
-	UPROPERTY(BlueprintAssignable)
-	FOnBodyEquipmentChanged OnBodyEquipmentChanged;
 
 	// 체력 셋팅
 	UPROPERTY(BlueprintAssignable)

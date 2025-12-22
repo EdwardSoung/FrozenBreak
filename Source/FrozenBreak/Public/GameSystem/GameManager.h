@@ -6,6 +6,7 @@
 #include "Engine/GameInstance.h"
 #include "Data/Enums.h"
 #include "Data/ItemDataList.h"
+#include "Data/EquipItemData.h"
 #include "GameSystem/EventSubSystem.h"
 #include "GameManager.generated.h"
 
@@ -27,6 +28,8 @@ public:
 
 	UItemData* GetItemData(EItemType InType);
 
+	TSubclassOf<class AToolActor> GetToolClass(EItemType InType);
+
 	uint32 GetUID();
 
 	inline float GetInGameStartTime() { return InGameStartTime; }
@@ -40,6 +43,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<UItemDataList> ItemDataList;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
+	TObjectPtr<UEquipItemData> EquipItemData;
 
 	// 인게임 시작 시간(0~1 : 0.25 = 6시, 0.5 = 12시, 0.75 = 18시, 1.0 = 00시)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")

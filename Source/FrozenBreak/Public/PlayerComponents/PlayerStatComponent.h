@@ -15,15 +15,15 @@ class FROZENBREAK_API UPlayerStatComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UPlayerStatComponent();
-	// �µ� ���� �Լ�
+	//온도 수치
 	UFUNCTION(BlueprintCallable, Category = "Status|Temperature")
 	void SetPlayerTemperature(float InTemperatureValue);
 
-	// �Ƿε� ���� �Լ�
+	//피로도 수치
 	UFUNCTION(BlueprintCallable, Category = "Status|Stamina")
 	void SetPlayerFatigue(float InFatigueValue);
 
-	// ������ ���� �Լ�
+	//배고픔 수치
 	UFUNCTION(BlueprintCallable, Category = "Status|Hunger")
 	void SetPlayerHunger(float InHungerValue);
 
@@ -32,6 +32,12 @@ protected:
 	virtual void BeginPlay() override;
 	void InitStatus();
 	void BindStatSettingEvents();
+
+	UFUNCTION()
+	void EquipItem(UInventoryItem* InItem);
+
+	UFUNCTION()
+	void UseEquippedHandItem();
 
 public:
 
@@ -75,5 +81,5 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment")
 	TObjectPtr<class UInventoryItem> HandEquip;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment")
-	TObjectPtr<class UInventoryItem> ArmorEquip;
+	TObjectPtr<class UInventoryItem> BodyEquip;
 };

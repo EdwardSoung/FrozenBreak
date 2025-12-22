@@ -16,13 +16,15 @@ void UInventoryWidget::NativeConstruct()
 
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
-		EventSystem->Chraracter.OnInitInventoryUI.AddDynamic(this, &UInventoryWidget::InitData);
-		EventSystem->Chraracter.OnAddItemToInventoryUI.AddDynamic(this, &UInventoryWidget::AddItem);
-		EventSystem->Chraracter.OnUpdateInventoryItem.AddDynamic(this, &UInventoryWidget::UpdateItemByType);
-		EventSystem->Chraracter.OnUpdateInventoryWeight.AddDynamic(this, &UInventoryWidget::UpdateWeight);
+		EventSystem->Character.OnInitInventoryUI.AddDynamic(this, &UInventoryWidget::InitData);
+		EventSystem->Character.OnAddItemToInventoryUI.AddDynamic(this, &UInventoryWidget::AddItem);
+		EventSystem->Character.OnUpdateInventoryItem.AddDynamic(this, &UInventoryWidget::UpdateItemByType);
+		EventSystem->Character.OnUpdateInventoryWeight.AddDynamic(this, &UInventoryWidget::UpdateWeight);
+
+		EventSystem->UI.OnInventoryItemSelected.AddDynamic(this, &UInventoryWidget::SelectionChanged);
 
 		//최초에 생성되면..초기화 요청
-		EventSystem->Chraracter.OnRequestInventoryInit.Broadcast();
+		EventSystem->Character.OnRequestInventoryInit.Broadcast();
 	}
 
 	TrashButton->OnClicked.AddDynamic(this, &UInventoryWidget::TrashItem);
@@ -31,10 +33,14 @@ void UInventoryWidget::NativeConstruct()
 
 FReply UInventoryWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
-	if (InKeyEvent.GetKey() == EKeys::I)
+	if (InKeyEvent.GetKey() == EKeys::One)
 	{		
-		//음..굳이..? 포커스도 맞추기 힘든..
-		//HideWidget();
+		auto Selected = InventoryList->GetSelectedItem();
+
+		if (Selected)
+		{
+
+		}
 		return FReply::Handled();
 	}
 
@@ -94,7 +100,7 @@ void UInventoryWidget::TrashItem()
 
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			EventSystem->Chraracter.OnTrashItem.Broadcast(selectedItem);
+			EventSystem->Character.OnTrashItem.Broadcast(selectedItem);
 		}
 	}
 }
@@ -106,7 +112,29 @@ void UInventoryWidget::UseItem()
 	if (Selected)
 	{
 		UInventoryItem* selectedItem = Cast<UInventoryItem>(Selected);
-		
+
+		switch (selectedItem->GetData()->ItemType)
+		{
+		case EItemType::Axe:
+		case EItemType::Pickaxe:
+		case EItemType::Knife:
+		case EItemType::Jaket:
+			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+			{
+				EventSystem->Character.OnEquipInventoryItem.Broadcast(selectedItem);
+			}
+			break;
+		case EItemType::CookedMeat:
+		case EItemType::Fruit:
+		case EItemType::Campfire:
+			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+			{
+				EventSystem->Character.OnUseInventoryItem.Broadcast(selectedItem);
+			}
+			break;
+		default:
+			break;
+		}
 	}
 }
 
@@ -122,6 +150,32 @@ void UInventoryWidget::UpdateWeight(float InWeight, float InMaxWeight)
 {
 	FString weightValue = FString::Printf(TEXT("%.2f/%.2f"), InWeight, InMaxWeight);
 	WeightText->SetText(FText::FromString(weightValue));
+}
+
+void UInventoryWidget::SelectionChanged(EItemType InType)
+{
+	switch (InType)
+	{
+	case EItemType::Axe:
+	case EItemType::Pickaxe:
+	case EItemType::Knife:
+	case EItemType::Jaket:
+		//버튼 텍스트 착용으로 변경
+		UseButton->SetIsEnabled(true);
+		UseButtonText->SetText(FText::FromString(TEXT("착용")));
+		break;
+	case EItemType::CookedMeat:
+	case EItemType::Fruit:
+	case EItemType::Campfire:
+		//버튼 텍스트 사용으로 변경
+		UseButton->SetIsEnabled(true);
+		UseButtonText->SetText(FText::FromString(TEXT("사용")));
+		break;
+	default:
+		UseButtonText->SetText(FText::FromString(TEXT("사용")));
+		UseButton->SetIsEnabled(false);
+		//나머지 음..버튼 비활성?
+	}
 }
 
 void UInventoryWidget::OpenWidget_Implementation()

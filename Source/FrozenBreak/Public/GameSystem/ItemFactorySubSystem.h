@@ -20,6 +20,11 @@ class FROZENBREAK_API UItemFactorySubSystem : public UGameInstanceSubsystem
 public:
 	static UItemFactorySubSystem* Get(const UObject* WorldContextObject);
 
+	UFUNCTION(BlueprintCallable)
 	APickupItem* Spawn(EItemType InType, FVector Location, int32 Amount = 1);
+
 	UInventoryItem* Spawn(EItemType InType, int32 Amount = 1);
+
+	UFUNCTION(BlueprintCallable)
+	class AToolActor* SpawnTool(EItemType InType);
 };

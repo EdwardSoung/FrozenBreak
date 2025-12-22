@@ -3,14 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Data/Enums.h"
 #include "UIEvents.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnToggleQuitMenu);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryItemSelected, EItemType, InType);
 
 USTRUCT(BlueprintType)
 struct FROZENBREAK_API FUIEvents
 {
 	GENERATED_BODY()
 
+	UPROPERTY(BlueprintAssignable)
 	FOnToggleQuitMenu OnToggleQuitMenu;
+	UPROPERTY(BlueprintAssignable)
+	FOnInventoryItemSelected OnInventoryItemSelected;
 };
