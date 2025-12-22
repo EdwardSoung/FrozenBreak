@@ -16,6 +16,13 @@ void UInventoryItem::Initialize(uint32 InUID, UItemData* InData)
 void UInventoryItem::AddAmount(int32 InAmount)
 {
 	Amount += InAmount;
+	if (Amount <= 0)
+	{
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		{
+			EventSystem->Character.OnTrashItem.Broadcast(this);
+		}
+	}
 }
 
 void UInventoryItem::SetAmount(int32 InAmount)
