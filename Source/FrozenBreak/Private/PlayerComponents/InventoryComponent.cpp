@@ -50,6 +50,18 @@ void UInventoryComponent::SendInventoryItems()
 	}
 }
 
+void UInventoryComponent::UseUsableItem(UItemData* InData)
+{
+	for (auto Item : Items)
+	{
+		if (Item->GetType() == InData->ItemType)
+		{
+			Item->AddAmount(-1);
+			break;
+		}
+	}
+}
+
 void UInventoryComponent::RefreshWeight()
 {
 	CurrentWeight = 0;
