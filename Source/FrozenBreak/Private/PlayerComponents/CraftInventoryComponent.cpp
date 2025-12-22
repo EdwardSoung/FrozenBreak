@@ -241,10 +241,15 @@ bool UCraftInventoryComponent::AreMapsEqual(const TMap<EItemType, int32>& A, con
 
 UInventoryItem* UCraftInventoryComponent::GetItem(EItemType Type)
 {
-	for (UInventoryItem* Item : CraftableItems)
+	if (!CraftableItems.IsEmpty())
 	{
-		if (Item && Item->GetData()->ItemType == Type)
-			return Item;
+		for (UInventoryItem* Item : CraftableItems)
+		{
+			if (Item && Item->GetData())
+			{
+				if (Item->GetData()->ItemType == Type) return Item;
+			}
+		}
 	}
 	return nullptr;
 }
