@@ -127,16 +127,15 @@ void UInventoryWidget::UseItem()
 		case EItemType::Knife:
 		case EItemType::Jaket:
 			
-			InventoryList->RemoveItem(Selected);
-			ItemDataList.Remove(selectedItem);
-
 			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 			{
 				EventSystem->Character.OnEquipInventoryItem.Broadcast(selectedItem);
 				//인벤토리에서 제거
 				EventSystem->Character.OnTrashItem.Broadcast(selectedItem);
-
 			}
+			InventoryList->RemoveItem(Selected);
+			ItemDataList.Remove(selectedItem);
+
 			break;
 		case EItemType::CookedMeat:
 		case EItemType::Fruit:
