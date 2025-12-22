@@ -28,6 +28,7 @@ void UInventoryComponent::BeginPlay()
 		EventSystem->Character.OnTrashItem.AddDynamic(this, &UInventoryComponent::TrashItem);
 
 		EventSystem->Character.OnRequestIventoryItems.AddDynamic(this, &UInventoryComponent::SendInventoryItems);
+		EventSystem->Character.OnUsableItemUsed.AddDynamic(this, &UInventoryComponent::UseUsableItem);
 
 		EventSystem->Character.OnRequestIventoryRawMeet.AddDynamic(this, &UInventoryComponent::SendRawMeetData);
 	}
