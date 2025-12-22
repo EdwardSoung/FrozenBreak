@@ -251,9 +251,41 @@ void AWorldProp::RockAction()
 		{
 			if (auto Durability = Cast<UPropDurabilityWidget>(DurabilityWidget->GetUserWidgetObject()))
 			{
+				// Rock 메시 위에서 스폰
 				FVector SpawnLocation = GetActorLocation() + FVector(0, 0, 85);
 
-				Factory->Spawn(Data->GenerateItemType, SpawnLocation, Data->GenerateItemCount);
+				// ItemFactory로 스폰, 밑에 작업을 위해 저장해놓는다
+				APickupItem* SpawnedItem = Factory->Spawn(Data->GenerateItemType, SpawnLocation, Data->GenerateItemCount);
+
+				// 스폰된 아이템을 플레이어 쪽으로 튀게 해주는 작업
+				if (SpawnedItem)
+				{
+					// 플레이어 위치
+					AActor* Player = UGameplayStatics::GetPlayerPawn(this, 0);
+					const FVector PlayerLocation = Player->GetActorLocation();
+
+					// 방향 벡터
+					FVector LaunchDirection = (PlayerLocation - SpawnLocation).GetSafeNormal();
+					
+					// 약간 위로 튀게
+					LaunchDirection = (LaunchDirection + FVector(0, 0, 0.5f)).GetSafeNormal();
+
+					// 얼마나 세게?
+					const float ImpulseStrength = 500.f;
+
+					// 스폰된 아이템 클래스 안에 있는 메시를 가져온다
+					if (UStaticMeshComponent* SpawnedItemMesh = Cast<UStaticMeshComponent>(
+						SpawnedItem->GetComponentByClass(UStaticMeshComponent::StaticClass())))
+					{
+						// 그 메시가 물리 시뮬레이션을 하고있지 않으면 
+						// (PickupItem 클래스에서 설정은 했지만 이중으로 보장)
+						if (!SpawnedItemMesh->IsSimulatingPhysics())
+						{
+							SpawnedItemMesh->SetSimulatePhysics(true);
+						}
+						SpawnedItemMesh->AddImpulseAtLocation((LaunchDirection * ImpulseStrength), SpawnLocation);
+					}
+				}
 				CurrentDurability = MaxDurability;
 				CurrentSpawnCount++;
 				Durability->SetDurabilityProgress(GetDurabilityRadio());
@@ -269,6 +301,8 @@ void AWorldProp::RockAction()
 
 	if (CurrentSpawnCount >= MaxSpawnCount)
 	{
+		// 일단 숨기고 짧은 시간 뒤에 없앤다
+		// Destory() 하면 터질 수 있음 (보통 터짐)
 		SetActorHiddenInGame(true);
 		SetLifeSpan(0.001f);
 	}
@@ -280,10 +314,15 @@ void AWorldProp::BedAction()
 	// 중복실행을 막아야 함
 	if (EventSystem)
 	{
+		// 플레이어 피로도 회복
 		EventSystem->Status.OnSetFatigue.Broadcast(FatigueRecoveryAmount);
+
+		// 플레이어가 배고파짐
 		EventSystem->Status.OnSetHunger.Broadcast(HungerReductionAmount);
-		UE_LOG(LogTemp, Log, TEXT("BroadCast 보냄."));
+		UE_LOG(LogTemp, Log, TEXT("BedAction : BroadCast 보냄."));
 	}
+
+	// 시간이 스킵된다.
 	GetWorld()->GetSubsystem<UTimeOfDaySubSystem>()->SkipTimeByHours(BedUsageHours);
 }
 
@@ -308,6 +347,7 @@ void AWorldProp::IsBedTime()
 
 float AWorldProp::GetDurabilityRadio() const
 {
+	// 수치를 0.0 ~ 1.0으로 (위젯에 전송용)
 	return FMath::Clamp(CurrentDurability / MaxDurability, 0.f, 1.f);
 }
 
