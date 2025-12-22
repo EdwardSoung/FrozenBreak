@@ -54,6 +54,7 @@ void UPlayerStatComponent::BindStatSettingEvents()
 
 		//Add
 		EventSystem->Character.OnEquipInventoryItem.AddDynamic(this, &UPlayerStatComponent::EquipItem);
+		EventSystem->Character.OnUsableItemUsed.AddDynamic(this, &UPlayerStatComponent::EatItem);
 	}
 }
 
@@ -103,6 +104,35 @@ void UPlayerStatComponent::UseEquippedHandItem()
 		{
 			EventSystem->Character.OnEquippedItemUsed.Broadcast();
 		}
+	}
+}
+
+void UPlayerStatComponent::EatItem(UItemData* InData)
+{
+	switch (InData->ItemType)
+	{
+	case EItemType::CookedMeat:
+	case EItemType::Fruit:
+		
+		if (float* fatigueValue = InData->Stats.Find(EItemStatType::Fatigue))
+		{
+			float value = *fatigueValue;
+			SetPlayerFatigue(value);
+		}
+		if (float* hungerValue = InData->Stats.Find(EItemStatType::Hunger))
+		{
+			float value = *hungerValue;
+			SetPlayerHunger(value);
+		}
+		if (float* temperatureValue = InData->Stats.Find(EItemStatType::Temperature))
+		{
+			float value = *temperatureValue;
+			SetPlayerTemperature(value);
+		}
+		break;
+	default:
+		//먹을 수 있는 아이템이 아님. 무시
+		break;
 	}
 }
 
