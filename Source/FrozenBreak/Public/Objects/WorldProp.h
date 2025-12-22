@@ -40,9 +40,16 @@ private:
 	const float BedUsageHours = 4.0f;
 
 private:
+	// 플레이어가 나무와 상호작용 시
 	void TreeAction();
+
+	// 플레이어가 바위와 상호작용 시
 	void RockAction();
+
+	// 플레이어가 침대와 상호작용 시
 	void BedAction();
+
+	// 지금이 잘 수 있는 시간인지 알려줌
 	void IsBedTime();
 
 	// 내구도 비율 계산해주는 함수
