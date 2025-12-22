@@ -18,6 +18,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAddItemToInventoryUI, UInventoryI
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUpdateInventoryItem, EItemType, InType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRequestInventoryInit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTrashItem, UInventoryItem*, InItem);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRemoveItem, UInventoryItem*, InItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSendInventoryData, TArray<UInventoryItem*>, InData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUpdateInventoryWeight, float, InWeight, float, InMaxWeight);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUseInventoryItem, UInventoryItem*, InData);
@@ -65,6 +66,7 @@ struct FCharacterEvents
 	FOnUpdateInventoryItem OnUpdateInventoryItem;
 	FOnRequestInventoryInit OnRequestInventoryInit;
 	FOnTrashItem OnTrashItem;
+	FOnRemoveItem OnRemoveItem;
 	FOnSendInventoryData OnSendInventoryData;
 	FOnUpdateInventoryWeight OnUpdateInventoryWeight;
 	FOnUseInventoryItem OnUseInventoryItem;

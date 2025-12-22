@@ -20,6 +20,8 @@ void UInventoryWidget::NativeConstruct()
 		EventSystem->Character.OnAddItemToInventoryUI.AddDynamic(this, &UInventoryWidget::AddItem);
 		EventSystem->Character.OnUpdateInventoryItem.AddDynamic(this, &UInventoryWidget::UpdateItemByType);
 		EventSystem->Character.OnUpdateInventoryWeight.AddDynamic(this, &UInventoryWidget::UpdateWeight);
+		EventSystem->Character.OnRemoveItem.AddDynamic(this, &UInventoryWidget::RemoveItem);
+		
 
 		EventSystem->UI.OnInventoryItemSelected.AddDynamic(this, &UInventoryWidget::SelectionChanged);
 
@@ -40,7 +42,7 @@ FReply UInventoryWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKey
 
 		if (Selected)
 		{
-
+			//퀵슬롯 등록
 		}
 		return FReply::Handled();
 	}
@@ -83,10 +85,14 @@ void UInventoryWidget::InitData(TArray<class UInventoryItem*> InData)
 	//WeightText->SetText(FText::FromString(weightValue));
 }
 
+//아이템이 제거됨
 void UInventoryWidget::RemoveItem(UInventoryItem* InItem)
 {
+	InventoryList->RemoveItem(InItem);
+	ItemDataList.Remove(InItem);
 }
 
+//아이템 밖에 버림 처리
 void UInventoryWidget::TrashItem()
 {
 	//어...참조라 지우면 같이 지워지지 않나?
@@ -135,6 +141,7 @@ void UInventoryWidget::UseItem()
 		case EItemType::CookedMeat:
 		case EItemType::Fruit:
 		case EItemType::Campfire:
+
 			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 			{
 				EventSystem->Character.OnUseInventoryItem.Broadcast(selectedItem);
