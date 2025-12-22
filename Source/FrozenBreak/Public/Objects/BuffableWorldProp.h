@@ -52,6 +52,9 @@ private:
 
 	void StartCampfireTimer();
 
+	UFUNCTION()
+	void CampfireTick();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class USphereComponent> BuffArea = nullptr;

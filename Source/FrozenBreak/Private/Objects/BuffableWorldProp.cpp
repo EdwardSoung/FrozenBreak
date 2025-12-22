@@ -137,24 +137,51 @@ void ABuffableWorldProp::FinishCamFireBuff()
 
 void ABuffableWorldProp::StartCampfireTimer()
 {
-	CurrentDurability = 0;
-	CampfireLifeBar->SetDurabilityProgress(CurrentDurability);
-	GetWorld()->GetTimerManager().SetTimer(
-		CampfireHandle,
-		[this]() {
-			CurrentDurability += CampfireTimerRate;
-			if (CampfireLifeBar 
-				&& CampfireLifeBar->GetVisibility() == ESlateVisibility::Visible) 
-			{
-				CampfireLifeBar->SetDurabilityProgress(CurrentDurability / MaxDurability);
-			}
-			if (CurrentDurability >= MaxDurability)
-			{
-				GetWorld()->GetTimerManager().ClearTimer(CampfireHandle);
-				Destroy();
-			}
-		},
-		CampfireTimerRate,
-		true
-	);
+	CurrentDurability = 0.0f;
+
+	if (IsValid(CampfireLifeBar))
+	{
+		CampfireLifeBar->SetDurabilityProgress(CurrentDurability);
+	}
+
+	if (UWorld* W = GetWorld())
+	{
+		W->GetTimerManager().ClearTimer(CampfireHandle);
+		W->GetTimerManager().SetTimer(
+			CampfireHandle,
+			this,
+			&ABuffableWorldProp::CampfireTick,
+			CampfireTimerRate,
+			true
+		);
+	}
+}
+
+void ABuffableWorldProp::CampfireTick()
+{
+	if (!IsValid(this) || IsActorBeingDestroyed())
+	{
+		if (UWorld* World = GetWorld())
+		{
+			World->GetTimerManager().ClearTimer(CampfireHandle);
+		}
+		return;
+	}
+
+	CurrentDurability += CampfireTimerRate;
+
+	if (IsValid(CampfireLifeBar) &&
+		CampfireLifeBar->GetVisibility() == ESlateVisibility::Visible)
+	{
+		CampfireLifeBar->SetDurabilityProgress(CurrentDurability / MaxDurability);
+	}
+
+	if (CurrentDurability >= MaxDurability)
+	{
+		if (UWorld* World = GetWorld())
+		{
+			World->GetTimerManager().ClearTimer(CampfireHandle);
+		}
+		Destroy();
+	}
 }

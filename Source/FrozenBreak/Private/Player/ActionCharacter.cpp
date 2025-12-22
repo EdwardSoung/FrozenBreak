@@ -782,16 +782,29 @@ void AActionCharacter::HandEquip(UInventoryItem* InItem)
 
 void AActionCharacter::PlayDead()
 {
-	if (DeadAnimation)
+	if (!InvincibleTester && DeadAnimation)
 	{
 		if (USkeletalMeshComponent* MeshComp = GetMesh())
 		{
 			if (UAnimInstance* Anim = MeshComp->GetAnimInstance())
 			{
 				Anim->Montage_Play(DeadAnimation);
-			
+
 				// 입력 차단
 				if (APlayerController* PC = Cast<APlayerController>(GetController())) DisableInput(PC);
+				FTimerHandle DeadTimerHandle;
+				GetWorldTimerManager().SetTimer(
+					DeadTimerHandle,
+					[this]() {
+						UGameplayStatics::OpenLevel(
+							this,
+							FName(TEXT("FrozenBreak"))
+						);
+					},
+					2.5f,
+					false
+				);
+
 			}
 		}
 	}

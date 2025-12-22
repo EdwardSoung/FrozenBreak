@@ -209,6 +209,9 @@ protected: // 아이템 관련
 	void SetHeldItemType(EItemType NewType);
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Test")
+	bool InvincibleTester = true; // 테스트용 무적 플래그
+
 protected:
 	// ===== Input Functions =====
 	void OnMove(const FInputActionValue& Value);
