@@ -10,6 +10,7 @@
 #include "Data/StatBuffValueData.h"
 #include "Data/PropData.h"
 #include "UI/Prop/InteractionWidget.h"
+#include <UI/Prop/PropDurabilityWidget.h>
 
 ABuffableWorldProp::ABuffableWorldProp()
 {
@@ -38,14 +39,13 @@ void ABuffableWorldProp::BeginPlay()
 	BuffArea->OnComponentEndOverlap.AddDynamic(this, &ABuffableWorldProp::EndBuff);
 
 	if (Data) PropType = Data->PropType;
-	
-
 	if (PropType == EPropType::Campfire)
 	{
 		if (EventSystem)
 		{
 			EventSystem->Chraracter.OnSendRawMeet.AddDynamic(this, &ABuffableWorldProp::SetMeets);
 		}
+		CampfireLifeBar = Cast<UPropDurabilityWidget>(DurabilityWidget->GetUserWidgetObject());
 		StartCampfireTimer();
 	}
 }
@@ -97,9 +97,15 @@ void ABuffableWorldProp::IsCookValid()
 
 void ABuffableWorldProp::GiveCampFireBuff()
 {
+	if (CampfireLifeBar) 
+	{
+		DurabilityWidget->SetVisibility(true);
+		CampfireLifeBar->SetVisibility(ESlateVisibility::Visible);
+	}
 	StatusCalculater->IncreaseTemperature(CampfireBuffValues->TemperatureBuffValue);
 	StatusCalculater->IncreaseFatigue(CampfireBuffValues->FatigueBuffValue);
 	StatusCalculater->IncreaseHunger(CampfireBuffValues->HungerBuffValue);
+
 }
 
 void ABuffableWorldProp::ReadyToCook()
@@ -126,16 +132,23 @@ void ABuffableWorldProp::FinishCamFireBuff()
 	StatusCalculater->DecreaseTemperature(CampfireBuffValues->TemperatureBuffValue);
 	StatusCalculater->DecreaseFatigue(CampfireBuffValues->FatigueBuffValue);
 	StatusCalculater->DecreaseHunger(CampfireBuffValues->HungerBuffValue);
+	if(CampfireLifeBar) CampfireLifeBar->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void ABuffableWorldProp::StartCampfireTimer()
 {
-	StatComponent->CurrentHealth = 0;
+	CurrentDurability = 0;
+	CampfireLifeBar->SetDurabilityProgress(CurrentDurability);
 	GetWorld()->GetTimerManager().SetTimer(
 		CampfireHandle,
 		[this]() {
-			StatComponent->CurrentHealth += CampfireTimerRate;
-			if (StatComponent->CurrentHealth >= StatComponent->MaxHealth)
+			CurrentDurability += CampfireTimerRate;
+			if (CampfireLifeBar 
+				&& CampfireLifeBar->GetVisibility() == ESlateVisibility::Visible) 
+			{
+				CampfireLifeBar->SetDurabilityProgress(CurrentDurability / MaxDurability);
+			}
+			if (CurrentDurability >= MaxDurability)
 			{
 				GetWorld()->GetTimerManager().ClearTimer(CampfireHandle);
 				Destroy();

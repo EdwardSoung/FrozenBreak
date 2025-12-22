@@ -64,6 +64,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Stat")
 	TObjectPtr<class UStatBuffValueData> CampfireBuffValues = nullptr;
 
+	UPROPERTY()
+	TObjectPtr<class UPropDurabilityWidget> CampfireLifeBar = nullptr;
 private:
 	class UStatusCalculationSubSystem* StatusCalculater;
 	EPropType PropType = EPropType::None;
