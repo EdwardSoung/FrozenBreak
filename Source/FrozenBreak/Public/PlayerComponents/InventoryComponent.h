@@ -34,7 +34,8 @@ protected:
 
 	UFUNCTION()
 	void SendInventoryItems();
-
+	UFUNCTION()
+	void UseUsableItem(EItemType InType);
 	void RefreshWeight();
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data|Bag")

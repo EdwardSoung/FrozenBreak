@@ -28,6 +28,7 @@ void UInventoryComponent::BeginPlay()
 		EventSystem->Character.OnTrashItem.AddDynamic(this, &UInventoryComponent::TrashItem);
 
 		EventSystem->Character.OnRequestIventoryItems.AddDynamic(this, &UInventoryComponent::SendInventoryItems);
+		EventSystem->Character.OnUsableItemUsed.AddDynamic(this, &UInventoryComponent::UseUsableItem);
 
 		EventSystem->Character.OnRequestIventoryRawMeet.AddDynamic(this, &UInventoryComponent::SendRawMeetData);
 	}
@@ -47,6 +48,18 @@ void UInventoryComponent::SendInventoryItems()
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
 		EventSystem->Character.OnSendInventoryData.Broadcast(Items);
+	}
+}
+
+void UInventoryComponent::UseUsableItem(EItemType InType)
+{
+	for (auto Item : Items)
+	{
+		if (Item->GetType() == InType)
+		{
+			Item->AddAmount(-1);
+			break;
+		}
 	}
 }
 
