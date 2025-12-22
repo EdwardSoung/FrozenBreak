@@ -22,6 +22,10 @@ AEscapeProp::AEscapeProp()
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	
 	SetRootComponent(MeshComponent);
+	MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+	// 인터랙션 트레이스 채널 Block (InteractionComponent와 동일 채널)
+	MeshComponent->SetCollisionResponseToChannel(InteractableActorChannel, ECR_Block);
 
 	InteractionWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("TextWidget"));
 	InteractionWidget->SetupAttachment(RootComponent);
@@ -77,11 +81,6 @@ void AEscapeProp::RockAction()
 
 }
 
-void AEscapeProp::OnDead_Implementation()
-{
-	//음...탈출 성공 연출...
-}
-
 void AEscapeProp::DoAction_Implementation()
 {
 	RockAction();
@@ -94,6 +93,11 @@ void AEscapeProp::OnSelect_Implementation(bool bIsStart)
 	{
 		Widget->UpdateInteraction(Data->PropType, Data->InteractionKey);
 		InteractionWidget->SetVisibility(bIsStart);
+	}
+	if (auto Durability = Cast<UPropDurabilityWidget>(DurabilityWidget->GetUserWidgetObject()))
+	{
+		DurabilityWidget->SetVisibility(bIsStart);
+		Durability->SetDurabilityProgress(FMath::Clamp(HealthComponent->CurrentHealth / HealthComponent->MaxHealth, 0.f, 1.f));
 	}
 }
 

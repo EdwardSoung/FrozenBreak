@@ -9,7 +9,7 @@
 #include "EscapeProp.generated.h"
 
 UCLASS()
-class FROZENBREAK_API AEscapeProp : public AActor, public IDamageable, public IInteractable
+class FROZENBREAK_API AEscapeProp : public AActor, public IInteractable
 {
 	GENERATED_BODY()
 	
@@ -35,12 +35,11 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Prop|Widget")
 	TObjectPtr<class UWidgetComponent> DurabilityWidget = nullptr;
+
+	const ECollisionChannel InteractableActorChannel = ECollisionChannel::ECC_GameTraceChannel1;
 public:
 	void OnDamage(float InDamage);
 	void RockAction();
-
-	UFUNCTION(BlueprintCallable)
-	void OnDead_Implementation() override ;
 
 	UFUNCTION(BlueprintCallable)
 	void DoAction_Implementation() override ;

@@ -6,6 +6,7 @@
 #include "Interface/Interactable.h"
 #include "Objects/WorldProp.h"
 #include "Objects/PickupItem.h"
+#include "Objects/EscapeProp.h"
 
 // Sets default values for this component's properties
 UInteractionComponent::UInteractionComponent()
@@ -83,14 +84,17 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 				// 바라본 대상이 WorldProp / Item 인지 구분해주는 함수
 				ProcessInteractableTarget();
 			}
-
 			else
 			{
-				// 범위 밖이면 표시하지 않음
-				if (LastInteractionActor)
+				//거리랑 상관없이 탈출 바위이면 상호작용
+				if (ProcessEscapeTarget() == false)
 				{
-					IInteractable::Execute_OnSelect(LastInteractionActor, false);
-					LastInteractionActor = nullptr;
+					// 범위 밖이면 표시하지 않음
+					if (LastInteractionActor)
+					{
+						IInteractable::Execute_OnSelect(LastInteractionActor, false);
+						LastInteractionActor = nullptr;
+					}
 				}
 			}
 		}
@@ -210,5 +214,20 @@ void UInteractionComponent::ProcessInteractableTarget()
 		UE_LOG(LogTemp, Warning, TEXT("이건 나무나 바위가 아니고, Item임"));
 		bIsInteracting = true;
 	}
+}
+
+bool UInteractionComponent::ProcessEscapeTarget()
+{
+	if (const AEscapeProp* Prop = Cast<AEscapeProp>(CurrentInteractionActor))
+	{
+		if (PlayerCurrentTool == EItemType::Pickaxe)
+		{
+			bIsInteracting = true;
+			IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
+
+			return true;
+		}
+	}
+	return false;
 }
 
