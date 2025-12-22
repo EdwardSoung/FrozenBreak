@@ -29,6 +29,7 @@ void UInventoryWidget::NativeConstruct()
 
 	TrashButton->OnClicked.AddDynamic(this, &UInventoryWidget::TrashItem);
 	CloseButton->OnClicked.AddDynamic(this, &UInventoryWidget::HideWidget);
+	UseButton->OnClicked.AddDynamic(this, &UInventoryWidget::UseItem);
 }
 
 FReply UInventoryWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
