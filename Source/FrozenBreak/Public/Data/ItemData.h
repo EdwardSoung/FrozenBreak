@@ -28,7 +28,7 @@ public:
 	float ItemWeight = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
-	TSoftObjectPtr<UTexture2D> ItemIcon;
+	TObjectPtr<UTexture2D> ItemIcon;
 
 	// 아이템 내구도
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
