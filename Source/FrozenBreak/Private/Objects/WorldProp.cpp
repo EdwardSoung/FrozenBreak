@@ -64,18 +64,10 @@ void AWorldProp::BeginPlay()
 		UE_LOG(LogTemp, Log, TEXT("EventSystem이 설정되어 있지 않다."));
 	}
 
-	if (StatComponent)
+	if (Data)
 	{
-		if (Data)
-		{
-			// 데이터 에셋에 작성된 데이터를 StatComponent로 보낸다.
-			StatComponent->InitStat(Data->Durability);
-		}
-	}
-	else
-	{
-		// 이건 정말 끔찍한 일이야
-		return;
+		CurrentDurability = Data->Durability;
+		MaxDurability = Data->Durability;
 	}
 }
 
@@ -155,10 +147,10 @@ void AWorldProp::OnSelect_Implementation(bool bIsStarted)
 	}
 	if (auto Durability = Cast<UPropDurabilityWidget>(DurabilityWidget->GetUserWidgetObject()))
 	{
-		EventSystem->Status.OnHealthPointChanged.Broadcast(GetDurabilityRadio());
 		DurabilityWidget->SetVisibility(bIsStarted);
+		Durability->SetDurabilityProgress(GetDurabilityRadio());
 	}
-	
+
 }
 
 void AWorldProp::TreeAction()
@@ -170,17 +162,18 @@ void AWorldProp::TreeAction()
 	{
 		if (AActionCharacter* Player = Cast<AActionCharacter>(UGameplayStatics::GetPlayerPawn(this, 0)))
 		{
-			ToolAtkPower = Player->GetCurrentToolAtkPower();
+			if (auto Durability = Cast<UPropDurabilityWidget>(DurabilityWidget->GetUserWidgetObject()))
+			{
+				ToolAtkPower = Player->GetCurrentToolAtkPower();
 
-			// 도구의 공격력 만큼 데미지 주기
-			StatComponent->OnPropDamaged(ToolAtkPower);
+				CurrentDurability -= ToolAtkPower;
 
-			EventSystem->Status.OnHealthPointChanged.Broadcast(GetDurabilityRadio());
+				Durability->SetDurabilityProgress(GetDurabilityRadio());
 
-
-			// 플레이어 피로도 감소? 시키기
-			EventSystem->Status.OnSetFatigue.Broadcast(FatigueCostPerWork);
-			UE_LOG(LogTemp, Log, TEXT("나무를 베었다. 나무 Durability : %.1f"), StatComponent->CurrentHealth);
+				// 플레이어 피로도 감소? 시키기
+				EventSystem->Status.OnSetFatigue.Broadcast(FatigueCostPerWork);
+				UE_LOG(LogTemp, Log, TEXT("나무를 베었다. 나무 Durability : %.1f"), CurrentDurability);
+			}
 		}
 		else
 		{
@@ -193,7 +186,7 @@ void AWorldProp::TreeAction()
 	}
 
 	// 나무의 Durability가 0 이하 일 때
-	if (StatComponent->CurrentHealth <= 0)
+	if (CurrentDurability <= 0)
 	{
 
 		if (UItemFactorySubSystem* Factory = GetGameInstance()
@@ -230,16 +223,18 @@ void AWorldProp::RockAction()
 	{
 		if (AActionCharacter* Player = Cast<AActionCharacter>(UGameplayStatics::GetPlayerPawn(this, 0)))
 		{
-			ToolAtkPower = Player->GetCurrentToolAtkPower();
+			if (auto Durability = Cast<UPropDurabilityWidget>(DurabilityWidget->GetUserWidgetObject()))
+			{
+				ToolAtkPower = Player->GetCurrentToolAtkPower();
 
-			// 도구의 공격력 만큼 데미지 주기
-			StatComponent->OnPropDamaged(ToolAtkPower);
+				CurrentDurability -= ToolAtkPower;
 
-			EventSystem->Status.OnHealthPointChanged.Broadcast(GetDurabilityRadio());
+				Durability->SetDurabilityProgress(GetDurabilityRadio());
 
-			// 플레이어 피로도 감소? 시키기
-			EventSystem->Status.OnSetFatigue.Broadcast(FatigueCostPerWork);
-			UE_LOG(LogTemp, Log, TEXT("바위를 찍었다. 바위 Durability : %.1f"), StatComponent->CurrentHealth);
+				// 플레이어 피로도 감소? 시키기
+				EventSystem->Status.OnSetFatigue.Broadcast(FatigueCostPerWork);
+				UE_LOG(LogTemp, Log, TEXT("바위를 찍었다. 바위 Durability : %.1f"), CurrentDurability);
+			}
 		}
 		else
 		{
@@ -247,20 +242,24 @@ void AWorldProp::RockAction()
 		}
 	}
 
-	if (StatComponent->CurrentHealth <= 0)
+	if (CurrentDurability <= 0)
 	{
 
 		if (UItemFactorySubSystem* Factory = GetGameInstance()
 			? GetGameInstance()->GetSubsystem<UItemFactorySubSystem>()
 			: nullptr)
 		{
-			FVector SpawnLocation = GetActorLocation() + FVector(0, 0, 85);
+			if (auto Durability = Cast<UPropDurabilityWidget>(DurabilityWidget->GetUserWidgetObject()))
+			{
+				FVector SpawnLocation = GetActorLocation() + FVector(0, 0, 85);
 
-			Factory->Spawn(Data->GenerateItemType, SpawnLocation, Data->GenerateItemCount);
-			StatComponent->CurrentHealth = StatComponent->MaxHealth;
-			CurrentSpawnCount++;
-			UE_LOG(LogTemp, Log, TEXT("Stone 생성. 생성된 수 : %d, 남은 생성 수 : %d"),
-				CurrentSpawnCount, (MaxSpawnCount - CurrentSpawnCount));
+				Factory->Spawn(Data->GenerateItemType, SpawnLocation, Data->GenerateItemCount);
+				CurrentDurability = MaxDurability;
+				CurrentSpawnCount++;
+				Durability->SetDurabilityProgress(GetDurabilityRadio());
+				UE_LOG(LogTemp, Log, TEXT("Stone 생성. 생성된 수 : %d, 남은 생성 수 : %d"),
+					CurrentSpawnCount, (MaxSpawnCount - CurrentSpawnCount));
+			}
 		}
 		else
 		{
@@ -309,17 +308,7 @@ void AWorldProp::IsBedTime()
 
 float AWorldProp::GetDurabilityRadio() const
 {
-	if (StatComponent)
-	{
-		const float MaxDurability = StatComponent->MaxHealth;
-		const float CurrentDurability = StatComponent->CurrentHealth;
-		return FMath::Clamp(CurrentDurability / MaxDurability, 0.f, 1.f);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("StatComponent가 없다."));
-		return 0;
-	}
+	return FMath::Clamp(CurrentDurability / MaxDurability, 0.f, 1.f);
 }
 
 inline EItemType AWorldProp::GetInteractableToolType() const

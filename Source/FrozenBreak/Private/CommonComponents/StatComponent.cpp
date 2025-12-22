@@ -53,9 +53,3 @@ void UStatComponent::OnDamaged(float InDamage)
 		}
 	}
 }
-
-// 프롭 상호작용
-void UStatComponent::OnPropDamaged(float InDamage)
-{
-	CurrentHealth -= InDamage;
-}

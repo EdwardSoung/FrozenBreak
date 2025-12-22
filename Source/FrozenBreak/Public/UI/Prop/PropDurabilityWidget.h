@@ -16,6 +16,7 @@ class FROZENBREAK_API UPropDurabilityWidget : public UUserWidget
 protected:
 	virtual void NativeConstruct() override;
 
+public:
 	UFUNCTION()
 	void SetDurabilityProgress(float InValue);
 

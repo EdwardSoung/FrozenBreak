@@ -82,6 +82,10 @@ protected:
 
 	float ToolAtkPower = 0.f;
 
+	float CurrentDurability = 0;
+
+	float MaxDurability = 0;
+
 	// Rock 용 StoneSpawnCount
 	// Stone 을 몇번 생성 시켰냐
 	int32 CurrentSpawnCount = 0;

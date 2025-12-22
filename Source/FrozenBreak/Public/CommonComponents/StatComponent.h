@@ -23,7 +23,6 @@ protected:
 public:
 	void InitStat(float InHealth, float InAttack = 0);
 	void OnDamaged(float InDamage);
-	void OnPropDamaged(float InDamage);
 public:	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	float Attack = 0;
