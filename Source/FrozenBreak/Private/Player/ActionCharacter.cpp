@@ -18,6 +18,9 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 
+#include "GameSystem/ItemFactorySubSystem.h"
+#include "GameSystem/EventSubSystem.h"
+
 #include "Interface/Interactable.h"
 #include "Player/Components/InteractionComponent.h"
 #include "PlayerComponents/CraftInventoryComponent.h"
@@ -90,6 +93,11 @@ AActionCharacter::AActionCharacter()
 	//걷기 세팅
 	MoveComp->MaxWalkSpeed = 200.0f;
 
+	if (UEventSubSystem* Event = UEventSubSystem::Get(this))
+	{
+		Event->Character.OnEquipInventoryItem.AddDynamic(this, &AActionCharacter::HandEquip);
+	}
+
 }
 
 
@@ -127,34 +135,34 @@ void AActionCharacter::BeginPlay()
 		}
 	}
 
-	
-	if (DefaultToolsClass && GetMesh())
-	{
-		FActorSpawnParameters Params;
-		Params.Owner = this;
-		Params.Instigator = this;
+	//초기 세팅으로 하면 안됨...
+	//if (DefaultToolsClass && GetMesh())
+	//{
+	//	FActorSpawnParameters Params;
+	//	Params.Owner = this;
+	//	Params.Instigator = this;
 
-		CurrentTools = GetWorld()->SpawnActor<AToolActor>(DefaultToolsClass, Params);
+	//	CurrentTools = GetWorld()->SpawnActor<AToolActor>(DefaultToolsClass, Params);
 
-		if (CurrentTools)
-		{
-			CurrentTools->AttachToComponent(
-				GetMesh(),
-				FAttachmentTransformRules::SnapToTargetNotIncludingScale,
-				TEXT("WeaponSocket")
-			);
+	//	if (CurrentTools)
+	//	{
+	//		CurrentTools->AttachToComponent(
+	//			GetMesh(),
+	//			FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+	//			TEXT("WeaponSocket")
+	//		);
 
-			
-			SetHeldItemType(CurrentTools->ToolType); // 내가 지금 뭘 들고 있는지 
+	//		
+	//		SetHeldItemType(CurrentTools->ToolType); // 내가 지금 뭘 들고 있는지 
 
-			UE_LOG(LogTemp, Warning, TEXT("[Tool] Equipped: %s Type=%d"),
-				*CurrentTools->GetName(), (int32)CurrentTools->ToolType);
-		}
-		else
-		{
-			SetHeldItemType(EItemType::None);
-		}
-	}
+	//		UE_LOG(LogTemp, Warning, TEXT("[Tool] Equipped: %s Type=%d"),
+	//			*CurrentTools->GetName(), (int32)CurrentTools->ToolType);
+	//	}
+	//	else
+	//	{
+	//		SetHeldItemType(EItemType::None);
+	//	}
+	//}
 }
 
 
@@ -721,6 +729,47 @@ void AActionCharacter::OnPickaxeHit()
 	}
 }
 
+void AActionCharacter::HandEquip(UInventoryItem* InItem)
+{
+	if (CurrentTools)
+	{
+		//이미 존재하는건 Destory..
+		CurrentTools->Destroy();
+		CurrentTools = nullptr;
+		SetHeldItemType(EItemType::None);
+	}
+
+	if (!InItem)
+	{
+		//그냥 내구도 다한거면 없애고 종료
+		return;
+	}
+
+	if (UItemFactorySubSystem* ItemFactory = UItemFactorySubSystem::Get(this))
+	{
+		CurrentTools = ItemFactory->SpawnTool(InItem->GetType());
+
+		if (CurrentTools)
+		{
+			CurrentTools->AttachToComponent(
+				GetMesh(),
+				FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+				TEXT("WeaponSocket")
+			);
+
+
+			SetHeldItemType(CurrentTools->ToolType); // 내가 지금 뭘 들고 있는지 
+
+			UE_LOG(LogTemp, Warning, TEXT("[Tool] Equipped: %s Type=%d"),
+				*CurrentTools->GetName(), (int32)CurrentTools->ToolType);
+		}
+		else
+		{
+			SetHeldItemType(EItemType::None);
+		}
+	}
+}
+
 void AActionCharacter::EndMining()
 {
 	bIsMining = false;
@@ -777,6 +826,13 @@ void AActionCharacter::OnToolHit() // 지금 들고있는 무기에 맞춰 행�
 	else if (CurrentHeldItemType == EItemType::Pickaxe)
 	{
 		OnPickaxeHit();
+	}
+
+	//무기 내구도 감소
+	//PlayerStatComponent로 보내고 거기서 감소시키고 내구도 없으면 여기도 null로 보내기
+	if (UEventSubSystem* Event = UEventSubSystem::Get(this))
+	{
+		Event->Character.OnEquippedItemUsed.Broadcast();
 	}
 }
 

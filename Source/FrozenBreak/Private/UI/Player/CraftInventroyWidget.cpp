@@ -14,12 +14,12 @@ void UCraftInventroyWidget::NativeConstruct()
 {
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
-		EventSystem->Chraracter.OnInitCraftUI.AddDynamic(this, &UCraftInventroyWidget::InitCraftableData);
-		EventSystem->Chraracter.OnAddItemToCraftInventoryUI.AddDynamic(this, &UCraftInventroyWidget::AddCraftItem);
-		EventSystem->Chraracter.OnUpdateCraftItem.AddDynamic(this, &UCraftInventroyWidget::UpdateCraftItemByType);
-		EventSystem->Chraracter.OnRemoveCraftItem.AddDynamic(this, &UCraftInventroyWidget::RemoveCraftItem);
+		EventSystem->Character.OnInitCraftUI.AddDynamic(this, &UCraftInventroyWidget::InitCraftableData);
+		EventSystem->Character.OnAddItemToCraftInventoryUI.AddDynamic(this, &UCraftInventroyWidget::AddCraftItem);
+		EventSystem->Character.OnUpdateCraftItem.AddDynamic(this, &UCraftInventroyWidget::UpdateCraftItemByType);
+		EventSystem->Character.OnRemoveCraftItem.AddDynamic(this, &UCraftInventroyWidget::RemoveCraftItem);
 
-		EventSystem->Chraracter.OnRequestIventoryItems.Broadcast();
+		EventSystem->Character.OnRequestIventoryItems.Broadcast();
 
 	}
 	OnNativeVisibilityChanged.AddUFunction(this, "RequestInventoryData");
@@ -37,7 +37,7 @@ void UCraftInventroyWidget::StartCraft()
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
 			UInventoryItem* ItemToCraft = Cast<UInventoryItem>(Selected);
-			EventSystem->Chraracter.OnCraftRequested.Broadcast(ItemToCraft);
+			EventSystem->Character.OnCraftRequested.Broadcast(ItemToCraft);
 			CloseCraft();
 		}
 	}
@@ -69,7 +69,7 @@ void UCraftInventroyWidget::RequestInventoryData()
 	{
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			EventSystem->Chraracter.OnRequestIventoryItems.Broadcast();
+			EventSystem->Character.OnRequestIventoryItems.Broadcast();
 		}
 		CarftInventoryList->ClearSelection();
 	}

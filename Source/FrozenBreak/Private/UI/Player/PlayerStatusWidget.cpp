@@ -8,6 +8,7 @@
 #include "GameSystem/UISubSystem.h"
 #include "UI/Player/EquipmentSlotWidget.h"
 #include "Data/ItemData.h"
+#include "Objects/InventoryItem.h"
 
 void UPlayerStatusWidget::NativeConstruct()
 {
@@ -18,8 +19,8 @@ void UPlayerStatusWidget::NativeConstruct()
 	{
 		statusEvent->Status.OnInGameTimeChanged.AddDynamic(this, &UPlayerStatusWidget::SetInGameTime);
 		statusEvent->Status.OnTemperatureDefenceChanged.AddDynamic(this, &UPlayerStatusWidget::SetTemperatureDefence);
-		statusEvent->Status.OnHandEquipmentChanged.AddDynamic(this, &UPlayerStatusWidget::SetHandEquipment);
-		statusEvent->Status.OnBodyEquipmentChanged.AddDynamic(this, &UPlayerStatusWidget::SetBodyEquipment);
+		statusEvent->Character.OnEquipInventoryItem.AddDynamic(this, &UPlayerStatusWidget::SetHandEquipment);
+		statusEvent->Character.OnEquipInventoryItem.AddDynamic(this, &UPlayerStatusWidget::SetBodyEquipment);
 	}
 	CloseStatButton->OnClicked.AddDynamic(this, &UPlayerStatusWidget::HideWidget);
 }
@@ -40,7 +41,7 @@ void UPlayerStatusWidget::SetTemperatureDefence(FText InDefenceValue)
 	}
 }
 
-void UPlayerStatusWidget::SetHandEquipment(UItemData* InHandItem)
+void UPlayerStatusWidget::SetHandEquipment(UInventoryItem* InHandItem)
 {
 	if (HandEquipment)
 	{
@@ -48,7 +49,7 @@ void UPlayerStatusWidget::SetHandEquipment(UItemData* InHandItem)
 	}
 }
 
-void UPlayerStatusWidget::SetBodyEquipment(UItemData* InBodyItem)
+void UPlayerStatusWidget::SetBodyEquipment(UInventoryItem* InBodyItem)
 {
 	if (BodyEquipment)
 	{

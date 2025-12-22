@@ -21,7 +21,7 @@ public:
 
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "Events")
-	FCharacterEvents Chraracter;
+	FCharacterEvents Character;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Events")
 	FStatusEvents Status;
@@ -34,6 +34,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TestAddItem(EItemType Type, int32 Amount)
 	{
-		Chraracter.OnGetPickupItem.Broadcast(Type, Amount);
+		Character.OnGetPickupItem.Broadcast(Type, Amount);
 	}
 };

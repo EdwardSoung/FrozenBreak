@@ -53,6 +53,8 @@ private:
 	void HideWidget();
 	UFUNCTION()
 	void UpdateWeight(float InWeight, float InMaxWeight);
+	UFUNCTION()
+	void SelectionChanged(EItemType InType);
 
 public:
 	void OpenWidget_Implementation();

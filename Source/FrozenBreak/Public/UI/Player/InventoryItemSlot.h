@@ -22,6 +22,9 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> AmountText;
 
+private:
+	TObjectPtr<class UInventoryItem> ItemData;
+
 protected:
 	virtual void NativeOnInitialized() override;
 public:

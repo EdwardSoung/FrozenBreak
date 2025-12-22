@@ -20,6 +20,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRequestInventoryInit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTrashItem, UInventoryItem*, InItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSendInventoryData, TArray<UInventoryItem*>, InData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUpdateInventoryWeight, float, InWeight, float, InMaxWeight);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUseInventoryItem, UInventoryItem*, InData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEquipInventoryItem, UInventoryItem*, InData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEquippedItemUsed);
 
 
 //Craft
@@ -63,6 +66,9 @@ struct FCharacterEvents
 	FOnTrashItem OnTrashItem;
 	FOnSendInventoryData OnSendInventoryData;
 	FOnUpdateInventoryWeight OnUpdateInventoryWeight;
+	FOnUseInventoryItem OnUseInventoryItem;
+	FOnEquipInventoryItem OnEquipInventoryItem;
+	FOnEquippedItemUsed OnEquippedItemUsed;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnInitCraftUI OnInitCraftUI;

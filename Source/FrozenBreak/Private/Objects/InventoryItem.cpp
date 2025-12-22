@@ -2,6 +2,7 @@
 
 
 #include "Objects/InventoryItem.h"
+#include "GameSystem/EventSubSystem.h"
 
 void UInventoryItem::Initialize(uint32 InUID, UItemData* InData)
 {
@@ -20,4 +21,23 @@ void UInventoryItem::AddAmount(int32 InAmount)
 void UInventoryItem::SetAmount(int32 InAmount)
 {
 	Amount = InAmount;
+}
+
+void UInventoryItem::Use()
+{
+	if (Data->Stats.Contains(EItemStatType::UseDurability))
+	{
+		float useValue = *Data->Stats.Find(EItemStatType::UseDurability);
+		Durability -= useValue;
+
+		Durability = FMath::Clamp(Durability, 0, MaxDurability);
+
+		if (Durability == 0)
+		{
+			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+			{
+				EventSystem->Character.OnEquipInventoryItem.Broadcast(nullptr);
+			}
+		}
+	}
 }

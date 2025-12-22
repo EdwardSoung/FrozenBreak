@@ -9,6 +9,7 @@
 #include "Sound/SoundBase.h"
 #include "Tools/AxeActor.h"
 #include "Animation/AnimMontage.h"
+#include "Objects/InventoryItem.h"
 #include "ActionCharacter.generated.h"
 
 // ===== Forward Declarations =====
@@ -176,8 +177,6 @@ protected: // 아이템 관련
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tool")
 	TObjectPtr<AToolActor> CurrentTools = nullptr;
 
-
-
 	UFUNCTION(BlueprintCallable, Category = "Item")
 	void SetHeldItemType(EItemType NewType);
 
@@ -212,6 +211,11 @@ protected:
 
 	bool bSavedUseControllerRotationYaw = true;
 	bool bToolYawLocked = false;
+
+
+	//장착
+	UFUNCTION(BlueprintCallable)
+	void HandEquip(UInventoryItem* InItem);
 
 public:
 	//곡괭이질

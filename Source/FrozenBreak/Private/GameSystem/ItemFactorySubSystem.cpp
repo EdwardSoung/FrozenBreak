@@ -3,6 +3,7 @@
 
 #include "GameSystem/ItemFactorySubSystem.h"
 #include "Objects/PickupItem.h"
+#include "Tools/ToolActor.h"
 #include "GameSystem/GameManager.h"
 
 UItemFactorySubSystem* UItemFactorySubSystem::Get(const UObject* WorldContextObject)
@@ -44,5 +45,19 @@ UInventoryItem* UItemFactorySubSystem::Spawn(EItemType InType, int32 Amount)
 
 		return NewItem;
 	}
+	return nullptr;
+}
+
+AToolActor* UItemFactorySubSystem::SpawnTool(EItemType InType)
+{
+	if (UGameManager* Manager = UGameManager::Get(this))
+	{
+		auto spawnClass = Manager->GetToolClass(InType);
+
+		AToolActor* EquipItem = GetWorld()->SpawnActor<AToolActor>(spawnClass);
+
+		return EquipItem;
+	}
+
 	return nullptr;
 }

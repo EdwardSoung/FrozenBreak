@@ -4,20 +4,29 @@
 #include "UI/Player/EquipmentSlotWidget.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Objects/InventoryItem.h"
 #include "GameSystem/EventSubSystem.h"
 
-void UEquipmentSlotWidget::RefreshSlot(UItemData* InItemData)
+void UEquipmentSlotWidget::RefreshSlot(UInventoryItem* InItem)
 {
-	if (InItemData)
+	if (InItem)
 	{
-		if (InItemData->ItemIcon)
+		ItemIcon->SetVisibility(ESlateVisibility::Visible);
+		auto ItemData = InItem->GetData();
+		if (ItemData->ItemIcon)
 		{
-			ItemIcon->SetBrushFromTexture(InItemData->ItemIcon.Get());
+			ItemIcon->SetBrushFromTexture(ItemData->ItemIcon.Get());
 		}
-		if (!InItemData->DisplayName.IsEmpty())
+		if (!ItemData->DisplayName.IsEmpty())
 		{
-			ItemName->SetText(InItemData->DisplayName);
+			ItemName->SetText(ItemData->DisplayName);
 		}
+	}
+	else
+	{
+		//빈칸으로 세팅해줘야함
+		ItemIcon->SetVisibility(ESlateVisibility::Collapsed);
+		ItemName->SetText(FText::FromString(TEXT("없음")));
 	}
 }
 

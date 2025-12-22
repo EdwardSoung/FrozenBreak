@@ -64,6 +64,7 @@ enum class EItemStatType : uint8
 	Temperature,
 	ColdResistance,
 	Weight,
+	UseDurability,	//내구도 차감 수치
 };
 
 UENUM(BlueprintType)

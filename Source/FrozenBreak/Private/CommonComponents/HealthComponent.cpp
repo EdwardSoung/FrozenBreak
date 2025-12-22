@@ -26,7 +26,7 @@ void UHealthComponent::SetPlayerHealth(float InHealthValue)
 		// TODO : 캐릭터 사망
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			EventSystem->Chraracter.OnPlayerDead.Broadcast();
+			EventSystem->Character.OnPlayerDead.Broadcast();
 		}
 	}
 }

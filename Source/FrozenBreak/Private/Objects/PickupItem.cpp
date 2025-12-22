@@ -85,7 +85,7 @@ void APickupItem::DoAction_Implementation() // 아이템을 획득
 	if (Data)
 	{
 		// 플레이어 Inventory Component에 Item List가 세팅되어 있어야 한다.
-		EventSystem->Chraracter.OnGetPickupItem.Broadcast(Data->ItemType, 1);
+		EventSystem->Character.OnGetPickupItem.Broadcast(Data->ItemType, 1);
 
 		SetActorHiddenInGame(true);
 		SetLifeSpan(0.001f);
