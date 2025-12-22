@@ -32,6 +32,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Prop|Widget")
 	TObjectPtr<class UWidgetComponent> InteractionWidget = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Prop|Widget")
+	TObjectPtr<class UWidgetComponent> DurabilityWidget = nullptr;
 public:
 	void OnDamage(float InDamage);
 	void RockAction();

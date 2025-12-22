@@ -9,6 +9,7 @@
 #include <Player/ActionCharacter.h>
 #include <Kismet/GameplayStatics.h>
 #include "UI/Prop/InteractionWidget.h"
+#include "UI/Prop/PropDurabilityWidget.h"
 #include "Data/PropData.h"
 
 // Sets default values
@@ -25,8 +26,14 @@ AEscapeProp::AEscapeProp()
 	InteractionWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("TextWidget"));
 	InteractionWidget->SetupAttachment(RootComponent);
 	InteractionWidget->SetRelativeLocation(FVector(0, 0, 0));
-	InteractionWidget->SetWidgetSpace(EWidgetSpace::Screen);
-	InteractionWidget->SetVisibility(false);
+	InteractionWidget->SetWidgetSpace(EWidgetSpace::Screen);	InteractionWidget->SetVisibility(false);
+
+
+	DurabilityWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("DurabilityWidget"));
+	DurabilityWidget->SetupAttachment(RootComponent);
+	DurabilityWidget->SetRelativeLocation(FVector(0, 0, 50));
+	DurabilityWidget->SetWidgetSpace(EWidgetSpace::Screen);
+	DurabilityWidget->SetVisibility(false);
 }
 
 // Called when the game starts or when spawned
@@ -46,6 +53,10 @@ void AEscapeProp::RockAction()
 	{
 		if (AActionCharacter* Player = Cast<AActionCharacter>(UGameplayStatics::GetPlayerPawn(this, 0)))
 		{
+			if (auto Durability = Cast<UPropDurabilityWidget>(DurabilityWidget->GetUserWidgetObject()))
+			{
+				Durability->SetDurabilityProgress(FMath::Clamp(HealthComponent->CurrentHealth / HealthComponent->MaxHealth, 0.f, 1.f));
+			}
 			ToolAtkPower = Player->GetCurrentToolAtkPower();
 
 			// 도구의 공격력 만큼 데미지 주기
