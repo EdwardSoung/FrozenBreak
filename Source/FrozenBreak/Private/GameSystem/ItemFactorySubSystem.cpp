@@ -41,6 +41,8 @@ UInventoryItem* UItemFactorySubSystem::Spawn(EItemType InType, int32 Amount)
 		auto NewData = Manager->GetItemData(InType);
 		NewItem->Initialize(Manager->GetUID(), NewData);
 		NewItem->AddAmount(Amount);
+
+		return NewItem;
 	}
 	return nullptr;
 }
