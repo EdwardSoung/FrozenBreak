@@ -26,5 +26,5 @@ protected:
 
 private:
 	// 플레이 시작 시 체온 초기화 값
-	float InitValue = 1.0f;
+	float InitValue = 0.0f;
 };
