@@ -4,6 +4,7 @@
 #include "Objects/BuffableWorldProp.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
+#include "CommonComponents/StatComponent.h"
 #include "GameSystem/StatusCalculationSubSystem.h"
 #include "GameSystem/EventSubSystem.h"
 #include "Data/StatBuffValueData.h"
@@ -36,9 +37,16 @@ void ABuffableWorldProp::BeginPlay()
 	BuffArea->OnComponentBeginOverlap.AddDynamic(this, &ABuffableWorldProp::BeginBuff);
 	BuffArea->OnComponentEndOverlap.AddDynamic(this, &ABuffableWorldProp::EndBuff);
 
-	if (EventSystem)
+	if (Data) PropType = Data->PropType;
+	
+
+	if (PropType == EPropType::Campfire)
 	{
-		EventSystem->Chraracter.OnSendRawMeet.AddDynamic(this, &ABuffableWorldProp::SetMeets);
+		if (EventSystem)
+		{
+			EventSystem->Chraracter.OnSendRawMeet.AddDynamic(this, &ABuffableWorldProp::SetMeets);
+		}
+		StartCampfireTimer();
 	}
 }
 
@@ -50,8 +58,6 @@ void ABuffableWorldProp::BeginBuff(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	if (Data) PropType = Data->PropType;
-
 	if (PropType == EPropType::Campfire && CampfireBuffValues)
 	{
 		GiveCampFireBuff();
@@ -112,11 +118,6 @@ void ABuffableWorldProp::SetMeets(TArray<UInventoryItem*> InData)
 		{
 			Meets.Add(SingleMeet);
 		}
-
-		if (Meets[0]->GetAmount() > 0)
-		{
-
-		}
 	}
 }
 
@@ -125,4 +126,22 @@ void ABuffableWorldProp::FinishCamFireBuff()
 	StatusCalculater->DecreaseTemperature(CampfireBuffValues->TemperatureBuffValue);
 	StatusCalculater->DecreaseFatigue(CampfireBuffValues->FatigueBuffValue);
 	StatusCalculater->DecreaseHunger(CampfireBuffValues->HungerBuffValue);
+}
+
+void ABuffableWorldProp::StartCampfireTimer()
+{
+	StatComponent->CurrentHealth = 0;
+	GetWorld()->GetTimerManager().SetTimer(
+		CampfireHandle,
+		[this]() {
+			StatComponent->CurrentHealth += CampfireTimerRate;
+			if (StatComponent->CurrentHealth >= StatComponent->MaxHealth)
+			{
+				GetWorld()->GetTimerManager().ClearTimer(CampfireHandle);
+				Destroy();
+			}
+		},
+		CampfireTimerRate,
+		true
+	);
 }

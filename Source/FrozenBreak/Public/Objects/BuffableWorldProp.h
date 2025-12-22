@@ -50,6 +50,8 @@ private:
 	void SetMeets(TArray<UInventoryItem*> InData);
 	void FinishCamFireBuff();
 
+	void StartCampfireTimer();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class USphereComponent> BuffArea = nullptr;
@@ -67,4 +69,8 @@ private:
 	EPropType PropType = EPropType::None;
 
 	TArray<UInventoryItem*> Meets;
+
+	// 모닥불 수명 관리
+	FTimerHandle CampfireHandle;
+	float CampfireTimerRate = 0.1f;
 };
