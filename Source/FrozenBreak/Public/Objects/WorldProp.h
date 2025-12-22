@@ -54,6 +54,14 @@ private:
 
 	// 내구도 비율 계산해주는 함수
 	float GetDurabilityRadio() const;
+
+	// BedActionWidget이 시작 됐을 때
+	UFUNCTION()
+	void BedActionWidgetStarted();
+
+	// BedActionWidget의 애니메이션이 끝났을 때
+	UFUNCTION()
+	void BedActionWidgetFinished();
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Stat")
 	TObjectPtr<class UStatComponent> StatComponent;
@@ -74,6 +82,14 @@ protected:
 
 	UPROPERTY()
 	class UEventSubSystem* EventSystem = nullptr;
+
+	// BedAction 위젯 WBP 클래스 (에디터에서 설정)
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<class UBedActionWidget> BedActionWidgetClass = nullptr;
+
+	// 현재 표시 중인 BedAction 위젯 인스턴스
+	UPROPERTY()
+	TObjectPtr<class UBedActionWidget> BedActionWidgetInstance = nullptr;
 
 protected:
 	// 작업시 소모시킬 피로도 (최종(확정된) 값이 아님)

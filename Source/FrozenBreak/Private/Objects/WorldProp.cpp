@@ -20,6 +20,7 @@
 
 #include "UI/Prop/PropDurabilityWidget.h"
 #include "UI/Prop/InteractionWidget.h"
+#include "UI/Prop/BedActionWidget.h"
 
 #include "Data/PropData.h"
 #include "Interface/Interactable.h"
@@ -266,12 +267,12 @@ void AWorldProp::RockAction()
 
 					// 방향 벡터
 					FVector LaunchDirection = (PlayerLocation - SpawnLocation).GetSafeNormal();
-					
+
 					// 약간 위로 튀게
-					LaunchDirection = (LaunchDirection + FVector(0, 0, 0.5f)).GetSafeNormal();
+					LaunchDirection = (LaunchDirection + FVector(0, 0, 1.f)).GetSafeNormal();
 
 					// 얼마나 세게?
-					const float ImpulseStrength = 500.f;
+					const float ImpulseStrength = 750.f;
 
 					// 스폰된 아이템 클래스 안에 있는 메시를 가져온다
 					if (UStaticMeshComponent* SpawnedItemMesh = Cast<UStaticMeshComponent>(
@@ -310,20 +311,27 @@ void AWorldProp::RockAction()
 
 void AWorldProp::BedAction()
 {
-	// Player : 침대에 눕는 애님은 없으니 위젯 애니메이션으로 검어졌다가 시간지나고 뭐 텍스트 띄우고...
-	// 중복실행을 막아야 함
-	if (EventSystem)
+	// BedActionWidget 띄우기
+	if (BedActionWidgetClass)
 	{
-		// 플레이어 피로도 회복
-		EventSystem->Status.OnSetFatigue.Broadcast(FatigueRecoveryAmount);
+		if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0))
+		{
+			BedActionWidgetInstance = CreateWidget<UBedActionWidget>(PlayerController, BedActionWidgetClass);
+			if (BedActionWidgetInstance)
+			{
+				BedActionWidgetInstance->OnBedActionWidgetStart.AddDynamic(this, &AWorldProp::BedActionWidgetStarted);
+				BedActionWidgetInstance->OnBedActionWidgetEnd.AddDynamic(this, &AWorldProp::BedActionWidgetFinished);
 
-		// 플레이어가 배고파짐
-		EventSystem->Status.OnSetHunger.Broadcast(HungerReductionAmount);
-		UE_LOG(LogTemp, Log, TEXT("BedAction : BroadCast 보냄."));
+
+				BedActionWidgetInstance->SetVisibility(ESlateVisibility::Visible);
+				BedActionWidgetInstance->AddToViewport();
+			}
+		}
 	}
-
-	// 시간이 스킵된다.
-	GetWorld()->GetSubsystem<UTimeOfDaySubSystem>()->SkipTimeByHours(BedUsageHours);
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("블루프린트에 위젯 할당이 되지 않았다."));
+	}
 }
 
 void AWorldProp::IsBedTime()
@@ -349,6 +357,43 @@ float AWorldProp::GetDurabilityRadio() const
 {
 	// 수치를 0.0 ~ 1.0으로 (위젯에 전송용)
 	return FMath::Clamp(CurrentDurability / MaxDurability, 0.f, 1.f);
+}
+
+void AWorldProp::BedActionWidgetStarted()
+{
+	// 플레이어 입력 차단
+	if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0))
+	{
+		if (APawn* Player = PlayerController->GetPawn())
+		{
+			Player->DisableInput(PlayerController);
+		}
+	}
+}
+
+void AWorldProp::BedActionWidgetFinished()
+{
+	// 플레이어 입력 복구
+	if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0))
+	{
+		if (APawn* Player = PlayerController->GetPawn())
+		{
+			Player->EnableInput(PlayerController);
+		}
+	}
+
+	if (EventSystem)
+	{
+		// 플레이어 피로도 회복
+		EventSystem->Status.OnSetFatigue.Broadcast(FatigueRecoveryAmount);
+
+		// 플레이어가 배고파짐
+		EventSystem->Status.OnSetHunger.Broadcast(HungerReductionAmount);
+		UE_LOG(LogTemp, Log, TEXT("BedAction : BroadCast 보냄."));
+
+		// 시간이 스킵된다.
+		GetWorld()->GetSubsystem<UTimeOfDaySubSystem>()->SkipTimeByHours(BedUsageHours);
+	}
 }
 
 inline EItemType AWorldProp::GetInteractableToolType() const
