@@ -163,6 +163,12 @@ void AActionCharacter::BeginPlay()
 	//		SetHeldItemType(EItemType::None);
 	//	}
 	//}
+
+	if (bForceAxeForTest) // 테스트 용입니다 나중에 지워주세요 
+    {
+        CurrentHeldItemType = ForceToolType;  // << 이 한 줄로 AnimBP가 Axe 로코모션으로 바뀜
+        UE_LOG(LogTemp, Warning, TEXT("[TEST] ForceToolType=%d"), (int32)CurrentHeldItemType);
+    }
 }
 
 
@@ -478,69 +484,7 @@ void AActionCharacter::OnHarvestStarted()
 		return;
 	}
 
-	if (CurrentHeldItemType != EItemType::Axe)
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("Blocked: Not Axe"));
-		return;
-	}
-
 	
-
-	if (!CurrentTools)
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("Blocked: No Tools"));
-		 return;
-	}
-
-
-	PendingHarvestTarget = nullptr;
-	PendingHarvestImpactPoint = FVector::ZeroVector;
-
-	const float Range = 250.0f;
-	const float Radius = 70.0f;
-	const float Up = 50.0f;
-	const float ForwardOffset = 60.0f;
-
-	const FVector Forward = GetActorForwardVector();
-	const FVector Start = GetActorLocation() + FVector(0, 0, Up) + Forward * ForwardOffset;
-	const FVector End = Start + Forward * Range;
-
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-	Params.AddIgnoredActor(CurrentTools);
-
-	FHitResult Hit;
-	const bool bHit = GetWorld()->SweepSingleByChannel(
-		Hit,
-		Start,
-		End,
-		FQuat::Identity,
-		ECC_GameTraceChannel1,
-		FCollisionShape::MakeSphere(Radius),
-		Params
-	);
-
-
-	UE_LOG(LogTemp, Warning, TEXT("[HarvestStart] bHit=%d HitActor=%s"),
-		bHit,
-		Hit.GetActor() ? *Hit.GetActor()->GetName() : TEXT("None")
-	);
-
-	AActor* HitActor = Hit.GetActor();
-	if (!bHit || !Hit.GetActor())
-		return;
-
-	if (!HitActor->ActorHasTag("Tree"))
-	{
-		return;
-	}
-
-	if (!HitActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
-		return;
-
-	//  캐싱
-	PendingHarvestTarget = HitActor;
-	PendingHarvestImpactPoint = Hit.ImpactPoint;
 
 	// 여기서부터 수확 시작
 	bIsHarvesting = true;
@@ -557,11 +501,7 @@ void AActionCharacter::OnHarvestStarted()
 
 	PlayAnimMontage(HarvestMontage);
 
-	//디버그용
 
-	DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1.0f, 0, 2.0f);
-	DrawDebugSphere(GetWorld(), Start, Radius, 12, FColor::Yellow, false, 1.0f);
-	DrawDebugSphere(GetWorld(), End, Radius, 12, FColor::Yellow, false, 1.0f);
 	
 }
 
@@ -624,63 +564,7 @@ void AActionCharacter::OnPickaxeStarted() // 곡괭이 전용
 	if (bIsMining)
 		return;
 
-	if (CurrentHeldItemType != EItemType::Pickaxe) //곡괭이 들고 있을때만
-		return;
-
-	if (!CurrentTools)
-		return;
-
-	PendingMiningTarget = nullptr;
-	PendingMiningImpactPoint = FVector::ZeroVector;
-
-	const float Range = 250.0f; // 일단 도끼랑 범위를 같게 세팅할게용
-	const float Radius = 70.0f;
-	const float Up = 50.0f;
-	const float ForwardOffset = 60.0f;
-
-	const FVector Forward = GetActorForwardVector();
-	const FVector Start = GetActorLocation() + FVector(0, 0, Up) + Forward * ForwardOffset;
-	const FVector End = Start + Forward * Range;
-
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this); // 액션 케릭터 무시
-	Params.AddIgnoredActor(CurrentTools); // 자기 자신(툴, 무기) 무시
-
-	FHitResult Hit;
-	const bool bHit = GetWorld()->SweepSingleByChannel(
-		Hit,
-		Start,
-		End,
-		FQuat::Identity,
-		ECC_GameTraceChannel1,
-		FCollisionShape::MakeSphere(Radius),
-		Params
-	);
-
-	UE_LOG(LogTemp, Warning, TEXT("[MiningStart] bHit=%d HitActor=%s"),
-		bHit,
-		Hit.GetActor() ? *Hit.GetActor()->GetName() : TEXT("None")
-	);
-
-	if (!bHit || !Hit.GetActor())
-	{
-		return;
-	}
-
-	AActor* HitActor = Hit.GetActor();
-
-	if (!HitActor->ActorHasTag("Stone")) // 곡괭이는 돌만 캠
-	{
-		return;
-	}
-
-	if (!HitActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))  // 돌인지 테스트 
-	{
-		return;
-	}
-
-	PendingMiningTarget = HitActor;
-	PendingMiningImpactPoint = Hit.ImpactPoint;
+	
 
 	bIsMining = true;
 
@@ -697,14 +581,9 @@ void AActionCharacter::OnPickaxeStarted() // 곡괭이 전용
 
 
 	float Len = PlayAnimMontage(PickaxeMontage);
-	UE_LOG(LogTemp, Warning, TEXT("[Pickaxe] Play Len=%.3f"), Len);
-
 	
 
-	// 디버그
-	DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1.0f, 0, 2.0f);
-	DrawDebugSphere(GetWorld(), Start, Radius, 12, FColor::Yellow, false, 1.0f);
-	DrawDebugSphere(GetWorld(), End, Radius, 12, FColor::Yellow, false, 1.0f);
+
 
 }
 

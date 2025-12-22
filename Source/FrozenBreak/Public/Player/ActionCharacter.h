@@ -276,6 +276,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
 	EItemType CurrentHeldItemType = EItemType::None;
 
+	EItemType GetCurrentToolsType() const { return CurrentHeldItemType; }
+
 public:
 	//사운드용
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
@@ -306,4 +308,11 @@ public:
 public: // 무기쪽
 	UPROPERTY(EditDefaultsOnly, Category = "Combat|Montage")
 	TObjectPtr<class UAnimMontage> UnarmedAttackMontage;
+
+public: // 테스트 용 입니다 나중에 지워도 상관없어요
+	UPROPERTY(EditAnywhere, Category = "Test|Tool")
+	bool bForceAxeForTest = true;   // 테스트 끝나면 false로
+
+	UPROPERTY(EditAnywhere, Category = "Test|Tool")
+	EItemType ForceToolType = EItemType::Axe;  // 나중에 Pickaxe/Sword로 바꾸기 쉬움
 };

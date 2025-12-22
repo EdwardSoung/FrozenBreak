@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "Data/Enums.h"
 #include "ActionAnimInstance.generated.h"
 
 /**
@@ -61,6 +62,15 @@ protected: // 뒤로 걷기(뒤로 달리기도 추가 예정)
 
 	UPROPERTY(BlueprintReadOnly, Category = "Anim")
 	bool bIsMovingBackward = false;
+
+protected:
+	// 도끼 BlendSpace(2D)용
+	UPROPERTY(BlueprintReadOnly, Category = "Anim")
+	float Direction = 0.0f;   // -180 ~ 180
+
+	// 툴 타입(맨손/도끼/곡괭이/칼...)
+	UPROPERTY(BlueprintReadOnly, Category = "Anim|Tool")
+	EItemType CurrentToolType = EItemType::None;
 
 
 
