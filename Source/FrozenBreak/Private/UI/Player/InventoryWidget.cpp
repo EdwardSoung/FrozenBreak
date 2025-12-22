@@ -114,22 +114,15 @@ void UInventoryWidget::UseItem()
 	{
 		UInventoryItem* selectedItem = Cast<UInventoryItem>(Selected);
 
-		switch (selectedItem->GetType())
+		switch (selectedItem->GetData()->ItemType)
 		{
 		case EItemType::Axe:
 		case EItemType::Pickaxe:
 		case EItemType::Knife:
 		case EItemType::Jaket:
-			
-			InventoryList->RemoveItem(Selected);
-			ItemDataList.Remove(selectedItem);
-
 			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 			{
 				EventSystem->Character.OnEquipInventoryItem.Broadcast(selectedItem);
-				//인벤토리에서 제거
-				EventSystem->Character.OnTrashItem.Broadcast(selectedItem);
-
 			}
 			break;
 		case EItemType::CookedMeat:
@@ -138,9 +131,6 @@ void UInventoryWidget::UseItem()
 			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 			{
 				EventSystem->Character.OnUseInventoryItem.Broadcast(selectedItem);
-
-				//개수 감소
-				EventSystem->Character.OnUsableItemUsed.Broadcast(selectedItem->GetData());
 			}
 			break;
 		default:

@@ -52,6 +52,7 @@ public:
 
 public:
 	inline float GetCurrentToolAtkPower() const { return CurrentTools->GetToolAtkPower(); }
+	inline AActor* GetCurrentTool() const { return CurrentTools; }
 protected:
 	// ===== Camera =====
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera")
@@ -83,7 +84,7 @@ protected:
 	TObjectPtr<UInputAction> IA_Interaction = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
-	TObjectPtr<UInputAction> IA_Attack = nullptr;
+	TObjectPtr<UInputAction> IA_Defense = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> IMC_Player = nullptr;
@@ -134,6 +135,33 @@ protected: // 달리기 조건 설정
 	// 뒤로는 여기까지만 
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
 	float BackwardMaxSpeed = 200.0f;
+
+private: // 맨손일때 방어 모션
+	// ===== 설정할 몽타주 =====
+	UPROPERTY(EditAnywhere, Category = "Action|Montage")
+	TObjectPtr<UAnimMontage> ActionMontage = nullptr;
+
+	// 섹션 이름(오타 방지용)
+	UPROPERTY(EditAnywhere, Category = "Action|Montage")
+	FName SectionStart = FName("Start");
+
+	UPROPERTY(EditAnywhere, Category = "Action|Montage")
+	FName SectionHold = FName("Hold");
+
+	UPROPERTY(EditAnywhere, Category = "Action|Montage")
+	FName SectionEnd = FName("End");
+
+	// 키를 누르고 있는 상태인지
+	bool bIsActionHeld = false;
+
+	UAnimInstance* GetMyAnimInstance() const;
+
+	// 유틸: 몽타주 실행
+	void PlayActionMontage_Start();
+
+	// 유틸: End로 탈출
+	void JumpToEndSection_IfPlaying();
+
 
 protected: // 도끼질
 
@@ -232,7 +260,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ToolAction")
 	void OnToolEnd();
 
-	void OnAttackPressed(); // 공격 
+	UFUNCTION()
+	void OnActionPressed(); // 맨손일때 방어키 누른상태
+	UFUNCTION()
+	void OnActionReleased(); // 맨손일 때 방어키 땔 때 
+
+
 	
 
 

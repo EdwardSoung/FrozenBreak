@@ -27,7 +27,6 @@ protected:
 
 	UFUNCTION()
 	void SleepAnimationFinished();
-
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnBedActionWidgetStart OnBedActionWidgetStart;
@@ -39,7 +38,4 @@ protected:
 	TObjectPtr<class UWidgetAnimation> SleepAnim = nullptr;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> DayCountText = nullptr;
-
-private:
-	int32 DayCount = 0;
 };

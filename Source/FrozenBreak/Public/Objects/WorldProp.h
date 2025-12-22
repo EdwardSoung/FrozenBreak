@@ -111,7 +111,6 @@ protected:
 
 	// Rock 용 StoneSpawnCount. Stone 을 몇번 생성 시켰냐
 	int32 CurrentSpawnCount = 0;
-
 	// Stone이 MaxSpawnCount가 되면 Rock은 파괴 됨.
 	const int32 MaxSpawnCount = 10;
 

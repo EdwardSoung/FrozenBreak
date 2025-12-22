@@ -4,6 +4,11 @@
 #include "UI/Prop/BedActionWidget.h"
 #include "Components/TextBlock.h"
 
+void UBedActionWidget::SetDayCountText(int32 InCount)
+{
+	DayCountText->SetText(FText::AsNumber(InCount));
+}
+
 void UBedActionWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -26,12 +31,4 @@ void UBedActionWidget::SleepAnimationFinished()
 
 	RemoveFromParent();
 	SetVisibility(ESlateVisibility::Hidden);
-}
-
-void UBedActionWidget::SetDayCountText(int32 InCount)
-{
-	if (DayCountText)
-	{
-		DayCountText->SetText(FText::AsNumber(InCount));
-	}
 }

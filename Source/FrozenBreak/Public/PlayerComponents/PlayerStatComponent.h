@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Data/ItemData.h"
 #include "PlayerStatComponent.generated.h"
 
 
@@ -39,9 +38,6 @@ protected:
 
 	UFUNCTION()
 	void UseEquippedHandItem();
-
-	UFUNCTION()
-	void EatItem(UItemData* InData);
 
 public:
 
