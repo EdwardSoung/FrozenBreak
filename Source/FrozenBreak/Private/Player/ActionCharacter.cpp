@@ -96,7 +96,7 @@ AActionCharacter::AActionCharacter()
 
 	if (UEventSubSystem* Event = UEventSubSystem::Get(this))
 	{
-		Event->Character.OnEquipInventoryItem.AddDynamic(this, &AActionCharacter::HandEquip);
+		Event->Character.OnEquipHandItem.AddDynamic(this, &AActionCharacter::HandEquip);
 		Event->Character.OnPlayerDead.AddDynamic(this, &AActionCharacter::PlayDead);
 	}
 }

@@ -27,14 +27,12 @@ void UInventoryComponent::BeginPlay()
 		EventSystem->Character.OnGetPickupItem.AddDynamic(this, &UInventoryComponent::AddItem);
 		EventSystem->Character.OnRequestInventoryInit.AddDynamic(this, &UInventoryComponent::InitInventoryUI);
 		EventSystem->Character.OnTrashItem.AddDynamic(this, &UInventoryComponent::TrashItem);
-		EventSystem->Character.OnRemoveItem.AddDynamic(this, &UInventoryComponent::TrashItem);
 
 		EventSystem->Character.OnRequestIventoryItems.AddDynamic(this, &UInventoryComponent::SendInventoryItems);
-		EventSystem->Character.OnUsableItemUsed.AddDynamic(this, &UInventoryComponent::UseUsableItem);
 
 		EventSystem->Character.OnRequestIventoryRawMeet.AddDynamic(this, &UInventoryComponent::SendRawMeetData);
 
-		EventSystem->Character.OnUseInventoryItem.AddDynamic(this, &UInventoryComponent::UseInventoryItem);
+		EventSystem->Character.OnUseItem.AddDynamic(this, &UInventoryComponent::UseInventoryItem);
 	}
 
 	//임시로 가방 강제 장착. 나중에 캐릭터 장착 쪽에 가방도 두면 좋을 것 같음..
@@ -55,16 +53,18 @@ void UInventoryComponent::SendInventoryItems()
 	}
 }
 
-void UInventoryComponent::UseUsableItem(UItemData* InData)
+
+void UInventoryComponent::UseItem(int32 UID)
 {
 	for (auto Item : Items)
 	{
-		if (Item->GetType() == InData->ItemType)
+		if (Item->GetUID() == UID)
 		{
 			Item->AddAmount(-1);
 			break;
 		}
 	}
+
 }
 
 void UInventoryComponent::RefreshWeight()
@@ -101,15 +101,26 @@ void UInventoryComponent::SendRawMeetData()
 
 void UInventoryComponent::UseInventoryItem(UInventoryItem* InItem)
 {
-	EItemType InType = InItem->GetData()->ItemType;
+	EItemType InType = InItem->GetType();
+	
 	switch (InType)
 	{
-	case EItemType::None:
+	case EItemType::Knife:
+	case EItemType::Axe:
+	case EItemType::Pickaxe:
+		//우선은 장착은 따로 보내줌...캐릭터에서도 분기타기 좀
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		{
+			EventSystem->Character.OnEquipHandItem.Broadcast(InItem);
+		}
 		break;
-	case EItemType::RawMeat:
+	case EItemType::Jaket:
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		{
+			EventSystem->Character.OnEquipBodyItem.Broadcast(InItem);
+		}
 		break;
 	case EItemType::CookedMeat:
-		break;
 	case EItemType::Fruit:
 		break;
 	case EItemType::Campfire:
@@ -118,6 +129,10 @@ void UInventoryComponent::UseInventoryItem(UInventoryItem* InItem)
 	default:
 		break;
 	}
+
+	//공통적으로 해당 아이템 개수를 줄여줌
+	//개수가 없으면 알아서 삭제 요청이 갈거임.
+	UseItem(InItem->GetUID());
 }
 
 void UInventoryComponent::SpawnCampfire()

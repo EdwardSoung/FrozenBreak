@@ -52,19 +52,18 @@ void UPlayerStatComponent::BindStatSettingEvents()
 		EventSystem->Status.OnSetFatigue.AddDynamic(this, &UPlayerStatComponent::SetPlayerFatigue);
 		EventSystem->Status.OnSetHunger.AddDynamic(this, &UPlayerStatComponent::SetPlayerHunger);
 
-		//Add
-		EventSystem->Character.OnEquipInventoryItem.AddDynamic(this, &UPlayerStatComponent::EquipItem);
-		EventSystem->Character.OnUsableItemUsed.AddDynamic(this, &UPlayerStatComponent::EatItem);
+		EventSystem->Character.OnUseItem.AddDynamic(this, &UPlayerStatComponent::ItemUsed);
 	}
 }
 
-void UPlayerStatComponent::EquipItem(UInventoryItem* InItem)
+//아이템이 사용(장착)됨
+void UPlayerStatComponent::ItemUsed(UInventoryItem* InItem)
 {
 	switch (InItem->GetType())
 	{
+	case EItemType::Knife:
 	case EItemType::Axe:
 	case EItemType::Pickaxe:
-	case EItemType::Knife:
 		if (HandEquip)
 		{
 			//현재 아이템 있으면 현재 아이템은 인벤토리로
@@ -74,9 +73,6 @@ void UPlayerStatComponent::EquipItem(UInventoryItem* InItem)
 			}
 		}
 		HandEquip = InItem;
-		//공격력은..?
-
-		break;
 	case EItemType::Jaket:
 		if (BodyEquip)
 		{
@@ -92,52 +88,29 @@ void UPlayerStatComponent::EquipItem(UInventoryItem* InItem)
 			UStatusCalculationSubSystem* StatusCalculater = GetWorld()->GetSubsystem<UStatusCalculationSubSystem>();
 			StatusCalculater->SetTemperatureDefence(*coldStat);
 		}
-		
+
 		break;
-	default:
-		UE_LOG(LogTemp, Warning, TEXT("장착할 수 없는 아이템 장착 시도"));
-		break;
-	}
-}
-
-void UPlayerStatComponent::UseEquippedHandItem()
-{
-	//내구도 감소
-
-	if (HandEquip)
-	{
-		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
-		{
-			EventSystem->Character.OnEquippedItemUsed.Broadcast();
-		}
-	}
-}
-
-void UPlayerStatComponent::EatItem(UItemData* InData)
-{
-	switch (InData->ItemType)
-	{
 	case EItemType::CookedMeat:
 	case EItemType::Fruit:
-		
-		if (float* fatigueValue = InData->Stats.Find(EItemStatType::Fatigue))
+
+		if (float* fatigueValue = InItem->GetData()->Stats.Find(EItemStatType::Fatigue))
 		{
 			float value = *fatigueValue;
 			SetPlayerFatigue(value);
 		}
-		if (float* hungerValue = InData->Stats.Find(EItemStatType::Hunger))
+		if (float* hungerValue = InItem->GetData()->Stats.Find(EItemStatType::Hunger))
 		{
 			float value = *hungerValue;
 			SetPlayerHunger(value);
 		}
-		if (float* temperatureValue = InData->Stats.Find(EItemStatType::Temperature))
+		if (float* temperatureValue = InItem->GetData()->Stats.Find(EItemStatType::Temperature))
 		{
 			float value = *temperatureValue;
 			SetPlayerTemperature(value);
 		}
 		break;
+
 	default:
-		//먹을 수 있는 아이템이 아님. 무시
 		break;
 	}
 }
