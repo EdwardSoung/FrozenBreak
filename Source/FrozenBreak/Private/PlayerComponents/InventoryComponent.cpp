@@ -5,6 +5,7 @@
 #include "GameSystem/EventSubSystem.h"
 #include "GameSystem/ItemFactorySubSystem.h"
 #include "Objects/InventoryItem.h"
+#include "Objects/BuffableWorldProp.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -32,6 +33,8 @@ void UInventoryComponent::BeginPlay()
 		EventSystem->Character.OnUsableItemUsed.AddDynamic(this, &UInventoryComponent::UseUsableItem);
 
 		EventSystem->Character.OnRequestIventoryRawMeet.AddDynamic(this, &UInventoryComponent::SendRawMeetData);
+
+		EventSystem->Character.OnUseInventoryItem.AddDynamic(this, &UInventoryComponent::UseInventoryItem);
 	}
 
 	//임시로 가방 강제 장착. 나중에 캐릭터 장착 쪽에 가방도 두면 좋을 것 같음..
@@ -93,6 +96,68 @@ void UInventoryComponent::SendRawMeetData()
 		{
 			EventSystem->Character.OnSendRawMeet.Broadcast(Meets);
 		}
+	}
+}
+
+void UInventoryComponent::UseInventoryItem(UInventoryItem* InItem)
+{
+	EItemType InType = InItem->GetData()->ItemType;
+	switch (InType)
+	{
+	case EItemType::None:
+		break;
+	case EItemType::RawMeat:
+		break;
+	case EItemType::CookedMeat:
+		break;
+	case EItemType::Fruit:
+		break;
+	case EItemType::Campfire:
+		SpawnCampfire();
+		break;
+	default:
+		break;
+	}
+}
+
+void UInventoryComponent::SpawnCampfire()
+{
+	if (CampfireClass)
+	{
+		AActor* OwnerActor = GetOwner();
+		if (!OwnerActor || !CampfireClass) return;
+
+		const float SpawnDistance = 150.f;
+
+		FVector Start =
+			OwnerActor->GetActorLocation() +
+			OwnerActor->GetActorForwardVector() * SpawnDistance;
+
+		FVector End = Start - FVector(0, 0, 500.f);
+
+		FHitResult Hit;
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(OwnerActor);
+
+		bool bHit = GetWorld()->LineTraceSingleByChannel(
+			Hit, Start, End, ECC_Visibility, Params
+		);
+
+		FVector SpawnLocation = bHit ? Hit.Location : Start;
+		FRotator SpawnRotation = FRotator(0.f, OwnerActor->GetActorRotation().Yaw, 0.f);
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = OwnerActor;
+		SpawnParams.Instigator = OwnerActor->GetInstigator();
+		SpawnParams.SpawnCollisionHandlingOverride =
+			ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+		GetWorld()->SpawnActor<ABuffableWorldProp>(
+			CampfireClass,
+			SpawnLocation,
+			SpawnRotation,
+			SpawnParams
+		);
 	}
 }
 

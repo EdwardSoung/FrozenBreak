@@ -41,8 +41,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data|Bag")
 	TObjectPtr<UItemData> BagData;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<class ABuffableWorldProp> CampfireClass = nullptr;
+
 	UFUNCTION()
 	void SendRawMeetData();
+
+	UFUNCTION()
+	void UseInventoryItem(UInventoryItem* InItem);
+
+private:
+	void SpawnCampfire();
 
 private:
 	TArray<UInventoryItem*> Items;
