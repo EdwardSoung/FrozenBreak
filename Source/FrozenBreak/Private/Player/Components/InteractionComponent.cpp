@@ -7,6 +7,9 @@
 #include "Objects/WorldProp.h"
 #include "Objects/PickupItem.h"
 #include "Objects/EscapeProp.h"
+#include "Data/Enums.h"
+#include "Player/ActionCharacter.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UInteractionComponent::UInteractionComponent()
@@ -162,6 +165,28 @@ void UInteractionComponent::DoAction_Implementation() // 플레이어가 상호�
 	{
 		if (CurrentInteractionActor) // 바라보고 있는 액터에게
 		{
+			
+			if (const AWorldProp* Prop = Cast<AWorldProp>(CurrentInteractionActor))
+			{
+				// 상호작용 물체가 나무나 바위면 플레이어한테 정보 넘겨주고 리턴 (나무나 바위에 피해 입히는건 애님노티파이가 처리)
+				if (Prop->GetPropType() == EPropType::Tree || Prop->GetPropType() == EPropType::Rock)
+				{
+					if (AActionCharacter* Player = Cast<AActionCharacter>(UGameplayStatics::GetPlayerPawn(this, 0)))
+					{
+						if (Prop->GetPropType() == EPropType::Tree)
+						{
+							Player->SetPendingHarvestTarget(CurrentInteractionActor);
+						}
+
+						if (Prop->GetPropType() == EPropType::Rock)
+						{
+							Player->SetPendingMiningTarget(CurrentInteractionActor);
+						}
+					}
+					return;
+				}
+			}
+			
 			// "너가 할 수 있는거 하셈" 알림
 			UE_LOG(LogTemp, Log, TEXT("인컴 : 인터페이스 받고 바라보고 있는 액터에게 인터페이스 보냄"));
 				IInteractable::Execute_DoAction(CurrentInteractionActor);
@@ -183,28 +208,32 @@ void UInteractionComponent::ProcessInteractableTarget()
 {
 	if (const AWorldProp* Prop = Cast<AWorldProp>(CurrentInteractionActor))
 	{
-		HitActorInteractableToolType = Prop->GetInteractableToolType();
+		if (AActionCharacter* Player = Cast<AActionCharacter>(UGameplayStatics::GetPlayerPawn(this, 0)))
+		{
+			HitActorInteractableToolType = Prop->GetInteractableToolType();
 
-		// 바라보고 있는 액터의 Data->InteractableToolType 이 None 아면
-		if (HitActorInteractableToolType == EItemType::None || HitActorInteractableToolType == EItemType::Campfire)
-		{
-			// 바라보고 있는 액터에게 "너 지금 바라봐지고 있어" 라고 알림
-			IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
-			UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
-			UE_LOG(LogTemp, Warning, TEXT("이건 나무나 바위가 아닌데 Prop이긴 함"));
-			bIsInteracting = true;
-		}
-		// 바라보고 있는 액터의 Data->InteractableToolType 이 Player의 CurrentHeldItemType과 같다면
-		else if (PlayerCurrentTool == HitActorInteractableToolType)
-		{
-			IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
-			UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
-			UE_LOG(LogTemp, Warning, TEXT("이건 나무나 바위임"));
-			bIsInteracting = true;
-		}
-		else
-		{
-			UE_LOG(LogTemp, Log, TEXT("플레이어의 도구는 바라보고 있는 액터에 상호작용 불가"));
+			// 바라보고 있는 액터의 Data->InteractableToolType 이 None 아면
+			if (HitActorInteractableToolType == EItemType::None || HitActorInteractableToolType == EItemType::Campfire)
+			{
+				// 바라보고 있는 액터에게 "너 지금 바라봐지고 있어" 라고 알림
+				IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
+				UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
+				UE_LOG(LogTemp, Warning, TEXT("이건 나무나 바위가 아닌데 Prop이긴 함"));
+				bIsInteracting = true;
+			}
+			// 바라보고 있는 액터의 Data->InteractableToolType 이 Player의 CurrentHeldItemType과 같다면
+			else if (PlayerCurrentTool == HitActorInteractableToolType)
+			{
+				IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
+
+				UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
+				UE_LOG(LogTemp, Warning, TEXT("이건 나무나 바위임"));
+				bIsInteracting = true;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Log, TEXT("플레이어의 도구는 바라보고 있는 액터에 상호작용 불가"));
+			}
 		}
 	}
 	// 바라보고 있는 액터가 Item 이면
