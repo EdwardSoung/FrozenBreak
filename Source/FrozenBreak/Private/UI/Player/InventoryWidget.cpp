@@ -36,17 +36,30 @@ void UInventoryWidget::NativeConstruct()
 
 FReply UInventoryWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
+	int32 numberKey = 0;
+	
 	if (InKeyEvent.GetKey() == EKeys::One)
-	{		
+		numberKey = 1;
+	else if (InKeyEvent.GetKey() == EKeys::Two)
+		numberKey = 2;
+	else if (InKeyEvent.GetKey() == EKeys::Three)
+		numberKey = 3;
+	else if (InKeyEvent.GetKey() == EKeys::Four)
+		numberKey = 4;
+	else if (InKeyEvent.GetKey() == EKeys::Five)
+		numberKey = 5;
+
+	if (numberKey > 0)
+	{
 		auto Selected = InventoryList->GetSelectedItem();
 
 		if (Selected)
 		{
+			UInventoryItem* selectedItem = Cast<UInventoryItem>(Selected);
 			//퀵슬롯 등록
 		}
 		return FReply::Handled();
 	}
-
 	// 다른 키는 부모 클래스 루틴 따름 (Unhandled 반환)
 	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
 }
