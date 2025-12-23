@@ -4,9 +4,11 @@
 #include "Player/Components/InteractionComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Interface/Interactable.h"
+
 #include "Objects/WorldProp.h"
 #include "Objects/PickupItem.h"
 #include "Objects/EscapeProp.h"
+
 #include "Data/Enums.h"
 #include "Player/ActionCharacter.h"
 #include "Kismet/GameplayStatics.h"
@@ -165,7 +167,7 @@ void UInteractionComponent::DoAction_Implementation() // 플레이어가 상호�
 	{
 		if (CurrentInteractionActor) // 바라보고 있는 액터에게
 		{
-			
+			// 일반 바위 / 나무 일 때
 			if (const AWorldProp* Prop = Cast<AWorldProp>(CurrentInteractionActor))
 			{
 				// 상호작용 물체가 나무나 바위면 플레이어한테 정보 넘겨주고 리턴 (나무나 바위에 피해 입히는건 애님노티파이가 처리)
@@ -183,6 +185,16 @@ void UInteractionComponent::DoAction_Implementation() // 플레이어가 상호�
 							Player->SetPendingMiningTarget(CurrentInteractionActor);
 						}
 					}
+					return;
+				}
+			}
+			
+			// 탈출 바위 일 때
+			if (const AEscapeProp* EscapeProp = Cast<AEscapeProp>(CurrentInteractionActor))
+			{
+				if (AActionCharacter* Player = Cast<AActionCharacter>(UGameplayStatics::GetPlayerPawn(this, 0)))
+				{
+					Player->SetPendingMiningTarget(CurrentInteractionActor);
 					return;
 				}
 			}
@@ -206,6 +218,7 @@ void UInteractionComponent::DoAction_Implementation() // 플레이어가 상호�
 
 void UInteractionComponent::ProcessInteractableTarget()
 {
+	// 바라보고 있는 대상이 일반 바위 / 나무 일 때
 	if (const AWorldProp* Prop = Cast<AWorldProp>(CurrentInteractionActor))
 	{
 		if (AActionCharacter* Player = Cast<AActionCharacter>(UGameplayStatics::GetPlayerPawn(this, 0)))
@@ -235,6 +248,15 @@ void UInteractionComponent::ProcessInteractableTarget()
 				UE_LOG(LogTemp, Log, TEXT("플레이어의 도구는 바라보고 있는 액터에 상호작용 불가"));
 			}
 		}
+	}
+
+	// 바라보고 있는 액터가 탈출바위면
+	else if (const AEscapeProp* EscapeProp = Cast<AEscapeProp>(CurrentInteractionActor))
+	{
+		IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
+		UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *InteractionHitResult.GetActor()->GetName());
+		UE_LOG(LogTemp, Log, TEXT("이건 탈출바위임"));
+		bIsInteracting = true;
 	}
 	// 바라보고 있는 액터가 Item 이면
 	else
