@@ -51,7 +51,7 @@ public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 public:
-	inline float GetCurrentToolAtkPower() const { return CurrentTools->GetToolAtkPower(); }
+	inline float GetCurrentToolAtkPower() const { return CurrentTools ? CurrentTools->GetToolAtkPower() : 0.0f; }
 	inline AActor* GetCurrentTool() const { return CurrentTools; }
 protected:
 	// ===== Camera =====
