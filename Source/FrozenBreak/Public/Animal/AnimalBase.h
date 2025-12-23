@@ -16,8 +16,6 @@ public:
 	// Sets default values for this character's properties
 	AAnimalBase();
 
-
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -69,6 +67,9 @@ protected:
 
 	UPROPERTY()
 	int32 LeatherDropCount = 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float AnimalDamage = 0.0f;
 
 private:
 	FTimerHandle HealthBarTimerHandle;

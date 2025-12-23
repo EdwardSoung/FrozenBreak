@@ -58,9 +58,12 @@ void AAnimalBase::OnTakeDamage(
 		{
 			PlayDead();
 		}
+		if (CurrentHealth <= MaxHealth / 2)
+		{
+			IDamageable::Execute_OnHalfHealth(this);
+		}
 	}
 }
-
 
 void AAnimalBase::StartHealthBarTimer()
 {

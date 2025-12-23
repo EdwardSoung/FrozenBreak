@@ -24,4 +24,7 @@ class FROZENBREAK_API IDamageable
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Damage")
 	void OnDead();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Damage")
+	void OnHalfHealth();
 };

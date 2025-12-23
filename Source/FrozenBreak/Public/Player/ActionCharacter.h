@@ -255,6 +255,14 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void HandEquip(UInventoryItem* InItem);
 
+	UFUNCTION()
+	void OnPlayerTakeDamage(
+		AActor* DamagedActor,
+		float Damage,
+		const UDamageType* DamageType,
+		AController* InstigatedBy,
+		AActor* DamageCauser);
+
 	UFUNCTION(BlueprintCallable)
 	void PlayDead();
 

@@ -135,6 +135,8 @@ void AActionCharacter::BeginPlay()
 		}
 	}
 
+	OnTakeAnyDamage.AddDynamic(this, &AActionCharacter::OnPlayerTakeDamage);
+
 	//초기 세팅으로 하면 안됨...
 	//if (DefaultToolsClass && GetMesh())
 	//{
@@ -672,6 +674,20 @@ void AActionCharacter::HandEquip(UInventoryItem* InItem)
 			SetHeldItemType(EItemType::None);
 		}
 	}
+}
+
+void AActionCharacter::OnPlayerTakeDamage(
+	AActor* DamagedActor,
+	float Damage,
+	const UDamageType* DamageType,
+	AController* InstigatedBy,
+	AActor* DamageCauser)
+{
+	if (UEventSubSystem* Event = UEventSubSystem::Get(this))
+	{
+		Event->Status.OnSetHealth.Broadcast(-Damage);
+	}
+
 }
 
 void AActionCharacter::PlayDead()
