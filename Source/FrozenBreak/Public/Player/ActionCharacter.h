@@ -332,22 +332,21 @@ protected: // 공격
 	// ===== Input callbacks =====
 	void OnAttackStarted();
 
-	// ===== Montage callbacks =====
-	UFUNCTION()
-	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 	// ===== Combo helpers =====
 	void StartAttackCombo();
-	void QueueNextComboInput();
-	void TryGotoNextComboSection();
+	bool bComboRequested = false;
+	bool bComboWindowOpen = false;
 
+	
 public:
-	// (AnimNotifyState에서 접근하려고 public로 둠)
-	void SetComboWindowOpen(bool bOpen);
-	bool IsComboWindowOpen() const;
 
 	// (AnimNotifyState에서 콤보 점프 호출)
 	void Notify_TryComboJump();
+	UFUNCTION()
+	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	FORCEINLINE void SetComboWindowOpen(bool bOpen) { bComboWindowOpen = bOpen; }
+	FORCEINLINE bool IsComboWindowOpen() const { return bComboWindowOpen; }
 
 private:
 
@@ -368,15 +367,8 @@ private:
 	int32 CurrentCombo = 0;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Combat|Combo")
-	int32 MaxCombo = 3;
+	int32 MaxCombo = 2;
 
-	// "콤보 입력 들어왔음" 플래그(윈도우 안에서 눌리면 true)
-	UPROPERTY(VisibleAnywhere, Category = "Combat|Combo")
-	bool bComboInputQueued = false;
-
-	// "콤보 입력 허용 구간(윈도우)" 열려있는지
-	UPROPERTY(VisibleAnywhere, Category = "Combat|Combo")
-	bool bComboWindowOpen = false;
 
 	// 섹션 이름 규칙: Attack1, Attack2, Attack3 ...
 	UPROPERTY(EditDefaultsOnly, Category = "Combat|Combo")
