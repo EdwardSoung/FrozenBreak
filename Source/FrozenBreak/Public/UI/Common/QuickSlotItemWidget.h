@@ -23,5 +23,5 @@ protected:
 	virtual void NativeOnInitialized() override;
 public:
 	void SetSlotNumber(int32 InNumber);
-
+	void SetIcon(class UTexture2D* InTexture);
 };

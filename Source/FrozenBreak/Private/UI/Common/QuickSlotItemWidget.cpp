@@ -23,3 +23,19 @@ void UQuickSlotItemWidget::SetSlotNumber(int32 InNumber)
 		SlotNumberText->SetText(FText::AsNumber(InNumber));
 	}
 }
+
+void UQuickSlotItemWidget::SetIcon(UTexture2D* InTexture)
+{
+	if (ItemIcon)
+	{
+		if (InTexture)
+		{
+			ItemIcon->SetBrushFromTexture(InTexture);
+			ItemIcon->SetVisibility(ESlateVisibility::Visible);
+		}
+		else
+		{
+			ItemIcon->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
+}
