@@ -129,12 +129,14 @@ void UInventoryComponent::SpawnCampfire()
 
 		const float SpawnDistance = 150.f;
 
+		// 캐릭터 앞 위치
 		FVector Start =
 			OwnerActor->GetActorLocation() +
 			OwnerActor->GetActorForwardVector() * SpawnDistance;
 
 		FVector End = Start - FVector(0, 0, 500.f);
 
+		// 바닥 라인트레이스
 		FHitResult Hit;
 		FCollisionQueryParams Params;
 		Params.AddIgnoredActor(OwnerActor);
@@ -143,14 +145,26 @@ void UInventoryComponent::SpawnCampfire()
 			Hit, Start, End, ECC_Visibility, Params
 		);
 
-		FVector SpawnLocation = bHit ? Hit.Location : Start;
-		FRotator SpawnRotation = FRotator(0.f, OwnerActor->GetActorRotation().Yaw, 0.f);
+		if (!bHit) return;
 
+		// 위치
+		FVector SpawnLocation = Hit.Location;
+
+		// 경사면 기준 Forward 계산
+		FVector OwnerForward = OwnerActor->GetActorForwardVector();
+
+		// 바닥 평면에 투영
+		FVector ProjectedForward = FVector::VectorPlaneProject(OwnerForward, Hit.Normal).GetSafeNormal();
+
+		// 회전
+		FRotator SpawnRotation =
+			FRotationMatrix::MakeFromZX(Hit.Normal, ProjectedForward).Rotator();
+
+		// Spawn
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = OwnerActor;
 		SpawnParams.Instigator = OwnerActor->GetInstigator();
-		SpawnParams.SpawnCollisionHandlingOverride =
-			ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 		GetWorld()->SpawnActor<ABuffableWorldProp>(
 			CampfireClass,
