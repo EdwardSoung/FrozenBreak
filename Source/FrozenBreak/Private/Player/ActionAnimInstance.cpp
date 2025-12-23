@@ -54,7 +54,7 @@ void UActionAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	if (bForceAxeLocomotion)
 	{
-		CurrentToolType = EItemType::Axe;
+		CurrentToolType = EItemType::Knife;
 	}
 	else
 	{

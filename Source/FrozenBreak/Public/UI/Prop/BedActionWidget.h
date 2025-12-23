@@ -7,6 +7,7 @@
 #include "BedActionWidget.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBedActionWidgetStart);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBedActionWidgetMid);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBedActionWidgetEnd);
 
 
@@ -26,12 +27,18 @@ protected:
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
+	void SleepAnimationMidPoint();
+	UFUNCTION()
 	void SleepAnimationFinished();
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnBedActionWidgetStart OnBedActionWidgetStart;
 	UPROPERTY(BlueprintAssignable)
+	FOnBedActionWidgetMid OnBedActionWidgetMid;
+	UPROPERTY(BlueprintAssignable)
 	FOnBedActionWidgetEnd OnBedActionWidgetEnd;
+
+	FTimerHandle SleepMidTimerHandle;
 
 protected:
 	UPROPERTY(Transient, meta = (BindWidgetAnim))

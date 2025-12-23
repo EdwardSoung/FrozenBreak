@@ -41,7 +41,7 @@ void UStatComponent::OnDamaged(float InDamage)
 
 	if (CurrentHealth > 0)
 	{
-		CurrentHealth = FMath::Clamp(CurrentHealth + InDamage, 0, MaxHealth);
+		CurrentHealth = FMath::Clamp(CurrentHealth - InDamage, 0, MaxHealth);
 
 	}
 	else

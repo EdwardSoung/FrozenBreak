@@ -75,6 +75,11 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 		FVector InteractionActorLoaction = CurrentInteractionActor->GetActorLocation();
 		BetweenDistance = FVector::Distance(PlayerLocation, InteractionActorLoaction);
 
+		if (CheckEscapeTarget())
+			ActivateInteractDistance = 2500.0f;
+		else
+			ActivateInteractDistance = 250.0f;
+
 		// 지금 상호작용 하고있지 않다
 		if (!bIsInteracting)
 		{
@@ -86,15 +91,11 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			}
 			else
 			{
-				//거리랑 상관없이 탈출 바위이면 상호작용
-				if (ProcessEscapeTarget() == false)
+				// 범위 밖이면 표시하지 않음
+				if (LastInteractionActor)
 				{
-					// 범위 밖이면 표시하지 않음
-					if (LastInteractionActor)
-					{
-						IInteractable::Execute_OnSelect(LastInteractionActor, false);
-						LastInteractionActor = nullptr;
-					}
+					IInteractable::Execute_OnSelect(LastInteractionActor, false);
+					LastInteractionActor = nullptr;
 				}
 			}
 		}
@@ -162,7 +163,7 @@ void UInteractionComponent::DoAction_Implementation() // 플레이어가 상호�
 		if (CurrentInteractionActor) // 바라보고 있는 액터에게
 		{
 			// "너가 할 수 있는거 하셈" 알림
-			UE_LOG(LogTemp, Log, TEXT("인컴 : 인터페이스 받고 바라보고 있는 액터에게 인터페이스 보냄"))
+			UE_LOG(LogTemp, Log, TEXT("인컴 : 인터페이스 받고 바라보고 있는 액터에게 인터페이스 보냄"));
 				IInteractable::Execute_DoAction(CurrentInteractionActor);
 
 			// 초기화
@@ -216,15 +217,12 @@ void UInteractionComponent::ProcessInteractableTarget()
 	}
 }
 
-bool UInteractionComponent::ProcessEscapeTarget()
+bool UInteractionComponent::CheckEscapeTarget()
 {
 	if (const AEscapeProp* Prop = Cast<AEscapeProp>(CurrentInteractionActor))
 	{
 		if (PlayerCurrentTool == EItemType::Pickaxe)
 		{
-			bIsInteracting = true;
-			IInteractable::Execute_OnSelect(CurrentInteractionActor, true);
-
 			return true;
 		}
 	}
