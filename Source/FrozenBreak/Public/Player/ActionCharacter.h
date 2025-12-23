@@ -53,6 +53,10 @@ public:
 public:
 	inline float GetCurrentToolAtkPower() const { return CurrentTools ? CurrentTools->GetToolAtkPower() : 0.0f; }
 	inline AActor* GetCurrentTool() const { return CurrentTools; }
+
+	inline void SetPendingHarvestTarget(AActor* InTarget) { PendingHarvestTarget = InTarget; }
+	inline void SetPendingMiningTarget(AActor* InTarget) { PendingMiningTarget = InTarget; }
+	
 protected:
 	// ===== Camera =====
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera")
