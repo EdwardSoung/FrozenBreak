@@ -719,14 +719,14 @@ bool AActionCharacter::OnToolActionStarted()
 	{
 		const bool bPrev = bIsHarvesting;
 		OnHarvestStarted();
-		return (!bPrev && bIsHarvesting);
+		return bPrev;
 	}
 
 	if (CurrentHeldItemType == EItemType::Pickaxe)
 	{
 		const bool bPrev = bIsMining;
 		OnPickaxeStarted();
-		return (!bPrev && bIsMining);
+		return bPrev;
 	}
 
 	return false;
