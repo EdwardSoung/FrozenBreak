@@ -69,6 +69,7 @@ void UPlayerStatComponent::ItemUsed(UInventoryItem* InItem)
 			//현재 아이템 있으면 현재 아이템은 인벤토리로
 			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 			{
+				HandEquip->SetAmount(1);	
 				EventSystem->Character.OnAddItemToInventoryUI.Broadcast(HandEquip);
 			}
 		}
@@ -78,6 +79,7 @@ void UPlayerStatComponent::ItemUsed(UInventoryItem* InItem)
 		{
 			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 			{
+				BodyEquip->SetAmount(1);
 				EventSystem->Character.OnAddItemToInventoryUI.Broadcast(BodyEquip);
 			}
 		}
