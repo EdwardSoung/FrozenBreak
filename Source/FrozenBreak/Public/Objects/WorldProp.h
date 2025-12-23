@@ -34,6 +34,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Prop|Data")
 	inline EItemType GetInteractableToolType() const;
 	
+	UFUNCTION(BlueprintPure, Category = "Prop|Data")
+	inline EPropType GetPropType() const;
+
 	virtual void CampfireAction() {};
 private:
 	const ECollisionChannel InteractableActorChannel = ECollisionChannel::ECC_GameTraceChannel1;
