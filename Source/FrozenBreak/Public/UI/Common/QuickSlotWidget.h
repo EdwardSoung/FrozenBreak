@@ -20,9 +20,12 @@ protected:
 
 private:
 	TArray<class UQuickSlotItemWidget*> Slots;
-
+	TMap<int32, class UInventoryItem*> SlotItems;
 protected:
 	virtual void NativeOnInitialized() override;
 
+	UFUNCTION()
 	void UpdateSlot(int32 InIndex, class UInventoryItem* InItem);
+	UFUNCTION()
+	void ItemBroken(uint32 InUID);
 };

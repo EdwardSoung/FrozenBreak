@@ -20,6 +20,7 @@ public:
 	inline float GetWeight() { return Data.Get()->ItemWeight * Amount; }
 	inline int32 GetAmount() { return Amount; }
 	inline EItemType GetType() { return Data.Get()->ItemType; }
+	inline uint32 GetUID() { return UID; }
 
 	void AddAmount(int32 InAmount);	
 	void SetAmount(int32 InAmount);
