@@ -59,7 +59,11 @@ private:
 	UFUNCTION()
 	void BedActionWidgetStarted();
 
-	// BedActionWidget의 애니메이션이 끝났을 때
+	// BedActionWidget 애니메이션의 중간 지점일 때
+	UFUNCTION()
+	void BedActionWidgetMid();
+
+	// BedActionWidget 애니메이션이 끝났을 때
 	UFUNCTION()
 	void BedActionWidgetFinished();
 protected:

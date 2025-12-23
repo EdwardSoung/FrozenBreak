@@ -7,6 +7,8 @@
 #include "Data/Enums.h"
 #include "ToolActor.generated.h"
 
+// 이제 안 씀. 나중에 청소 해야함
+
 UCLASS()
 class FROZENBREAK_API AToolActor : public AActor
 {

@@ -36,7 +36,7 @@ AWorldProp::AWorldProp()
 	SetRootComponent(Mesh);
 
 	// 트레이스가 맞도록 쿼리 활성화
-	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 
 	// 인터랙션 트레이스 채널 Block (InteractionComponent와 동일 채널)
 	Mesh->SetCollisionResponseToChannel(InteractableActorChannel, ECR_Block);
@@ -334,6 +334,7 @@ void AWorldProp::BedAction()
 			if (BedActionWidgetInstance)
 			{
 				BedActionWidgetInstance->OnBedActionWidgetStart.AddDynamic(this, &AWorldProp::BedActionWidgetStarted);
+				BedActionWidgetInstance->OnBedActionWidgetMid.AddDynamic(this, &AWorldProp::BedActionWidgetMid);
 				BedActionWidgetInstance->OnBedActionWidgetEnd.AddDynamic(this, &AWorldProp::BedActionWidgetFinished);
 
 				DayCount++;
@@ -386,17 +387,8 @@ void AWorldProp::BedActionWidgetStarted()
 	}
 }
 
-void AWorldProp::BedActionWidgetFinished()
+void AWorldProp::BedActionWidgetMid()
 {
-	// 플레이어 입력 복구
-	if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0))
-	{
-		if (APawn* Player = PlayerController->GetPawn())
-		{
-			Player->EnableInput(PlayerController);
-		}
-	}
-
 	if (EventSystem)
 	{
 		// 플레이어 피로도 회복
@@ -408,6 +400,18 @@ void AWorldProp::BedActionWidgetFinished()
 
 		// 시간이 스킵된다.
 		GetWorld()->GetSubsystem<UTimeOfDaySubSystem>()->SkipTimeByHours(BedUsageHours);
+	}
+}
+
+void AWorldProp::BedActionWidgetFinished()
+{
+	// 플레이어 입력 복구
+	if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0))
+	{
+		if (APawn* Player = PlayerController->GetPawn())
+		{
+			Player->EnableInput(PlayerController);
+		}
 	}
 }
 
