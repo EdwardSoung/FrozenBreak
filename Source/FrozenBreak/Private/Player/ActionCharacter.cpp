@@ -638,6 +638,7 @@ void AActionCharacter::HandEquip(UInventoryItem* InItem)
 	{
 		return;
 	}
+	
 
 	if (UItemFactorySubSystem* ItemFactory = UItemFactorySubSystem::Get(this))
 	{
@@ -651,12 +652,34 @@ void AActionCharacter::HandEquip(UInventoryItem* InItem)
 			const FName SocketName = (ItemType == EItemType::Knife)
 				? FName(TEXT("hand_r_Knife"))
 				: FName(TEXT("hand_r_Tool")); // 도끼/곡괭이 등
+			UPrimitiveComponent* Prim = Cast<UPrimitiveComponent>(CurrentTools->GetRootComponent());
+			if (Prim)
+			{
+				Prim->SetSimulatePhysics(false);
+				Prim->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			}
 
 			CurrentTools->AttachToComponent(
 				GetMesh(),
 				FAttachmentTransformRules::SnapToTargetNotIncludingScale,
 				SocketName
 			);
+			CurrentTools->SetActorRelativeLocation(FVector::ZeroVector);
+			CurrentTools->SetActorRelativeRotation(FRotator::ZeroRotator);
+			UE_LOG(LogTemp, Warning, TEXT("[Attach] Socket=%s Exists=%d"),
+				*SocketName.ToString(),
+				GetMesh() ? (GetMesh()->DoesSocketExist(SocketName) ? 1 : 0) : 0);
+
+			UE_LOG(LogTemp, Warning, TEXT("[Attach] WorldLoc=%s WorldRot=%s"),
+				*CurrentTools->GetActorLocation().ToString(),
+				*CurrentTools->GetActorRotation().ToString());
+
+			UE_LOG(LogTemp, Warning, TEXT("[Attach] Parent=%s"),
+				CurrentTools->GetAttachParentActor() ? *CurrentTools->GetAttachParentActor()->GetName() : TEXT("None"));
+			UE_LOG(LogTemp, Warning, TEXT("[Attach] Mesh=%s Skeleton=%s"),
+				*GetNameSafe(GetMesh()),
+				GetMesh() && GetMesh()->GetSkeletalMeshAsset() ? *GetNameSafe(GetMesh()->GetSkeletalMeshAsset()->GetSkeleton()) : TEXT("NULL"));
+
 
 			// ToolType 말고 ItemType으로 들고 있는 타입 확정
 			SetHeldItemType(ItemType);
