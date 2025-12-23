@@ -28,42 +28,4 @@ void UQuickSlotWidget::NativeOnInitialized()
     {
         Slots[i]->SetSlotNumber(i + 1);
     }
-
-	if (UEventSubSystem* Event = UEventSubSystem::Get(this))
-	{
-        Event->UI.OnSetItemToQuickSlot.AddDynamic(this, &UQuickSlotWidget::UpdateSlot);
-	}
-}
-
-void UQuickSlotWidget::UpdateSlot(int32 InIndex, UInventoryItem* InItem)
-{
-    if (SlotItems.Contains(InIndex))
-        SlotItems[InIndex] = InItem;
-    else
-        SlotItems.Add(InIndex, InItem);
-
-    if (InItem)
-    {
-        Slots[InIndex - 1]->SetIcon(InItem->GetData()->ItemIcon);
-    }
-}
-
-void UQuickSlotWidget::ItemBroken(uint32 InUID)
-{
-    int32 removeKey = 0;
-    for (auto item : SlotItems)
-    {
-        if (item.Value->GetUID() == InUID)
-        {
-            removeKey = item.Key;
-            break;
-        }
-    }
-
-    if (removeKey > 0)
-    {
-        Slots[removeKey]->SetIcon(nullptr);
-
-        SlotItems.Remove(removeKey);
-    }
 }

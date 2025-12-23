@@ -26,6 +26,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void HideWidget(EWidgetType InWidgetType);
+
+	bool IsOpenedWidget(EWidgetType InWidgetType);
 	
 private:
 	UPROPERTY()

@@ -49,6 +49,10 @@ protected:
 
 	UFUNCTION()
 	void UseInventoryItem(UInventoryItem* InItem);
+	UFUNCTION()
+	void QuickSlotExecute(int32 InSlotNum);
+	UFUNCTION()
+	void ResetQuickSlot(int32 InSlotNum);
 
 private:
 	void SpawnCampfire();

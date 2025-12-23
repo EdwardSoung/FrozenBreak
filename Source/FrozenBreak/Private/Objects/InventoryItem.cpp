@@ -21,12 +21,7 @@ void UInventoryItem::AddAmount(int32 InAmount)
 	{
 		//개수 업데이트를 인벤토리 컴포넌트, 위젯, 퀵슬롯에서 받으면 각자 0개면 지워주도록
 		EventSystem->Character.OnUpdateItem.Broadcast(this);
-		if (QuickSlotNum > 0)
-		{
-			EventSystem->UI.OnUseQuickSlotItem.Broadcast(QuickSlotNum);
-		}
 	}
-
 }
 
 void UInventoryItem::SetAmount(int32 InAmount)

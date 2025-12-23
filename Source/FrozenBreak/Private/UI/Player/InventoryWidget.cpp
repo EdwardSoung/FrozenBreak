@@ -55,10 +55,18 @@ FReply UInventoryWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKey
 
 		if (Selected)
 		{
-			UInventoryItem* selectedItem = Cast<UInventoryItem>(Selected);
-			selectedItem->QuickSlotNum = numberKey;
-			//퀵슬롯 등록
+			//이거 하기전에 현재 인벤토리에서 이 번호 아이템 있으면 슬롯 지워야함
 
+
+			//퀵슬롯 등록
+			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+			{
+				EventSystem->UI.OnResetQuickSlotItem.Broadcast(numberKey);
+
+				UInventoryItem* selectedItem = Cast<UInventoryItem>(Selected);
+				selectedItem->QuickSlotNum = numberKey;
+				EventSystem->UI.OnSetItemToQuickSlot.Broadcast(numberKey, selectedItem);
+			}
 		}
 		return FReply::Handled();
 	}
@@ -155,40 +163,8 @@ void UInventoryWidget::UseItem()
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
 			EventSystem->Character.OnUseItem.Broadcast(selectedItem);
+			selectedItem->QuickSlotNum = 0;
 		}
-
-		//switch (selectedItem->GetType())
-		//{
-		//case EItemType::Axe:
-		//case EItemType::Pickaxe:
-		//case EItemType::Knife:
-		//case EItemType::Jaket:
-		//	
-		//	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
-		//	{
-		//		EventSystem->Character.OnEquipInventoryItem.Broadcast(selectedItem);
-		//		//인벤토리에서 제거
-		//		EventSystem->Character.OnTrashItem.Broadcast(selectedItem);
-		//	}
-		//	InventoryList->RemoveItem(Selected);
-		//	ItemDataList.Remove(selectedItem);
-
-		//	break;
-		//case EItemType::CookedMeat:
-		//case EItemType::Fruit:
-		//case EItemType::Campfire:
-
-		//	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
-		//	{
-		//		EventSystem->Character.OnUseInventoryItem.Broadcast(selectedItem);
-
-		//		//개수 감소
-		//		EventSystem->Character.OnUsableItemUsed.Broadcast(selectedItem->GetData());
-		//	}
-		//	break;
-		//default:
-		//	break;
-		//}
 	}
 }
 

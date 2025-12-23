@@ -33,6 +33,8 @@ void UInventoryComponent::BeginPlay()
 		EventSystem->Character.OnRequestIventoryRawMeet.AddDynamic(this, &UInventoryComponent::SendRawMeetData);
 
 		EventSystem->Character.OnUseItem.AddDynamic(this, &UInventoryComponent::UseInventoryItem);
+		EventSystem->UI.OnQuickSlotExecute.AddDynamic(this, &UInventoryComponent::QuickSlotExecute);
+		EventSystem->UI.OnResetQuickSlotItem.AddDynamic(this, &UInventoryComponent::ResetQuickSlot);
 	}
 
 	//임시로 가방 강제 장착. 나중에 캐릭터 장착 쪽에 가방도 두면 좋을 것 같음..
@@ -133,6 +135,35 @@ void UInventoryComponent::UseInventoryItem(UInventoryItem* InItem)
 	//공통적으로 해당 아이템 개수를 줄여줌
 	//개수가 없으면 알아서 삭제 요청이 갈거임.
 	UseItem(InItem->GetUID());
+
+}
+
+void UInventoryComponent::QuickSlotExecute(int32 InSlotNum)
+{
+	for (auto Item : Items)
+	{
+		if (Item->QuickSlotNum == InSlotNum)
+		{
+			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+			{
+				EventSystem->Character.OnUseItem.Broadcast(Item);
+				Item->QuickSlotNum = 0;
+			}
+			break;
+		}
+	}
+}
+
+void UInventoryComponent::ResetQuickSlot(int32 InSlotNum)
+{
+	for (auto Item : Items)
+	{
+		if (Item->QuickSlotNum == InSlotNum)
+		{
+			Item->QuickSlotNum = 0;
+			break;
+		}
+	}
 }
 
 void UInventoryComponent::SpawnCampfire()

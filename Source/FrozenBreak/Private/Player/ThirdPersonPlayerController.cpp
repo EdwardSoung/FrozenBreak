@@ -38,6 +38,19 @@ void AThirdPersonPlayerController::SetupInputComponent()
 		
 		if(IA_PlayerStatus)
 			EnhancedInputComponent->BindAction(IA_PlayerStatus, ETriggerEvent::Started, this, &AThirdPersonPlayerController::OnPlayerStatusTriggered);
+
+		//1,2,3,4,5를 여기서 하는게 맞는건지...
+		//InputMode가 GameOnly라 퀵슬롯 사용하려면...
+		if (IA_QuickSlot1)
+			EnhancedInputComponent->BindAction(IA_QuickSlot1, ETriggerEvent::Started, this, &AThirdPersonPlayerController::OnOneStarted);
+		if (IA_QuickSlot2)
+			EnhancedInputComponent->BindAction(IA_QuickSlot2, ETriggerEvent::Started, this, &AThirdPersonPlayerController::OnTwoStarted);
+		if (IA_QuickSlot3)
+			EnhancedInputComponent->BindAction(IA_QuickSlot3, ETriggerEvent::Started, this, &AThirdPersonPlayerController::OnThreeStarted);
+		if (IA_QuickSlot4)
+			EnhancedInputComponent->BindAction(IA_QuickSlot4, ETriggerEvent::Started, this, &AThirdPersonPlayerController::OnFourStarted);
+		if (IA_QuickSlot5)
+			EnhancedInputComponent->BindAction(IA_QuickSlot5, ETriggerEvent::Started, this, &AThirdPersonPlayerController::OnFiveStarted);
 	}
 }
 
@@ -85,5 +98,46 @@ void AThirdPersonPlayerController::OnPlayerStatusTriggered(const FInputActionVal
 	if (UUISubSystem* UISystem = UUISubSystem::Get(this))
 	{
 		UISystem->ShowWidget(EWidgetType::CharacterState);
+	}
+}
+
+void AThirdPersonPlayerController::OnOneStarted(const FInputActionValue& Value)
+{
+	QuickSlotExecute(1);
+}
+
+void AThirdPersonPlayerController::OnTwoStarted(const FInputActionValue& Value)
+{
+	QuickSlotExecute(2);
+}
+
+void AThirdPersonPlayerController::OnThreeStarted(const FInputActionValue& Value)
+{
+	QuickSlotExecute(3);
+}
+
+void AThirdPersonPlayerController::OnFourStarted(const FInputActionValue& Value)
+{
+	QuickSlotExecute(4);
+}
+
+void AThirdPersonPlayerController::OnFiveStarted(const FInputActionValue& Value)
+{
+	QuickSlotExecute(5);
+}
+
+void AThirdPersonPlayerController::QuickSlotExecute(int32 InSlotKey)
+{
+	if (UUISubSystem* UISystem = UUISubSystem::Get(this))
+	{
+		if (UISystem->IsOpenedWidget(EWidgetType::Inventory) == false)
+		{
+			//퀵슬롯 사용
+			if (UEventSubSystem* Event = UEventSubSystem::Get(this))
+			{
+				Event->UI.OnQuickSlotExecute.Broadcast(InSlotKey);
+			}
+		}
+
 	}
 }
