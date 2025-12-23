@@ -30,6 +30,7 @@
 #include "CommonComponents/HealthComponent.h"
 #include "CommonComponents/StatComponent.h"
 
+#include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
 
 #include "Tools/AxeActor.h"
@@ -683,6 +684,9 @@ void AActionCharacter::HandEquip(UInventoryItem* InItem)
 
 			// ToolType 말고 ItemType으로 들고 있는 타입 확정
 			SetHeldItemType(ItemType);
+			bHasKnife = (ItemType == EItemType::Knife);
+			UE_LOG(LogTemp, Warning, TEXT("[EquipState] bHasKnife=%d Held=%s"),
+				bHasKnife, *UEnum::GetValueAsString(ItemType));
 
 			UE_LOG(LogTemp, Warning, TEXT("[Tool] Equipped: %s ItemType=%s Socket=%s ToolType=%s"),
 				*CurrentTools->GetName(),
@@ -879,6 +883,7 @@ void AActionCharacter::JumpToEndSection_IfPlaying()
 	{
 		return;
 	}
+	
 
 	// End 섹션으로 점프해서 루프 탈출
 	Anim->Montage_JumpToSection(SectionEnd, ActionMontage);
@@ -887,164 +892,84 @@ void AActionCharacter::JumpToEndSection_IfPlaying()
 
 void AActionCharacter::OnAttackStarted()
 {
-	bHasKnife = true;
-	// 1) 나이프 들고 있을 때만 공격
+	
 	if (!bHasKnife)
-	{
 		return;
-	}
 
-	// 2) 애님/몽타주 체크
-	UAnimInstance* Anim = nullptr;
-	if (GetMesh())
-	{
-		Anim = GetMesh()->GetAnimInstance();
-	}
+	UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
 	if (!Anim || !KnifeAttackMontage)
-	{
 		return;
-	}
 
-	// 3) 이미 공격 중이면:
-	// - 콤보 윈도우 열려있으면 입력 큐만 쌓고 리턴
-	// - 아니면 그냥 무시
+	// 공격 중이면 그냥 무시 (콤보는 애님에서 처리)
 	if (bIsAttacking)
 	{
-		if (bComboWindowOpen)
+		if (!Anim->Montage_IsPlaying(KnifeAttackMontage))
 		{
-			QueueNextComboInput();
+			bIsAttacking = false;
+			bComboRequested = false;
+			CurrentCombo = 0;
 		}
-		return;
+		else 
+		{
+			bComboRequested = true;
+			return;
+		}
+		
 	}
 
-	// 4) 혹시 Montage_IsPlaying으로도 한 번 더 방어
-	if (Anim->Montage_IsPlaying(KnifeAttackMontage))
-	{
-		return;
-	}
-
-	// 5) 콤보 1타 시작
 	StartAttackCombo();
 }
 
+
 void AActionCharacter::StartAttackCombo()
 {
-	UAnimInstance* Anim = nullptr;
-	if (GetMesh())
-	{
-		Anim = GetMesh()->GetAnimInstance();
-	}
+	
+	UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
 	if (!Anim || !KnifeAttackMontage)
-	{
 		return;
-	}
 
 	bIsAttacking = true;
-	bComboInputQueued = false;
-	bComboWindowOpen = false;
-
+	bComboRequested = false;
 	CurrentCombo = 1;
 
-	// 몽타주 끝났을 때 bIsAttacking 풀기
-	FOnMontageEnded EndDelegate;
-	EndDelegate.BindUObject(this, &AActionCharacter::OnAttackMontageEnded);
-	Anim->Montage_SetEndDelegate(EndDelegate, KnifeAttackMontage);
+	FOnMontageEnded EndDel;
+	EndDel.BindUObject(this, &AActionCharacter::OnAttackMontageEnded);
+	Anim->Montage_SetEndDelegate(EndDel, KnifeAttackMontage);
 
-	// 섹션으로 점프해서 시작(Attack1)
-	const FString SectionNameStr = ComboSectionPrefix.ToString() + FString::FromInt(CurrentCombo);
-	const FName SectionName(*SectionNameStr);
-
-	// 몽타주 재생
-	PlayAnimMontage(KnifeAttackMontage);
-
-	// 첫 섹션으로 점프 (섹션이 없으면 그냥 처음부터 재생)
-	Anim->Montage_JumpToSection(SectionName, KnifeAttackMontage);
+	Anim->Montage_Play(KnifeAttackMontage);
+	Anim->Montage_JumpToSection(TEXT("Attack1"), KnifeAttackMontage);
 }
 
-void AActionCharacter::QueueNextComboInput()
+void AActionCharacter::Notify_TryComboJump()
 {
-	// 이미 큐가 true면 또 눌러도 의미 없음 (한 번만 받자)
-	if (bComboInputQueued)
-	{
+	if (!bComboRequested)   
 		return;
-	}
-
-	bComboInputQueued = true;
-}
-
-void AActionCharacter::TryGotoNextComboSection()
-{
-	// 윈도우가 열려있지 않으면 점프 금지
-	if (!bComboWindowOpen)
-	{
+	
+	UE_LOG(LogTemp, Warning, TEXT("[Notify] TryComboJump CALLED"));
+	UAnimInstance* Anim = GetMesh()->GetAnimInstance();
+	if (!Anim)
 		return;
-	}
 
-	// 입력 큐가 없으면 점프 금지
-	if (!bComboInputQueued)
-	{
-		return;
-	}
 
-	// 최대 콤보면 끝
+
 	if (CurrentCombo >= MaxCombo)
-	{
 		return;
-	}
+	bComboRequested = false;
+	CurrentCombo++;
 
-	UAnimInstance* Anim = nullptr;
-	if (GetMesh())
-	{
-		Anim = GetMesh()->GetAnimInstance();
-	}
-	if (!Anim || !KnifeAttackMontage)
-	{
-		return;
-	}
+	const FName NextSection =
+		FName(*FString::Printf(TEXT("Attack%d"), CurrentCombo));
 
-	// 다음 콤보로
-	CurrentCombo = CurrentCombo + 1;
-	bComboInputQueued = false;
-
-	const FString NextSectionStr = ComboSectionPrefix.ToString() + FString::FromInt(CurrentCombo);
-	const FName NextSection(*NextSectionStr);
-
-	// 실제 섹션 점프
 	Anim->Montage_JumpToSection(NextSection, KnifeAttackMontage);
 }
 
 void AActionCharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
+	UE_LOG(LogTemp, Warning, TEXT("[Attack] MontageEnded"));
 	if (Montage != KnifeAttackMontage)
-	{
 		return;
-	}
 
-	// 공격 상태 리셋
 	bIsAttacking = false;
-	bComboInputQueued = false;
-	bComboWindowOpen = false;
+	bComboRequested = false;
 	CurrentCombo = 0;
-}
-
-void AActionCharacter::SetComboWindowOpen(bool bOpen)
-{
-	bComboWindowOpen = bOpen;
-
-	// 윈도우가 "열리는 순간" 이미 입력 큐가 쌓여있다면 바로 점프 시도도 가능
-	if (bComboWindowOpen)
-	{
-		TryGotoNextComboSection();
-	}
-}
-
-bool AActionCharacter::IsComboWindowOpen() const
-{
-	return bComboWindowOpen;
-}
-
-void AActionCharacter::Notify_TryComboJump()
-{
-	// AnimNotifyState에서 윈도우 중 Tick/End 시점에 호출할 용도
-	TryGotoNextComboSection();
 }

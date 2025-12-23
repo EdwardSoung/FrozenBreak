@@ -39,14 +39,17 @@ void UAnimNotifyState_ComboAttack::NotifyTick(USkeletalMeshComponent* MeshComp, 
 {
 	Super::NotifyTick(MeshComp, Animation, FrameDeltaTime);
 
-	// (선택) 윈도우 동안 입력 큐가 들어오면 즉시 점프 시도
 	AActionCharacter* Character = GetOwnerCharacter(MeshComp);
 	if (!Character)
 	{
 		return;
 	}
 
-	Character->Notify_TryComboJump();
+	// 윈도우 열려 있을 때만 점프 시도 (충돌 방지)
+	if (Character->IsComboWindowOpen())
+	{
+		Character->Notify_TryComboJump();
+	}
 }
 
 void UAnimNotifyState_ComboAttack::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
@@ -59,9 +62,12 @@ void UAnimNotifyState_ComboAttack::NotifyEnd(USkeletalMeshComponent* MeshComp, U
 		return;
 	}
 
+	// 끝나는 순간 한 번 더 점프 시도(보험) - 닫기 전에 마지막으로
+	if (Character->IsComboWindowOpen())
+	{
+		Character->Notify_TryComboJump();
+	}
+
 	// 윈도우 닫기
 	Character->SetComboWindowOpen(false);
-
-	// 끝나는 순간 한 번 더 점프 시도(마지막 프레임에 눌렀을 때 보험)
-	Character->Notify_TryComboJump();
 }
