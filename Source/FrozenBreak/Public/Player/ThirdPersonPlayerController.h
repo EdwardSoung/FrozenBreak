@@ -21,7 +21,13 @@ protected:
 	void OnPauseTriggered(const FInputActionValue& Value);
 	void OnInventoryTriggered(const FInputActionValue& Value);
 	void OnPlayerStatusTriggered(const FInputActionValue& Value);
+	void OnOneStarted(const FInputActionValue& Value);
+	void OnTwoStarted(const FInputActionValue& Value);
+	void OnThreeStarted(const FInputActionValue& Value);
+	void OnFourStarted(const FInputActionValue& Value);
+	void OnFiveStarted(const FInputActionValue& Value);
 
+    void QuickSlotExecute(int32 InSlotKey);
 public:
 	virtual void SetupInputComponent() override;
 	UFUNCTION()
@@ -35,6 +41,16 @@ protected:
     TObjectPtr<UInputAction> IA_Inventory;
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
     TObjectPtr<UInputAction> IA_PlayerStatus;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|QuickSlot")
+    TObjectPtr<UInputAction> IA_QuickSlot1;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|QuickSlot")
+    TObjectPtr<UInputAction> IA_QuickSlot2;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|QuickSlot")
+    TObjectPtr<UInputAction> IA_QuickSlot3;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|QuickSlot")
+    TObjectPtr<UInputAction> IA_QuickSlot4;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|QuickSlot")
+    TObjectPtr<UInputAction> IA_QuickSlot5;
 
 private:
 	bool bIsMenuOpen = false;

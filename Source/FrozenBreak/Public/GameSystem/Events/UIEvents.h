@@ -10,7 +10,8 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnToggleQuitMenu);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryItemSelected, EItemType, InType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSetItemToQuickSlot, int32, InIndex, UInventoryItem*, InItem);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUseQuickSlotItem, int32, InIndex);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuickSlotExecute, int32, InSlotNum);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnResetQuickSlotItem, int32, InSlotNum);
 
 
 USTRUCT(BlueprintType)
@@ -24,5 +25,6 @@ struct FROZENBREAK_API FUIEvents
 	FOnInventoryItemSelected OnInventoryItemSelected;
 
 	FOnSetItemToQuickSlot OnSetItemToQuickSlot;
-	FOnUseQuickSlotItem OnUseQuickSlotItem;
+	FOnQuickSlotExecute OnQuickSlotExecute;
+	FOnResetQuickSlotItem OnResetQuickSlotItem;
 };

@@ -69,12 +69,16 @@ void UPlayerStatComponent::ItemUsed(UInventoryItem* InItem)
 			//현재 아이템 있으면 현재 아이템은 인벤토리로
 			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 			{
-				HandEquip->SetAmount(1);	
+				//아이템 사용 차감을 동일하게 가져가고, 여기를 우선 다시 세팅..
+				HandEquip->SetAmount(1);
 				EventSystem->Character.OnAddItemToInventoryUI.Broadcast(HandEquip);
 			}
 		}
 		HandEquip = InItem;
+		break;
+
 	case EItemType::Jaket:
+
 		if (BodyEquip)
 		{
 			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
