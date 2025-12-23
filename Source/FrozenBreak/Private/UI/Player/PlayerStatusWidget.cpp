@@ -19,8 +19,8 @@ void UPlayerStatusWidget::NativeConstruct()
 	{
 		statusEvent->Status.OnInGameTimeChanged.AddDynamic(this, &UPlayerStatusWidget::SetInGameTime);
 		statusEvent->Status.OnTemperatureDefenceChanged.AddDynamic(this, &UPlayerStatusWidget::SetTemperatureDefence);
-		statusEvent->Character.OnEquipInventoryItem.AddDynamic(this, &UPlayerStatusWidget::SetHandEquipment);
-		statusEvent->Character.OnEquipInventoryItem.AddDynamic(this, &UPlayerStatusWidget::SetBodyEquipment);
+		statusEvent->Character.OnEquipHandItem.AddDynamic(this, &UPlayerStatusWidget::SetHandEquipment);
+		statusEvent->Character.OnEquipBodyItem.AddDynamic(this, &UPlayerStatusWidget::SetBodyEquipment);
 	}
 	CloseStatButton->OnClicked.AddDynamic(this, &UPlayerStatusWidget::HideWidget);
 }

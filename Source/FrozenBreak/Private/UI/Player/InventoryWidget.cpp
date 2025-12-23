@@ -20,7 +20,7 @@ void UInventoryWidget::NativeConstruct()
 		EventSystem->Character.OnAddItemToInventoryUI.AddDynamic(this, &UInventoryWidget::AddItem);
 		EventSystem->Character.OnUpdateInventoryItem.AddDynamic(this, &UInventoryWidget::UpdateItemByType);
 		EventSystem->Character.OnUpdateInventoryWeight.AddDynamic(this, &UInventoryWidget::UpdateWeight);
-		EventSystem->Character.OnRemoveItem.AddDynamic(this, &UInventoryWidget::RemoveItem);
+		EventSystem->Character.OnUpdateItem.AddDynamic(this, &UInventoryWidget::UpdateItem);
 		
 
 		EventSystem->UI.OnInventoryItemSelected.AddDynamic(this, &UInventoryWidget::SelectionChanged);
@@ -56,7 +56,9 @@ FReply UInventoryWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKey
 		if (Selected)
 		{
 			UInventoryItem* selectedItem = Cast<UInventoryItem>(Selected);
+			selectedItem->QuickSlotNum = numberKey;
 			//퀵슬롯 등록
+
 		}
 		return FReply::Handled();
 	}
@@ -99,10 +101,24 @@ void UInventoryWidget::InitData(TArray<class UInventoryItem*> InData)
 }
 
 //아이템이 제거됨
-void UInventoryWidget::RemoveItem(UInventoryItem* InItem)
+void UInventoryWidget::UpdateItem(UInventoryItem* InItem)
 {
-	InventoryList->RemoveItem(InItem);
-	ItemDataList.Remove(InItem);
+	if (InItem->GetAmount() == 0)
+	{
+		InventoryList->RemoveItem(InItem);
+		ItemDataList.Remove(InItem);
+	}
+	else
+	{
+		for (auto data : ItemDataList)
+		{
+			if (data->GetUID() == InItem->GetUID())
+			{
+				data = InItem;
+			}
+		}
+		//리스트 갱신?
+	}	
 }
 
 //아이템 밖에 버림 처리
@@ -125,6 +141,7 @@ void UInventoryWidget::TrashItem()
 	}
 }
 
+//사용/장착 버튼을 눌렀음
 void UInventoryWidget::UseItem()
 {
 	auto Selected = InventoryList->GetSelectedItem();
@@ -133,38 +150,45 @@ void UInventoryWidget::UseItem()
 	{
 		UInventoryItem* selectedItem = Cast<UInventoryItem>(Selected);
 
-		switch (selectedItem->GetType())
+		//그냥 InventoryComponent로 사용을 알림		
+
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-		case EItemType::Axe:
-		case EItemType::Pickaxe:
-		case EItemType::Knife:
-		case EItemType::Jaket:
-			
-			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
-			{
-				EventSystem->Character.OnEquipInventoryItem.Broadcast(selectedItem);
-				//인벤토리에서 제거
-				EventSystem->Character.OnTrashItem.Broadcast(selectedItem);
-			}
-			InventoryList->RemoveItem(Selected);
-			ItemDataList.Remove(selectedItem);
-
-			break;
-		case EItemType::CookedMeat:
-		case EItemType::Fruit:
-		case EItemType::Campfire:
-
-			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
-			{
-				EventSystem->Character.OnUseInventoryItem.Broadcast(selectedItem);
-
-				//개수 감소
-				EventSystem->Character.OnUsableItemUsed.Broadcast(selectedItem->GetData());
-			}
-			break;
-		default:
-			break;
+			EventSystem->Character.OnUseItem.Broadcast(selectedItem);
 		}
+
+		//switch (selectedItem->GetType())
+		//{
+		//case EItemType::Axe:
+		//case EItemType::Pickaxe:
+		//case EItemType::Knife:
+		//case EItemType::Jaket:
+		//	
+		//	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		//	{
+		//		EventSystem->Character.OnEquipInventoryItem.Broadcast(selectedItem);
+		//		//인벤토리에서 제거
+		//		EventSystem->Character.OnTrashItem.Broadcast(selectedItem);
+		//	}
+		//	InventoryList->RemoveItem(Selected);
+		//	ItemDataList.Remove(selectedItem);
+
+		//	break;
+		//case EItemType::CookedMeat:
+		//case EItemType::Fruit:
+		//case EItemType::Campfire:
+
+		//	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		//	{
+		//		EventSystem->Character.OnUseInventoryItem.Broadcast(selectedItem);
+
+		//		//개수 감소
+		//		EventSystem->Character.OnUsableItemUsed.Broadcast(selectedItem->GetData());
+		//	}
+		//	break;
+		//default:
+		//	break;
+		//}
 	}
 }
 
@@ -205,6 +229,19 @@ void UInventoryWidget::SelectionChanged(EItemType InType)
 		UseButtonText->SetText(FText::FromString(TEXT("사용")));
 		UseButton->SetIsEnabled(false);
 		//나머지 음..버튼 비활성?
+	}
+}
+
+void UInventoryWidget::ResetQuickSlotNumber(uint32 UID)
+{
+	//퀵슬롯에 이미 아이템이 있는 경우 기존 아이템 퀵슬롯 제거
+	for (auto Item : ItemDataList)
+	{
+		if (Item->GetUID() == UID)
+		{
+			Item->QuickSlotNum = 0;
+			break;
+		}
 	}
 }
 

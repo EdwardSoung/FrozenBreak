@@ -35,13 +35,7 @@ protected:
 	void BindStatSettingEvents();
 
 	UFUNCTION()
-	void EquipItem(UInventoryItem* InItem);
-
-	UFUNCTION()
-	void UseEquippedHandItem();
-
-	UFUNCTION()
-	void EatItem(UItemData* InData);
+	void ItemUsed(UInventoryItem* InItem);
 
 public:
 

@@ -44,7 +44,7 @@ private:
 	UFUNCTION()
 	void InitData(TArray<class UInventoryItem*> InData);
 	UFUNCTION()
-	void RemoveItem(class UInventoryItem* InItem);
+	void UpdateItem(class UInventoryItem* InItem);
 	UFUNCTION()
 	void TrashItem();
 	UFUNCTION()
@@ -55,6 +55,9 @@ private:
 	void UpdateWeight(float InWeight, float InMaxWeight);
 	UFUNCTION()
 	void SelectionChanged(EItemType InType);
+
+	UFUNCTION()
+	void ResetQuickSlotNumber(uint32 UID);
 
 public:
 	void OpenWidget_Implementation();
