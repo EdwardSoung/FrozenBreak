@@ -516,6 +516,7 @@ void AActionCharacter::EndHarvest()
 	bIsHarvesting = false;
 
 	PendingHarvestTarget = nullptr;
+	UE_LOG(LogTemp, Log, TEXT("PendingHarvestTarget = null"));
 	PendingHarvestImpactPoint = FVector::ZeroVector;
 
 	// 이동 복구
@@ -537,6 +538,7 @@ void AActionCharacter::OnHarvestHit()
 	if (!bIsHarvesting) return;
 
 	AActor* Target = PendingHarvestTarget.Get();
+	UE_LOG(LogTemp, Log, TEXT("PendingHarvestTarget 설정됨"));
 	if (!Target) return;
 
 	if (!Target->ActorHasTag("Tree"))
@@ -605,6 +607,7 @@ void AActionCharacter::OnPickaxeHit()
 	}
 
 	AActor* Target = PendingMiningTarget.Get();
+	UE_LOG(LogTemp, Log, TEXT("PendingMiningTarget 설정됨"));
 	if (!Target)
 	{
 		return;
@@ -706,6 +709,7 @@ void AActionCharacter::EndMining()
 	bIsMining = false;
 
 	PendingMiningTarget = nullptr;
+	UE_LOG(LogTemp, Log, TEXT("PendingMiningTarget = null"));
 	PendingMiningImpactPoint = FVector::ZeroVector;
 
 	if (GetCharacterMovement())
