@@ -16,13 +16,12 @@ void UInventoryItem::Initialize(uint32 InUID, UItemData* InData)
 void UInventoryItem::AddAmount(int32 InAmount)
 {
 	Amount += InAmount;
-	if (Amount <= 0)
+	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
-		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
-		{
-			EventSystem->Character.OnRemoveItem.Broadcast(this);
-		}
+		//개수 업데이트를 인벤토리 컴포넌트, 위젯, 퀵슬롯에서 받으면 각자 0개면 지워주도록
+		EventSystem->Character.OnUpdateItem.Broadcast(this);
 	}
+
 }
 
 void UInventoryItem::SetAmount(int32 InAmount)
@@ -43,7 +42,7 @@ void UInventoryItem::Use()
 		{
 			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 			{
-				EventSystem->Character.OnEquipInventoryItem.Broadcast(nullptr);
+				EventSystem->Character.OnEquipHandItem.Broadcast(nullptr);
 			}
 		}
 	}

@@ -21,11 +21,13 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTrashItem, UInventoryItem*, InIte
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRemoveItem, UInventoryItem*, InItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSendInventoryData, TArray<UInventoryItem*>, InData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUpdateInventoryWeight, float, InWeight, float, InMaxWeight);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUseInventoryItem, UInventoryItem*, InData);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEquipInventoryItem, UInventoryItem*, InData);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEquippedItemUsed);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUsableItemUsed, UItemData*, InType);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEquipHandItem, UInventoryItem*, InData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEquipBodyItem, UInventoryItem*, InData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEquippedItemUsed);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUseItem, UInventoryItem*, InData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUpdateItem, UInventoryItem*, InItem);
 
 //Craft
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRequestIventoryItems);
@@ -69,10 +71,14 @@ struct FCharacterEvents
 	FOnRemoveItem OnRemoveItem;
 	FOnSendInventoryData OnSendInventoryData;
 	FOnUpdateInventoryWeight OnUpdateInventoryWeight;
-	FOnUseInventoryItem OnUseInventoryItem;
-	FOnEquipInventoryItem OnEquipInventoryItem;
+
+	FOnEquipHandItem OnEquipHandItem;
+	FOnEquipBodyItem OnEquipBodyItem;
 	FOnEquippedItemUsed OnEquippedItemUsed;
-	FOnUsableItemUsed OnUsableItemUsed;
+	FOnUpdateItem OnUpdateItem;
+	
+	//새로 만듦
+	FOnUseItem OnUseItem;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnInitCraftUI OnInitCraftUI;

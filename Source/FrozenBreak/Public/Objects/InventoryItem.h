@@ -33,4 +33,7 @@ private:
 	
 	float Durability = 0.0f;
 	float MaxDurability = 0.0f;
+
+public:
+	int32 QuickSlotNum = 0;
 };
