@@ -87,6 +87,9 @@ protected:
 	TObjectPtr<UInputAction> IA_Defense = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> IA_Attack = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> IMC_Player = nullptr;
 
 	// Interaction Component
@@ -313,4 +316,57 @@ public: // 무기쪽
 	TObjectPtr<class UAnimMontage> UnarmedAttackMontage;
 
 
+protected: // 공격
+	// ===== Input callbacks =====
+	void OnAttackStarted();
+
+	// ===== Montage callbacks =====
+	UFUNCTION()
+	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	// ===== Combo helpers =====
+	void StartAttackCombo();
+	void QueueNextComboInput();
+	void TryGotoNextComboSection();
+
+public:
+	// (AnimNotifyState에서 접근하려고 public로 둠)
+	void SetComboWindowOpen(bool bOpen);
+	bool IsComboWindowOpen() const;
+
+	// (AnimNotifyState에서 콤보 점프 호출)
+	void Notify_TryComboJump();
+
+private:
+
+	// ====== Weapon state ======
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	bool bHasKnife = false; // 네 프로젝트에서 실제 나이프 장착 상태로 갱신해줘야 함
+
+	// ====== Attack montage ======
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|Montage")
+	TObjectPtr<UAnimMontage> KnifeAttackMontage;
+
+	// ====== Attack gating ======
+	UPROPERTY(VisibleAnywhere, Category = "Combat")
+	bool bIsAttacking = false;
+
+	// ====== Combo ======
+	UPROPERTY(VisibleAnywhere, Category = "Combat|Combo")
+	int32 CurrentCombo = 0;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|Combo")
+	int32 MaxCombo = 3;
+
+	// "콤보 입력 들어왔음" 플래그(윈도우 안에서 눌리면 true)
+	UPROPERTY(VisibleAnywhere, Category = "Combat|Combo")
+	bool bComboInputQueued = false;
+
+	// "콤보 입력 허용 구간(윈도우)" 열려있는지
+	UPROPERTY(VisibleAnywhere, Category = "Combat|Combo")
+	bool bComboWindowOpen = false;
+
+	// 섹션 이름 규칙: Attack1, Attack2, Attack3 ...
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|Combo")
+	FName ComboSectionPrefix = TEXT("Attack");
 };
