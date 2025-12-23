@@ -76,6 +76,20 @@ void AAnimalBase::StartHealthBarTimer()
 		);
 }
 
+void AAnimalBase::PlayHit()
+{
+	if (AnimalHitAnimation)
+	{
+		if (USkeletalMeshComponent* MeshComp = GetMesh())
+		{
+			if (UAnimInstance* Anim = MeshComp->GetAnimInstance())
+			{
+				Anim->Montage_Play(AnimalHitAnimation);
+			}
+		}
+	}
+}
+
 void AAnimalBase::PlayDead()
 {
 	IDamageable::Execute_OnDead(this);

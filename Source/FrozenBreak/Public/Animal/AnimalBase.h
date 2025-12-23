@@ -36,6 +36,7 @@ protected:
 private:
 	void StartHealthBarTimer();
 
+	void PlayHit();
 	void PlayDead();
 
 	UFUNCTION()
@@ -53,6 +54,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UEnemyHealthBarWidget> HealthBar = nullptr;
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<class UAnimMontage> AnimalHitAnimation = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<class UAnimMontage> AnimalDeadAnimation = nullptr;
