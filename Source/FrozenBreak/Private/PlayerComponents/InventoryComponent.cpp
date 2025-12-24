@@ -229,10 +229,10 @@ void UInventoryComponent::AddItem(EItemType Type, int32 Amount)
 		//무게 초과라 안먹어져야 함
 		return;
 	}
-
-	if (UInventoryItem* TargetItem = GetItem(Type))
+	UInventoryItem* TargetItem = GetItem(Type);
+	if (TargetItem && TargetItem->GetData()->IsStackable)
 	{
-		//장비류면 그냥 새로 추가해야.. uid 부여해서 장착 시 처리
+		//누적가능한 아이템이면 개수 증가
 		TargetItem->AddAmount(Amount);
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
@@ -263,12 +263,6 @@ void UInventoryComponent::TrashItem(UInventoryItem* InItem)
 //동일 타입의 아이템이 존재하는지...
 UInventoryItem* UInventoryComponent::GetItem(EItemType Type)
 {
-	if (Type == EItemType::Axe || Type == EItemType::Pickaxe || Type == EItemType::Knife)
-	{
-		//장비류는 동일아이템이 없다.
-		//TODO : 의복도 추가..이거 그냥 아이템 그룹을 나누는게 나을지
-		return nullptr;
-	}
 	for (auto Item : Items)
 	{
 		if (Item->GetData()->ItemType == Type)
