@@ -17,31 +17,17 @@ AToolActor::AToolActor()
 	SetRootComponent(ToolsMesh);
 }
 
-void AToolActor::BeginPlay()
+void AToolActor::InitializeData(UItemData* InData, float InDurability)
 {
-	Super::BeginPlay();
-
 	if (StatComponent)
 	{
-		if (Data)
+		ToolAtkPower = 0.f;
+		if (const float* AttackStats = InData->Stats.Find(EItemStatType::Attack))
 		{
-			// Attack을 가지지 않은 아이템의 Attack 기본값 (0)
-			ToolAtkPower = 0.f;
-			if (const float* AttackStats = Data->Stats.Find(EItemStatType::Attack))
-			{
-				ToolAtkPower = *AttackStats;
-			}
-			else
-			{
-				UE_LOG(LogTemp, Log, TEXT("아이템에 Attack 스텟이 설정되어 있지 않거나, 필요없는 아이템 입니다."));
-			}
-			// 데이터 에셋에 작성된 데이터를 StatComponent로 보낸다.
-			StatComponent->InitStat(Data->Durability, ToolAtkPower);
+			ToolAtkPower = *AttackStats;
 		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Pickup Item Begin : 아이템 데이터가 없음!"));
-		}
+
+		StatComponent->InitStat(InDurability, InData->Durability, ToolAtkPower);
 	}
 }
 

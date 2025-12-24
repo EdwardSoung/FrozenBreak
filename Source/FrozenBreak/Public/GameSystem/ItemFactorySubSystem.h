@@ -26,5 +26,5 @@ public:
 	UInventoryItem* Spawn(EItemType InType, int32 Amount = 1, float InDurability = 0.0f);
 
 	UFUNCTION(BlueprintCallable)
-	class AToolActor* SpawnTool(EItemType InType);
+	class AToolActor* SpawnTool(EItemType InType, float InDurability);
 };

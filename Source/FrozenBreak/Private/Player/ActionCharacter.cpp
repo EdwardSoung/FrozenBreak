@@ -383,6 +383,7 @@ void AActionCharacter::OnMove(const FInputActionValue& Value)
 // ===== Look =====
 void AActionCharacter::OnLook(const FInputActionValue& Value)
 {
+
 	const FVector2D Input = Value.Get<FVector2D>();
 	if (!Controller)
 	{
@@ -392,10 +393,56 @@ void AActionCharacter::OnLook(const FInputActionValue& Value)
 	AddControllerYawInput(Input.X);
 	AddControllerPitchInput(Input.Y);
 }
+void AActionCharacter::PlayJumpSFX()
+{
+	// 무음 확률
+	if (JumpSkipChance > 0.0f && FMath::FRand() < JumpSkipChance)
+	{
+		return;
+	}
+
+	const int32 Count = JumpSounds.Num();
+	if (Count <= 0)
+	{
+		return;
+	}
+
+	int32 PickedIndex = FMath::RandRange(0, Count - 1);
+
+	if (bAvoidSameJumpSound && Count > 1)
+	{
+		while (PickedIndex == LastJumpSoundIndex)
+		{
+			PickedIndex = FMath::RandRange(0, Count - 1);
+		}
+	}
+
+	LastJumpSoundIndex = PickedIndex;
+
+	USoundBase* SoundToPlay = JumpSounds[PickedIndex];
+	if (!SoundToPlay)
+	{
+		return;
+	}
+
+	UGameplayStatics::PlaySoundAtLocation(
+		this,
+		SoundToPlay,
+		GetActorLocation(),
+		VolumeMultiplier,
+		PitchMultiplier
+	);
+}
 
 void AActionCharacter::OnJumpStarted()
 {
-	Jump();
+	UE_LOG(LogTemp, Warning, TEXT("[Jump] Jump() CALLED"));
+	if(GetCharacterMovement()->IsFalling())
+	{
+		return;
+	}
+	PlayJumpSFX();
+	Super::Jump();
 }
 
 void AActionCharacter::OnJumpStopped()
@@ -640,14 +687,13 @@ void AActionCharacter::HandEquip(UInventoryItem* InItem)
 	if (!InItem)
 	{
 		return;
-	}
-	
+	}	
 
 	if (UItemFactorySubSystem* ItemFactory = UItemFactorySubSystem::Get(this))
 	{
 		const EItemType ItemType = InItem->GetType(); // ✅ 진짜 타입은 이걸로
 
-		CurrentTools = ItemFactory->SpawnTool(ItemType);
+		CurrentTools = ItemFactory->SpawnTool(ItemType, InItem->GetDurability());
 
 		if (CurrentTools)
 		{
@@ -778,14 +824,14 @@ void AActionCharacter::SetHeldItemType(EItemType NewType) // 지금 뭐들고 �
 
 bool AActionCharacter::OnToolActionStarted()
 {
-	if (CurrentHeldItemType == EItemType::Axe)
+	if (CurrentHeldItemType == EItemType::Axe && PendingHarvestTarget.IsValid())
 	{
 		const bool bPrev = bIsHarvesting;
 		OnHarvestStarted();
 		return bPrev;
 	}
 
-	if (CurrentHeldItemType == EItemType::Pickaxe)
+	if (CurrentHeldItemType == EItemType::Pickaxe && PendingMiningTarget.IsValid())
 	{
 		const bool bPrev = bIsMining;
 		OnPickaxeStarted();
@@ -800,18 +846,23 @@ void AActionCharacter::OnToolHit() // 지금 들고있는 무기에 맞춰 행�
 	if (CurrentHeldItemType == EItemType::Axe)
 	{
 		OnHarvestHit();
+		if (UEventSubSystem* Event = UEventSubSystem::Get(this))
+		{
+			Event->Character.OnEquipHandItemUsed.Broadcast();
+		}
 	}
 	else if (CurrentHeldItemType == EItemType::Pickaxe)
 	{
 		OnPickaxeHit();
+		if (UEventSubSystem* Event = UEventSubSystem::Get(this))
+		{
+			Event->Character.OnEquipHandItemUsed.Broadcast();
+		}
 	}
 
 	//무기 내구도 감소
 	//PlayerStatComponent로 보내고 거기서 감소시키고 내구도 없으면 여기도 null로 보내기
-	if (UEventSubSystem* Event = UEventSubSystem::Get(this))
-	{
-		Event->Character.OnEquippedItemUsed.Broadcast();
-	}
+	
 }
 
 void AActionCharacter::OnToolEnd()
@@ -830,19 +881,19 @@ void AActionCharacter::OnActionPressed()
 {
 
 	UE_LOG(LogTemp, Warning, TEXT("[INPUT] Pressed!"));
-	bIsActionHeld = true;
+	//bIsActionHeld = true;
 
 	// 누르면 Start부터 재생 시작
-	PlayActionMontage_Start();
+	//PlayActionMontage_Start();
 }
 
 void AActionCharacter::OnActionReleased()
 {
 	UE_LOG(LogTemp, Warning, TEXT("[INPUT] Released!"));
-	bIsActionHeld = false;
+	//bIsActionHeld = false;
 
 	// 떼면 End로 빠져나감
-	JumpToEndSection_IfPlaying();
+	//JumpToEndSection_IfPlaying();
 }
 
 UAnimInstance* AActionCharacter::GetMyAnimInstance() const

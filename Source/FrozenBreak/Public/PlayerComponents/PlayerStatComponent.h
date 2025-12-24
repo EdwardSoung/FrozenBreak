@@ -37,6 +37,9 @@ protected:
 	UFUNCTION()
 	void ItemUsed(UInventoryItem* InItem);
 
+	UFUNCTION()
+	void EquipHandItemUsed();
+
 public:
 
 protected:

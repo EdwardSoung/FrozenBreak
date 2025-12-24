@@ -33,6 +33,9 @@ public:
 	// 아이템 내구도
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	float Durability = -1;
+	//사용 시 감소하는 내구도
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	float UseDurability = 20;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
 	EInteractKeyType InteractionKey;

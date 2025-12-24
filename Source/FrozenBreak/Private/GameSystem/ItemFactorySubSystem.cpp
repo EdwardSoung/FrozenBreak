@@ -49,7 +49,7 @@ UInventoryItem* UItemFactorySubSystem::Spawn(EItemType InType, int32 Amount, flo
 	return nullptr;
 }
 
-AToolActor* UItemFactorySubSystem::SpawnTool(EItemType InType)
+AToolActor* UItemFactorySubSystem::SpawnTool(EItemType InType, float InDurability)
 {
 	if (UGameManager* Manager = UGameManager::Get(this))
 	{
@@ -58,6 +58,9 @@ AToolActor* UItemFactorySubSystem::SpawnTool(EItemType InType)
 		if (spawnClass)
 		{
 			AToolActor* EquipItem = GetWorld()->SpawnActor<AToolActor>(spawnClass);
+			
+			auto NewData = Manager->GetItemData(InType);
+			EquipItem->InitializeData(NewData, InDurability);
 
 			return EquipItem;
 		}

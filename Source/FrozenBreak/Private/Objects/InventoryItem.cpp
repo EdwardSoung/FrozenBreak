@@ -10,6 +10,10 @@ void UInventoryItem::Initialize(uint32 InUID, UItemData* InData, float InDurabil
 	Data = InData;
 	Amount = 0;
 	MaxDurability = Data->Durability;
+	if (Data->Durability < 0)
+	{
+		Data->UseDurability = 0;
+	}
 	Durability = InDurability > 0 ? InDurability : MaxDurability;
 	QuickSlotNum = 0;
 }
@@ -29,21 +33,19 @@ void UInventoryItem::SetAmount(int32 InAmount)
 	Amount = InAmount;
 }
 
-void UInventoryItem::Use()
+void UInventoryItem::ItemUsed()
 {
-	if (Data->Stats.Contains(EItemStatType::UseDurability))
+	Durability -= Data->UseDurability;
+	if (Durability < 0)
 	{
-		float useValue = *Data->Stats.Find(EItemStatType::UseDurability);
-		Durability -= useValue;
+		Durability = 0;
 
-		Durability = FMath::Clamp(Durability, 0, MaxDurability);
-
-		if (Durability == 0)
+		//파괴
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
-			{
-				EventSystem->Character.OnEquipHandItem.Broadcast(nullptr);
-			}
+			EventSystem->Character.OnEquipHandItem.Broadcast(nullptr);
 		}
 	}
+
+	
 }

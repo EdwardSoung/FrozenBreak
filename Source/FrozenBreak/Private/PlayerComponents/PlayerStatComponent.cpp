@@ -5,6 +5,7 @@
 #include "Data/StatusDataAsset.h"
 #include <GameSystem/EventSubSystem.h>
 #include <GameSystem/StatusCalculationSubSystem.h>
+#include "Objects/InventoryItem.h"
 
 // Sets default values for this component's properties
 UPlayerStatComponent::UPlayerStatComponent()
@@ -53,6 +54,7 @@ void UPlayerStatComponent::BindStatSettingEvents()
 		EventSystem->Status.OnSetHunger.AddDynamic(this, &UPlayerStatComponent::SetPlayerHunger);
 
 		EventSystem->Character.OnUseItem.AddDynamic(this, &UPlayerStatComponent::ItemUsed);
+		EventSystem->Character.OnEquipHandItemUsed.AddDynamic(this, &UPlayerStatComponent::EquipHandItemUsed);
 	}
 }
 
@@ -118,6 +120,31 @@ void UPlayerStatComponent::ItemUsed(UInventoryItem* InItem)
 
 	default:
 		break;
+	}
+}
+
+void UPlayerStatComponent::EquipHandItemUsed()
+{
+	if (HandEquip)
+	{
+		HandEquip->ItemUsed();
+
+		if (HandEquip->GetDurability() <= 0)
+		{
+			HandEquip = nullptr;
+			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+			{
+				EventSystem->Character.OnEquipHandItem.Broadcast(nullptr);
+			}
+		}
+	}
+	else
+	{
+		//캐릭터에 무기 없애기
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		{
+			EventSystem->Character.OnEquipHandItem.Broadcast(nullptr);
+		}
 	}
 }
 

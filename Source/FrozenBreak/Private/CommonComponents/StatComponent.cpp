@@ -24,11 +24,11 @@ void UStatComponent::BeginPlay()
 	
 }
 
-void UStatComponent::InitStat(float InHealth, float InAttack)
+void UStatComponent::InitStat(float InCurrentHealth, float InMaxHealth, float InAttack)
 {
 	Attack = InAttack;
-	MaxHealth = InHealth;
-	CurrentHealth = InHealth;
+	MaxHealth = InCurrentHealth;
+	CurrentHealth = InMaxHealth;
 }
 
 void UStatComponent::OnDamaged(float InDamage)
