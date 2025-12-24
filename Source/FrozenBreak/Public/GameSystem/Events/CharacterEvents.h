@@ -74,7 +74,7 @@ struct FCharacterEvents
 
 	FOnEquipHandItem OnEquipHandItem;
 	FOnEquipBodyItem OnEquipBodyItem;
-	FOnEquippedItemUsed OnEquippedItemUsed;
+	FOnEquippedItemUsed OnEquipHandItemUsed;
 	FOnUpdateItem OnUpdateItem;
 	
 	//새로 만듦

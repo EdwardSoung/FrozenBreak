@@ -25,7 +25,7 @@ public:
 
 	void AddAmount(int32 InAmount);	
 	void SetAmount(int32 InAmount);
-	void Use();
+	void ItemUsed();
 private:
 	uint32 UID = 0;
 

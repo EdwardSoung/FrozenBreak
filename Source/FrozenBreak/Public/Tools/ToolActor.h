@@ -20,8 +20,7 @@ public:
 
 	inline float GetToolAtkPower() const { return ToolAtkPower; }
 
-protected:
-	virtual void BeginPlay() override;
+	void InitializeData(class UItemData* InData, float InDurability);
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tool") // 이 도구가 무엇인지
@@ -32,8 +31,6 @@ protected:
 	TObjectPtr<class USkeletalMeshComponent> ToolsMesh = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tool|Stat")
 	TObjectPtr<class UStatComponent> StatComponent = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tool|Data")
-	TObjectPtr<class UItemData> Data = nullptr;
 
 protected:
 	float ToolAtkPower = 0;

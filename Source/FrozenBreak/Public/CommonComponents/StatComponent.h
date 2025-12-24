@@ -21,7 +21,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void InitStat(float InHealth, float InAttack = 0);
+	void InitStat(float InCurrentHealth, float InMaxHealth, float InAttack = 0);
 	void OnDamaged(float InDamage);
 public:	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")

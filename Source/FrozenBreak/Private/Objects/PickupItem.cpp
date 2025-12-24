@@ -72,7 +72,7 @@ void APickupItem::BeginPlay()
 				UE_LOG(LogTemp, Log, TEXT("아이템에 Attack 스텟이 설정되어 있지 않거나, 필요없는 아이템 입니다."));
 			}
 			// 데이터 에셋에 작성된 데이터를 StatComponent로 보낸다.
-			StatComponent->InitStat(Data->Durability, Attack);
+			StatComponent->InitStat(ExistDurability, Data->Durability, Attack);
 		}
 		else
 		{

@@ -43,18 +43,28 @@ void UPlayerStatusWidget::SetTemperatureDefence(FText InDefenceValue)
 
 void UPlayerStatusWidget::SetHandEquipment(UInventoryItem* InHandItem)
 {
-	switch (InHandItem->GetType())
+	if (InHandItem)
 	{
-	case EItemType::Axe:
-	case EItemType::Pickaxe:
-	case EItemType::Knife:
-		break;
-	default:
-		return;
+		switch (InHandItem->GetType())
+		{
+		case EItemType::Axe:
+		case EItemType::Pickaxe:
+		case EItemType::Knife:
+			break;
+		default:
+			return;
+		}
+		if (HandEquipment)
+		{
+			HandEquipment->RefreshSlot(InHandItem);
+		}
 	}
-	if (HandEquipment)
+	else
 	{
-		HandEquipment->RefreshSlot(InHandItem);
+		if (HandEquipment)
+		{
+			HandEquipment->RefreshSlot(InHandItem);
+		}
 	}
 }
 
