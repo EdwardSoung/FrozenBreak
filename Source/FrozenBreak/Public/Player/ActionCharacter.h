@@ -315,6 +315,26 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dead|Montage")
 	TObjectPtr<class UAnimMontage> DeadAnimation = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound|Jump")
+	TArray<TObjectPtr<USoundBase>> JumpSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound|Jump", meta = (ClampMin = "0.0"))
+	float VolumeMultiplier = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound|Jump", meta = (ClampMin = "0.0"))
+	float PitchMultiplier = 1.0f;
+
+	// 같은 소리 연속 방지
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound|Jump")
+	bool bAvoidSameJumpSound = true;
+
+	// 점프 사운드 무음 확률 (0.0 = 항상 재생)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound|Jump", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float JumpSkipChance = 0.0f;
+
+	int32 LastJumpSoundIndex = INDEX_NONE;
+	void PlayJumpSFX();
+
 public: // 무기쪽
 	UPROPERTY(EditDefaultsOnly, Category = "Combat|Montage")
 	TObjectPtr<class UAnimMontage> UnarmedAttackMontage;

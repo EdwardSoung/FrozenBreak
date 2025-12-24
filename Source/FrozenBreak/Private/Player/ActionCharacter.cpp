@@ -381,6 +381,7 @@ void AActionCharacter::OnMove(const FInputActionValue& Value)
 // ===== Look =====
 void AActionCharacter::OnLook(const FInputActionValue& Value)
 {
+
 	const FVector2D Input = Value.Get<FVector2D>();
 	if (!Controller)
 	{
@@ -390,10 +391,56 @@ void AActionCharacter::OnLook(const FInputActionValue& Value)
 	AddControllerYawInput(Input.X);
 	AddControllerPitchInput(Input.Y);
 }
+void AActionCharacter::PlayJumpSFX()
+{
+	// 무음 확률
+	if (JumpSkipChance > 0.0f && FMath::FRand() < JumpSkipChance)
+	{
+		return;
+	}
+
+	const int32 Count = JumpSounds.Num();
+	if (Count <= 0)
+	{
+		return;
+	}
+
+	int32 PickedIndex = FMath::RandRange(0, Count - 1);
+
+	if (bAvoidSameJumpSound && Count > 1)
+	{
+		while (PickedIndex == LastJumpSoundIndex)
+		{
+			PickedIndex = FMath::RandRange(0, Count - 1);
+		}
+	}
+
+	LastJumpSoundIndex = PickedIndex;
+
+	USoundBase* SoundToPlay = JumpSounds[PickedIndex];
+	if (!SoundToPlay)
+	{
+		return;
+	}
+
+	UGameplayStatics::PlaySoundAtLocation(
+		this,
+		SoundToPlay,
+		GetActorLocation(),
+		VolumeMultiplier,
+		PitchMultiplier
+	);
+}
 
 void AActionCharacter::OnJumpStarted()
 {
-	Jump();
+	UE_LOG(LogTemp, Warning, TEXT("[Jump] Jump() CALLED"));
+	if(GetCharacterMovement()->IsFalling())
+	{
+		return;
+	}
+	PlayJumpSFX();
+	Super::Jump();
 }
 
 void AActionCharacter::OnJumpStopped()
