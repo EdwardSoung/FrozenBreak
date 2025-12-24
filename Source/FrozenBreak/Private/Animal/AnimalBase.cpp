@@ -103,7 +103,6 @@ void AAnimalBase::PlayDead()
 
 	if (AAnimalAIControllerBase * MyController = Cast<AAnimalAIControllerBase>(GetController()))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UnPossess %s"), *GetController()->GetName());
 		MyController->UnPossess();
 	}
 
