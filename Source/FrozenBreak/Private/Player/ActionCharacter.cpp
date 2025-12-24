@@ -881,19 +881,19 @@ void AActionCharacter::OnActionPressed()
 {
 
 	UE_LOG(LogTemp, Warning, TEXT("[INPUT] Pressed!"));
-	bIsActionHeld = true;
+	//bIsActionHeld = true;
 
 	// 누르면 Start부터 재생 시작
-	PlayActionMontage_Start();
+	//PlayActionMontage_Start();
 }
 
 void AActionCharacter::OnActionReleased()
 {
 	UE_LOG(LogTemp, Warning, TEXT("[INPUT] Released!"));
-	bIsActionHeld = false;
+	//bIsActionHeld = false;
 
 	// 떼면 End로 빠져나감
-	JumpToEndSection_IfPlaying();
+	//JumpToEndSection_IfPlaying();
 }
 
 UAnimInstance* AActionCharacter::GetMyAnimInstance() const
