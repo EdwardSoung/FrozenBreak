@@ -33,6 +33,9 @@
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
 
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
+
 #include "Tools/AxeActor.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -102,6 +105,7 @@ AActionCharacter::AActionCharacter()
 		Event->Character.OnPlayerDead.AddDynamic(this, &AActionCharacter::PlayDead);
 	}
 }
+
 
 
 // Called when the game starts or when spawned
@@ -177,7 +181,6 @@ void AActionCharacter::BeginPlay()
 void AActionCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 
 }
 
@@ -624,8 +627,6 @@ void AActionCharacter::OnHarvestHit()
 		{
 			UGameplayStatics::PlaySoundAtLocation(this, AxeHitSound, PendingHarvestImpactPoint);
 		}
-		
-		IInteractable::Execute_DoAction(Target);
 	}
 }
 
@@ -984,6 +985,78 @@ void AActionCharacter::JumpToEndSection_IfPlaying()
 	Anim->Montage_JumpToSection(SectionEnd, ActionMontage);
 }
 
+
+void AActionCharacter::Debug_Hit() // 디버그 용이에용 
+{
+	
+	
+	// 위치 계산: 소켓 있으면 소켓 위치, 없으면 액터 위치
+	FVector SpawnLocation = GetActorLocation();
+	FRotator SpawnRotation = GetActorRotation();
+
+	USkeletalMeshComponent* MeshComp = GetMesh();
+	if (MeshComp && !BloodSocketName.IsNone() && MeshComp->DoesSocketExist(BloodSocketName))
+	{
+		SpawnLocation = MeshComp->GetSocketLocation(BloodSocketName);
+		SpawnRotation = MeshComp->GetSocketRotation(BloodSocketName);
+	}
+
+	// VFX 랜덤으로 하나 재생 , 중복재생 안되게 
+	if (BloodVFXList.Num() >0)
+	{
+		int32 PickedIndex = FMath::RandRange(0, BloodVFXList.Num() - 1);
+
+		if (bAvoidSameBloodVFX && BloodVFXList.Num() > 1)
+		{
+			while (PickedIndex == LastBloodVFXIndex)
+			{
+				PickedIndex = FMath::RandRange(0, BloodVFXList.Num() - 1);
+			}
+		}
+		LastBloodVFXIndex = PickedIndex;
+		UNiagaraSystem* PickedVFX = BloodVFXList[PickedIndex];
+		if (PickedVFX)
+		{
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+				GetWorld(),
+				PickedVFX,
+				SpawnLocation,
+				SpawnRotation
+			);
+		}
+	}
+
+
+
+	// SFX 랜덤으로 하나 재생 중복재생 안되게
+	if (HitSoundList.Num() >0)
+	{
+		int32 PickedIndex = FMath::RandRange(0, HitSoundList.Num() - 1);
+		if (bAvoidSameHitSound && HitSoundList.Num() >1)
+		{
+			while (PickedIndex == LastHitSoundIndex)
+			{
+				PickedIndex = FMath::RandRange(0, HitSoundList.Num() - 1);
+			}
+		}
+
+		LastHitSoundIndex = PickedIndex;
+
+		USoundBase* PickedSFX = HitSoundList[PickedIndex];
+		if (PickedSFX)
+		{
+			UGameplayStatics::PlaySoundAtLocation(
+				this,
+				PickedSFX,
+				SpawnLocation,
+				HitVolumeMultiplier,
+				HitPitchMultiplier
+			);
+		}
+		
+	}
+	
+}
 
 void AActionCharacter::OnAttackStarted()
 {
