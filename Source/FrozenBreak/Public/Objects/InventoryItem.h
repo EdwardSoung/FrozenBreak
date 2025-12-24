@@ -15,12 +15,13 @@ class FROZENBREAK_API UInventoryItem : public UObject
 {
 	GENERATED_BODY()
 public:
-	void Initialize(uint32 InUID, UItemData* InData);
+	void Initialize(uint32 InUID, UItemData* InData, float InDurability = 0.0f);
 	inline UItemData* GetData() { return Data.Get(); }
 	inline float GetWeight() { return Data.Get()->ItemWeight * Amount; }
 	inline int32 GetAmount() { return Amount; }
 	inline EItemType GetType() { return Data.Get()->ItemType; }
 	inline uint32 GetUID() { return UID; }
+	inline float GetDurability() { return Durability; }
 
 	void AddAmount(int32 InAmount);	
 	void SetAmount(int32 InAmount);

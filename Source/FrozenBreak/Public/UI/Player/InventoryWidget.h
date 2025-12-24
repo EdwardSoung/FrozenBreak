@@ -46,7 +46,7 @@ private:
 	UFUNCTION()
 	void UpdateItem(class UInventoryItem* InItem);
 	UFUNCTION()
-	void TrashItem();
+	void DropItem();
 	UFUNCTION()
 	void UseItem();
 	UFUNCTION()

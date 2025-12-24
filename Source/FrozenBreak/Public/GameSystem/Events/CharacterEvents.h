@@ -12,13 +12,13 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerDead);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStartCraft, float, InCraftAmount); // 캐릭터가 실제 작업을 시작하는 델리게이트
 
 //Inventory
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGetPickupItem, EItemType, InType, int32, Amount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnGetPickupItem, EItemType, InType, int32, InAmount, float, InDurability);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInitInventoryUI, TArray<UInventoryItem*>, InData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAddItemToInventoryUI, UInventoryItem*, InItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUpdateInventoryItem, EItemType, InType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRequestInventoryInit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTrashItem, UInventoryItem*, InItem);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRemoveItem, UInventoryItem*, InItem);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDropItem, UInventoryItem*, InItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSendInventoryData, TArray<UInventoryItem*>, InData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUpdateInventoryWeight, float, InWeight, float, InMaxWeight);
 
@@ -68,7 +68,7 @@ struct FCharacterEvents
 	FOnUpdateInventoryItem OnUpdateInventoryItem;
 	FOnRequestInventoryInit OnRequestInventoryInit;
 	FOnTrashItem OnTrashItem;
-	FOnRemoveItem OnRemoveItem;
+	FOnDropItem OnDropItem;
 	FOnSendInventoryData OnSendInventoryData;
 	FOnUpdateInventoryWeight OnUpdateInventoryWeight;
 

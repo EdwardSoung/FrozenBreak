@@ -4,13 +4,13 @@
 #include "Objects/InventoryItem.h"
 #include "GameSystem/EventSubSystem.h"
 
-void UInventoryItem::Initialize(uint32 InUID, UItemData* InData)
+void UInventoryItem::Initialize(uint32 InUID, UItemData* InData, float InDurability)
 {
 	UID = InUID;
 	Data = InData;
 	Amount = 0;
 	MaxDurability = Data->Durability;
-	Durability = MaxDurability;
+	Durability = InDurability > 0 ? InDurability : MaxDurability;
 	QuickSlotNum = 0;
 }
 
