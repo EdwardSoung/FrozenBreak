@@ -10,6 +10,7 @@
 #include "Tools/AxeActor.h"
 #include "Animation/AnimMontage.h"
 #include "Objects/InventoryItem.h"
+
 #include "ActionCharacter.generated.h"
 
 // ===== Forward Declarations =====
@@ -18,6 +19,8 @@ class USpringArmComponent;
 class UInputAction;
 class UInputMappingContext;
 class UAnimMontage;
+class UNiagaraSystem;
+class USoundBase;
 
 struct FInputActionValue;
 
@@ -38,6 +41,7 @@ class FROZENBREAK_API AActionCharacter : public ACharacter, public IInteractable
 public:
 	// Sets default values
 	AActionCharacter();
+	
 
 protected:
 	// Called when the game starts or when spawned
@@ -342,6 +346,37 @@ public:
 
 	int32 LastJumpSoundIndex = INDEX_NONE;
 	void PlayJumpSFX();
+
+
+	// 피격 VFX (Niagara)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hit|VFX")
+	TArray<TObjectPtr<UNiagaraSystem>> BloodVFXList;
+	// 피격 사운드
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hit|SFX")
+	TArray<TObjectPtr<USoundBase>> HitSoundList;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hit|VFX")
+	bool bAvoidSameBloodVFX = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hit|SFX")
+	bool bAvoidSameHitSound = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hit|SFX", meta = (ClampMin = "0.0"))
+	float HitVolumeMultiplier = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hit|SFX", meta = (ClampMin = "0.0"))
+	float HitPitchMultiplier = 1.0f;
+
+	// 피 튀길 소켓(없으면 캡슐/액터 위치)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hit")
+	FName BloodSocketName = TEXT("spine_03");
+
+	UFUNCTION(BlueprintCallable)
+	void Debug_Hit(); // 디버그용 나중에 지우기
+
+	//중복되는 효과 방지용 인덱스 
+	int32 LastBloodVFXIndex = INDEX_NONE;
+	int32 LastHitSoundIndex = INDEX_NONE;
 
 public: // 무기쪽
 	UPROPERTY(EditDefaultsOnly, Category = "Combat|Montage")
