@@ -378,6 +378,14 @@ public:
 	int32 LastBloodVFXIndex = INDEX_NONE;
 	int32 LastHitSoundIndex = INDEX_NONE;
 
+	//피격 애니메이션 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Hit|Montage")
+	TArray<TObjectPtr<UAnimMontage>> HitMontages;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Hit|Montage")
+	bool bAvoidSameHitMontage = true;
+
+	int32 LastHitMontageIndex = INDEX_NONE;
 public: // 무기쪽
 	UPROPERTY(EditDefaultsOnly, Category = "Combat|Montage")
 	TObjectPtr<class UAnimMontage> UnarmedAttackMontage;

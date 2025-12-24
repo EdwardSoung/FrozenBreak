@@ -960,6 +960,11 @@ void AActionCharacter::JumpToEndSection_IfPlaying()
 
 void AActionCharacter::Debug_Hit() // 디버그 용이에용 
 {
+	UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	if (Anim && Anim->Montage_IsPlaying(nullptr))
+	{
+		return;
+	}
 	
 	
 	// 위치 계산: 소켓 있으면 소켓 위치, 없으면 액터 위치
@@ -1026,6 +1031,37 @@ void AActionCharacter::Debug_Hit() // 디버그 용이에용
 			);
 		}
 		
+	}
+
+	// 랜덤으로 몽타주 하나 재생
+
+	
+	if (Anim && HitMontages.Num() > 0)
+	{
+		int32 PickedIndex = FMath::RandRange(0, HitMontages.Num() - 1);
+
+		//같은 몽타주 연속방지
+		if (bAvoidSameHitMontage && HitMontages.Num() > 1)
+		{
+			while (PickedIndex == LastHitMontageIndex)
+			{
+				PickedIndex = FMath::RandRange(0, HitMontages.Num() - 1);
+			}
+			
+		}
+
+		LastHitMontageIndex = PickedIndex;
+
+		UAnimMontage* PickedMontage = HitMontages[PickedIndex];
+
+		if (Anim->Montage_IsPlaying(PickedMontage))
+		{
+			return;
+		}
+		if (PickedMontage)
+		{
+			Anim->Montage_Play(PickedMontage);
+		}
 	}
 	
 }
