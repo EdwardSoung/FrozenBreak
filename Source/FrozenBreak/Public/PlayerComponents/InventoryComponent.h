@@ -28,13 +28,15 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 	UFUNCTION()
-	void AddItem(EItemType Type, int32 Amount);
+	void AddItem(EItemType InType, int32 InAmount, float InDurability);
+
 	UFUNCTION()
-	void TrashItem(UInventoryItem* InItem);
+	void DropItem(UInventoryItem* InItem);
 
 	UFUNCTION()
 	void SendInventoryItems();
 
+	void RemoveItem(UInventoryItem* InItem);
 	void UseItem(int32 UID);
 	void RefreshWeight();
 protected:
@@ -53,6 +55,8 @@ protected:
 	void QuickSlotExecute(int32 InSlotNum);
 	UFUNCTION()
 	void ResetQuickSlot(int32 InSlotNum);
+	UFUNCTION()
+	void UpdateItem(UInventoryItem* InItem);
 
 private:
 	void SpawnCampfire();

@@ -20,8 +20,7 @@ void UInventoryWidget::NativeConstruct()
 		EventSystem->Character.OnAddItemToInventoryUI.AddDynamic(this, &UInventoryWidget::AddItem);
 		EventSystem->Character.OnUpdateInventoryItem.AddDynamic(this, &UInventoryWidget::UpdateItemByType);
 		EventSystem->Character.OnUpdateInventoryWeight.AddDynamic(this, &UInventoryWidget::UpdateWeight);
-		EventSystem->Character.OnUpdateItem.AddDynamic(this, &UInventoryWidget::UpdateItem);
-		
+		EventSystem->Character.OnUpdateItem.AddDynamic(this, &UInventoryWidget::UpdateItem);		
 
 		EventSystem->UI.OnInventoryItemSelected.AddDynamic(this, &UInventoryWidget::SelectionChanged);
 
@@ -29,7 +28,7 @@ void UInventoryWidget::NativeConstruct()
 		EventSystem->Character.OnRequestInventoryInit.Broadcast();
 	}
 
-	TrashButton->OnClicked.AddDynamic(this, &UInventoryWidget::TrashItem);
+	TrashButton->OnClicked.AddDynamic(this, &UInventoryWidget::DropItem);
 	CloseButton->OnClicked.AddDynamic(this, &UInventoryWidget::HideWidget);
 	UseButton->OnClicked.AddDynamic(this, &UInventoryWidget::UseItem);
 }
@@ -103,12 +102,8 @@ void UInventoryWidget::InitData(TArray<class UInventoryItem*> InData)
 	{
 		InventoryList->AddItem(data);
 	}
-
-	//FString weightValue = FString::Printf(TEXT("%.2f"), Weight);
-	//WeightText->SetText(FText::FromString(weightValue));
 }
 
-//아이템이 제거됨
 void UInventoryWidget::UpdateItem(UInventoryItem* InItem)
 {
 	if (InItem->GetAmount() == 0)
@@ -125,26 +120,30 @@ void UInventoryWidget::UpdateItem(UInventoryItem* InItem)
 				data = InItem;
 			}
 		}
-		//리스트 갱신?
 	}	
 }
 
 //아이템 밖에 버림 처리
-void UInventoryWidget::TrashItem()
+void UInventoryWidget::DropItem()
 {
 	//어...참조라 지우면 같이 지워지지 않나?
 	auto Selected = InventoryList->GetSelectedItem();
 
 	if (Selected)
 	{
-		//InventoryList->ClearSelection();
-		InventoryList->RemoveItem(Selected);
 		UInventoryItem* selectedItem = Cast<UInventoryItem>(Selected);
+		int32 quickSlot = selectedItem->QuickSlotNum;
+		InventoryList->RemoveItem(Selected);
 		ItemDataList.Remove(selectedItem);
 
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			EventSystem->Character.OnTrashItem.Broadcast(selectedItem);
+			EventSystem->Character.OnDropItem.Broadcast(selectedItem);
+
+			if (quickSlot > 0)
+			{
+				EventSystem->UI.OnResetQuickSlotItem.Broadcast(quickSlot);
+			}
 		}
 	}
 }
