@@ -35,5 +35,5 @@ private:
 	UPROPERTY()
 	TMap<EWidgetType, UUserWidget*> OpenedWidgets;
 
-	TObjectPtr<class APlayerController> CurrentPlayerController = nullptr;
+	TWeakObjectPtr<class APlayerController> CurrentPlayerController = nullptr;
 };
