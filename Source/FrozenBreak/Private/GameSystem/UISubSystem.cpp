@@ -23,7 +23,7 @@ UUISubSystem* UUISubSystem::Get(const UObject* WorldContextObject)
 	return nullptr;
 }
 
-UUserWidget* UUISubSystem::ShowWidget(EWidgetType InWidgetType)
+UUserWidget* UUISubSystem::ShowWidget(EWidgetType InWidgetType, EInputModeType InInputMode)
 {
 	if (CurrentPlayerController == nullptr)
 	{
@@ -75,10 +75,20 @@ UUserWidget* UUISubSystem::ShowWidget(EWidgetType InWidgetType)
 		//기본 HUD가 아닐 때 처음 열어주는거면 인풋모드 변경
 		if (OpenedWidgets.Num() == 0)
 		{
-			FInputModeGameAndUI InputMode;
-			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-			CurrentPlayerController->SetInputMode(InputMode);
-			CurrentPlayerController->bShowMouseCursor = true;
+			if (InInputMode == EInputModeType::GameAndUI)
+			{
+				FInputModeGameAndUI InputMode;
+				InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+				CurrentPlayerController->SetInputMode(InputMode);
+				CurrentPlayerController->bShowMouseCursor = true;
+			}
+			else if (InInputMode == EInputModeType::UIOnly)
+			{
+				FInputModeUIOnly InputMode;
+				InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+				CurrentPlayerController->SetInputMode(InputMode);
+				CurrentPlayerController->bShowMouseCursor = true;
+			}
 		}
 		
 		OpenedWidgets.Add(InWidgetType, Widget);
