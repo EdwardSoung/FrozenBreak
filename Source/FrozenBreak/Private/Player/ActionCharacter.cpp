@@ -777,14 +777,14 @@ void AActionCharacter::SetHeldItemType(EItemType NewType) // 지금 뭐들고 �
 
 bool AActionCharacter::OnToolActionStarted()
 {
-	if (CurrentHeldItemType == EItemType::Axe)
+	if (CurrentHeldItemType == EItemType::Axe && PendingHarvestTarget.IsValid())
 	{
 		const bool bPrev = bIsHarvesting;
 		OnHarvestStarted();
 		return bPrev;
 	}
 
-	if (CurrentHeldItemType == EItemType::Pickaxe)
+	if (CurrentHeldItemType == EItemType::Pickaxe && PendingMiningTarget.IsValid())
 	{
 		const bool bPrev = bIsMining;
 		OnPickaxeStarted();
