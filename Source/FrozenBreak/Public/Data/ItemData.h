@@ -39,6 +39,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
 	float CraftCost = -1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
+	bool IsStackable = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item|Stat")
 	TMap<EItemStatType, float> Stats;
