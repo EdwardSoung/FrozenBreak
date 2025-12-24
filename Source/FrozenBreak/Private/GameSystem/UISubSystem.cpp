@@ -25,7 +25,7 @@ UUISubSystem* UUISubSystem::Get(const UObject* WorldContextObject)
 
 UUserWidget* UUISubSystem::ShowWidget(EWidgetType InWidgetType, EInputModeType InInputMode)
 {
-	if (CurrentPlayerController == nullptr)
+	if (CurrentPlayerController.IsValid() == false)
 	{
 		CurrentPlayerController = GetWorld()->GetFirstPlayerController();
 	}
@@ -59,7 +59,7 @@ UUserWidget* UUISubSystem::ShowWidget(EWidgetType InWidgetType, EInputModeType I
 
 			if (WidgetClass)
 			{
-				Widget = CreateWidget(CurrentPlayerController, WidgetClass);
+				Widget = CreateWidget(CurrentPlayerController.Get(), WidgetClass);
 			}
 		}
 

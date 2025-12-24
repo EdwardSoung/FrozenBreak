@@ -5,6 +5,8 @@
 #include "Components/Button.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include "Kismet/GameplayStatics.h"
+#include "GameSystem/GameManager.h"
+#include "GameFramework/GameModeBase.h"
 
 void ULobbyWidget::NativeConstruct()
 {
@@ -16,7 +18,7 @@ void ULobbyWidget::NativeConstruct()
 
 void ULobbyWidget::OnClickStart()
 {
-	UGameplayStatics::OpenLevel(this, TEXT("FrozenForest"));
+	UGameplayStatics::OpenLevel(this, "FrozenForest", true);
 }
 
 void ULobbyWidget::OnClickExit()

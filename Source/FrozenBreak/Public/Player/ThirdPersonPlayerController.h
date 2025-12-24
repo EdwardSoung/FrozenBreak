@@ -17,6 +17,7 @@ class FROZENBREAK_API AThirdPersonPlayerController : public APlayerController
 	GENERATED_BODY()
 protected:
 	virtual void BeginPlay() override;
+    virtual void OnPossess(APawn* InPawn) override;
 
 	void OnPauseTriggered(const FInputActionValue& Value);
 	void OnInventoryTriggered(const FInputActionValue& Value);
