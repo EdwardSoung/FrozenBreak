@@ -2,9 +2,10 @@
 
 
 #include "Animal/AnimalBase.h"
+#include "Animal/AI/AnimalAIControllerBase.h"
+#include "GameSystem/ItemFactorySubSystem.h"
 #include "Components/WidgetComponent.h"
 #include "UI/Enemy/EnemyHealthBarWidget.h"
-#include "GameSystem/ItemFactorySubSystem.h"
 
 // Sets default values
 AAnimalBase::AAnimalBase()
@@ -49,6 +50,8 @@ void AAnimalBase::OnTakeDamage(
 	AController* InstigatedBy, 
 	AActor* DamageCauser)
 {
+	PlayHit();
+	
 	CurrentHealth = FMath::Max(CurrentHealth - Damage, DefaultMinimum);
 	if (HealthBar)
 	{
@@ -97,6 +100,12 @@ void AAnimalBase::PlayDead()
 {
 	IDamageable::Execute_OnDead(this);
 	HealthBarWidgetComponent->SetVisibility(false);
+
+	if (AAnimalAIControllerBase * MyController = Cast<AAnimalAIControllerBase>(GetController()))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UnPossess %s"), *GetController()->GetName());
+		MyController->UnPossess();
+	}
 
 	if (AnimalDeadAnimation)
 	{

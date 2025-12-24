@@ -53,7 +53,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UEnemyHealthBarWidget> HealthBar = nullptr;
 
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<class UAnimMontage> AnimalHitAnimation = nullptr;
 
