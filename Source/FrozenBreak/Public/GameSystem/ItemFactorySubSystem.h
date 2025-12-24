@@ -21,9 +21,9 @@ public:
 	static UItemFactorySubSystem* Get(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintCallable)
-	APickupItem* Spawn(EItemType InType, FVector Location, int32 Amount = 1);
+	APickupItem* Spawn(EItemType InType, FVector Location, int32 Amount = 1, float InDurability = 0.0f);
 
-	UInventoryItem* Spawn(EItemType InType, int32 Amount = 1);
+	UInventoryItem* Spawn(EItemType InType, int32 Amount = 1, float InDurability = 0.0f);
 
 	UFUNCTION(BlueprintCallable)
 	class AToolActor* SpawnTool(EItemType InType);

@@ -28,6 +28,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void OnSelect_Implementation(bool bIsStarted) override;
 
+	void SetExistValues(int32 InAmount, float InDurability);
+
 private:
 	const ECollisionChannel InteractableActorChannel = ECollisionChannel::ECC_GameTraceChannel1;
 
@@ -47,4 +49,12 @@ protected:
 
 	UPROPERTY()
 	class UEventSubSystem* EventSystem = nullptr;
+
+	//버릴 때 가지고 있을 데이터
+	//애초에 래핑 구조를 따로 짜서 애매해짐...
+	//그냥 변수로 가지고 있는걸로
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item|Value")
+	float ExistDurability = 0.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item|Value")
+	int32 ExistAmount = 0;
 };

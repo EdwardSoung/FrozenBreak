@@ -26,13 +26,13 @@ void UInventoryComponent::BeginPlay()
 	{
 		EventSystem->Character.OnGetPickupItem.AddDynamic(this, &UInventoryComponent::AddItem);
 		EventSystem->Character.OnRequestInventoryInit.AddDynamic(this, &UInventoryComponent::InitInventoryUI);
-		EventSystem->Character.OnTrashItem.AddDynamic(this, &UInventoryComponent::TrashItem);
-
 		EventSystem->Character.OnRequestIventoryItems.AddDynamic(this, &UInventoryComponent::SendInventoryItems);
+		EventSystem->Character.OnUpdateItem.AddDynamic(this, &UInventoryComponent::UpdateItem);
+		EventSystem->Character.OnUseItem.AddDynamic(this, &UInventoryComponent::UseInventoryItem);
+		EventSystem->Character.OnDropItem.AddDynamic(this, &UInventoryComponent::DropItem);
 
 		EventSystem->Character.OnRequestIventoryRawMeet.AddDynamic(this, &UInventoryComponent::SendRawMeetData);
 
-		EventSystem->Character.OnUseItem.AddDynamic(this, &UInventoryComponent::UseInventoryItem);
 		EventSystem->UI.OnQuickSlotExecute.AddDynamic(this, &UInventoryComponent::QuickSlotExecute);
 		EventSystem->UI.OnResetQuickSlotItem.AddDynamic(this, &UInventoryComponent::ResetQuickSlot);
 	}
@@ -166,6 +166,27 @@ void UInventoryComponent::ResetQuickSlot(int32 InSlotNum)
 	}
 }
 
+void UInventoryComponent::UpdateItem(UInventoryItem* InItem)
+{
+	for (auto Item : Items)
+	{
+		if (Item->GetUID() == InItem->GetUID())
+		{
+			if (InItem->GetAmount() == 0)
+			{
+				RemoveItem(Item);
+			}
+			else
+			{
+				//내구도, 개수 등 변경될게 많다...
+				Item = InItem;
+			}
+			break;
+		}
+	}
+	
+}
+
 void UInventoryComponent::SpawnCampfire()
 {
 	if (CampfireClass)
@@ -222,28 +243,28 @@ void UInventoryComponent::SpawnCampfire()
 }
 
 //우선은...중복 허용하지 않음
-void UInventoryComponent::AddItem(EItemType Type, int32 Amount)
+void UInventoryComponent::AddItem(EItemType InType, int32 InAmount, float InDurability)
 {	
 	if (CurrentWeight >= InventoryMaxWeight)
 	{
 		//무게 초과라 안먹어져야 함
 		return;
 	}
-	UInventoryItem* TargetItem = GetItem(Type);
+	UInventoryItem* TargetItem = GetItem(InType);
 	if (TargetItem && TargetItem->GetData()->IsStackable)
 	{
 		//누적가능한 아이템이면 개수 증가
-		TargetItem->AddAmount(Amount);
+		TargetItem->AddAmount(InAmount);
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			EventSystem->Character.OnUpdateInventoryItem.Broadcast(Type);
+			EventSystem->Character.OnUpdateInventoryItem.Broadcast(InType);
 		}
 	}
 	else
 	{
 		if (UItemFactorySubSystem* ItemFactory = UItemFactorySubSystem::Get(this))
 		{
-			UInventoryItem* NewItem = ItemFactory->Spawn(Type, Amount);
+			UInventoryItem* NewItem = ItemFactory->Spawn(InType, InAmount, InDurability);
 			Items.Add(NewItem);
 
 			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
@@ -255,10 +276,27 @@ void UInventoryComponent::AddItem(EItemType Type, int32 Amount)
 	RefreshWeight();
 }
 
-void UInventoryComponent::TrashItem(UInventoryItem* InItem)
+void UInventoryComponent::RemoveItem(UInventoryItem* InItem)
 {
 	Items.Remove(InItem);
 	RefreshWeight();
+}
+void UInventoryComponent::DropItem(UInventoryItem* InItem)
+{
+	if (UItemFactorySubSystem* ItemFactory = UItemFactorySubSystem::Get(this))
+	{
+		FVector GenLocation = GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * 100.0f;
+		ItemFactory->Spawn(InItem->GetType(), GenLocation, InItem->GetAmount(), InItem->GetDurability());
+	}
+
+	for (auto Item : Items)
+	{
+		if (Item->GetUID() == InItem->GetUID())
+		{
+			RemoveItem(Item);			
+			break;
+		}
+	}
 }
 //동일 타입의 아이템이 존재하는지...
 UInventoryItem* UInventoryComponent::GetItem(EItemType Type)

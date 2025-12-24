@@ -21,26 +21,27 @@ UItemFactorySubSystem* UItemFactorySubSystem::Get(const UObject* WorldContextObj
 	return nullptr;
 }
 
-APickupItem* UItemFactorySubSystem::Spawn(EItemType InType, FVector Location, int32 Amount)
+APickupItem* UItemFactorySubSystem::Spawn(EItemType InType, FVector Location, int32 Amount, float InDurability)
 {
 	if (UGameManager* Manager = UGameManager::Get(this))
 	{
 		auto spawnClass = Manager->GetPickupItemClass(InType);
 		APickupItem* DropItem = GetWorld()->SpawnActor<APickupItem>(spawnClass, Location, FRotator::ZeroRotator);
-		
+		DropItem->SetExistValues(Amount, InDurability);
+
 		return DropItem;		
 	}
 
 	return nullptr;
 }
 
-UInventoryItem* UItemFactorySubSystem::Spawn(EItemType InType, int32 Amount)
+UInventoryItem* UItemFactorySubSystem::Spawn(EItemType InType, int32 Amount, float InDurability)
 {
 	if (UGameManager* Manager = UGameManager::Get(this))
 	{
 		auto NewItem = NewObject<UInventoryItem>(this);
 		auto NewData = Manager->GetItemData(InType);
-		NewItem->Initialize(Manager->GetUID(), NewData);
+		NewItem->Initialize(Manager->GetUID(), NewData, InDurability);
 		NewItem->AddAmount(Amount);
 
 		return NewItem;

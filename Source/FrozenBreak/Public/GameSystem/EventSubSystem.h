@@ -34,6 +34,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TestAddItem(EItemType Type, int32 Amount)
 	{
-		Character.OnGetPickupItem.Broadcast(Type, Amount);
+		Character.OnGetPickupItem.Broadcast(Type, Amount, 0);
 	}
 };
