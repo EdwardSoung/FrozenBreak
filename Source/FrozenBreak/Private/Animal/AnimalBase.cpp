@@ -130,7 +130,10 @@ void AAnimalBase::DestroyAnimal()
 {
 	if (UItemFactorySubSystem* ItemFactory = UItemFactorySubSystem::Get(this))
 	{
-		ItemFactory->Spawn(EItemType::Lether, GetActorLocation() + FVector(10, 10, 50), LeatherDropCount);
+		for (int i = 0; i < LeatherDropCount; i++)
+		{
+			ItemFactory->Spawn(EItemType::Lether, GetActorLocation() + FVector(-10, -10, 50), DefaultMinimum);
+		}
 		for (int i = 0; i < RawMeatDropCount; i++)
 		{
 			ItemFactory->Spawn(EItemType::RawMeat, GetActorLocation() + FVector(-10, -10, 50), DefaultMinimum);

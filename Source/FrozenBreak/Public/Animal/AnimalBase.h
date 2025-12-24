@@ -61,10 +61,10 @@ protected:
 
 	float DefaultMinimum = 0.0f;
 
-	UPROPERTY()
-	int32 RawMeatDropCount = 2;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	int32 RawMeatDropCount = 1;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	int32 LeatherDropCount = 1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
