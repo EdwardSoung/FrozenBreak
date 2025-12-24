@@ -13,6 +13,7 @@ enum class EWidgetType : uint8
 	CraftProcessBar,
 	CharacterState,
 	QuitMenu,
+	Lobby,
 };
 
 
@@ -72,4 +73,12 @@ enum class ERecipeCategory : uint8
 {
 	Crafting UMETA(DisplayName = "제작"),
 	Cooking  UMETA(DisplayName = "요리")
+};
+
+UENUM(BlueprintType)
+enum class EInputModeType : uint8
+{
+	GameOnly,
+	UIOnly,
+	GameAndUI,
 };
