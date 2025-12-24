@@ -253,6 +253,16 @@ protected:
 
 	bool bSavedUseControllerRotationYaw = true;
 	bool bToolYawLocked = false;
+	//툴 액션몽타주 실행중 버그 패치
+	bool bSaveOrientRotationToMovement = false;
+
+	void SaveToolLockSnapshot();
+	void RestoreToolLockSnapshot();
+
+	UFUNCTION()
+	void OnToolMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	
+
 
 
 	//장착

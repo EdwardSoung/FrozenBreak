@@ -575,14 +575,18 @@ void AActionCharacter::OnHarvestStarted()
 
 	if (!bToolYawLocked)
 	{
-		bSavedUseControllerRotationYaw = bUseControllerRotationYaw;
+		SaveToolLockSnapshot();
 		bUseControllerRotationYaw = false;      // 몽타주가 재생중일때 캐릭터가 마우스에 안 돌아감
 		bToolYawLocked = true;
 	}
+	if (UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr)
+	{
+		FOnMontageEnded EndDel;
+		EndDel.BindUObject(this, &AActionCharacter::OnToolMontageEnded);
+		Anim->Montage_SetEndDelegate(EndDel, HarvestMontage);
 
+	}
 	PlayAnimMontage(HarvestMontage);
-
-
 	
 }
 
@@ -605,8 +609,7 @@ void AActionCharacter::EndHarvest()
 	}
 	if (bToolYawLocked)
 	{
-		bUseControllerRotationYaw = bSavedUseControllerRotationYaw;
-		bToolYawLocked = false;
+		RestoreToolLockSnapshot();
 	}
 }
 
@@ -634,11 +637,10 @@ void AActionCharacter::OnHarvestHit()
 
 void AActionCharacter::OnPickaxeStarted() // 곡괭이 전용
 {
-	UE_LOG(LogTemp, Warning, TEXT("[Pickaxe] OnPickaxeStarted ENTER"));
-	UE_LOG(LogTemp, Warning, TEXT("[Pickaxe] Enter bIsMining=%d"), bIsMining);
+	
 	if (GetCharacterMovement()->IsFalling())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[Pickaxe] return: Falling"));
+		
 		return;
 	}
 
@@ -655,16 +657,20 @@ void AActionCharacter::OnPickaxeStarted() // 곡괭이 전용
 	}
 	if (!bToolYawLocked)
 	{
-		bSavedUseControllerRotationYaw = bUseControllerRotationYaw;
+		SaveToolLockSnapshot();
 		bUseControllerRotationYaw = false;      // 캐릭터가 마우스에 안 돌아감
 		bToolYawLocked = true;
 	}
 
 
-	float Len = PlayAnimMontage(PickaxeMontage);
-	
+	if (UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr)
+	{
+		FOnMontageEnded EndDel;
+		EndDel.BindUObject(this, &AActionCharacter::OnToolMontageEnded); 
+		Anim->Montage_SetEndDelegate(EndDel, PickaxeMontage);            
+	}
 
-
+	PlayAnimMontage(PickaxeMontage);
 
 }
 
@@ -838,8 +844,7 @@ void AActionCharacter::EndMining()
 
 	if (bToolYawLocked)
 	{
-		bUseControllerRotationYaw = bSavedUseControllerRotationYaw;
-		bToolYawLocked = false;
+		RestoreToolLockSnapshot();
 	}
 }
 
@@ -868,6 +873,53 @@ bool AActionCharacter::OnToolActionStarted()
 	}
 
 	return false;
+}
+
+void AActionCharacter::SaveToolLockSnapshot()
+{
+	if (bToolYawLocked)
+	{
+		return;
+	}
+
+	bSavedUseControllerRotationYaw = bUseControllerRotationYaw;
+
+	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+	{
+		bSaveOrientRotationToMovement = MoveComp->bOrientRotationToMovement;
+	}
+}
+
+void AActionCharacter::RestoreToolLockSnapshot()
+{
+	if (!bToolYawLocked)
+	{
+		return;
+	}
+
+	// 회전 설정 복구
+	bUseControllerRotationYaw = bSavedUseControllerRotationYaw;
+
+	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+	{
+		MoveComp->bOrientRotationToMovement = bSaveOrientRotationToMovement;
+	}
+
+	bToolYawLocked = false;
+}
+
+void AActionCharacter::OnToolMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (Montage == HarvestMontage)
+	{
+		EndHarvest();                // 기존 정리 로직(이동/플래그) 유지
+		RestoreToolLockSnapshot();   
+	}
+	else if (Montage == PickaxeMontage)
+	{
+		EndMining();
+		RestoreToolLockSnapshot();
+	}
 }
 
 void AActionCharacter::OnToolHit() // 지금 들고있는 무기에 맞춰 행동
@@ -989,10 +1041,7 @@ void AActionCharacter::JumpToEndSection_IfPlaying()
 void AActionCharacter::Debug_Hit() // 디버그 용이에용 
 {
 	UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
-	if (Anim && Anim->Montage_IsPlaying(nullptr))
-	{
-		return;
-	}
+	
 	
 	
 	// 위치 계산: 소켓 있으면 소켓 위치, 없으면 액터 위치
@@ -1031,8 +1080,6 @@ void AActionCharacter::Debug_Hit() // 디버그 용이에용
 		}
 	}
 
-
-
 	// SFX 랜덤으로 하나 재생 중복재생 안되게
 	if (HitSoundList.Num() >0)
 	{
@@ -1060,6 +1107,13 @@ void AActionCharacter::Debug_Hit() // 디버그 용이에용
 		}
 		
 	}
+
+
+	if (Anim && Anim->Montage_IsPlaying(nullptr))
+	{
+		return; // 몽타주만 막음
+	}
+
 
 	// 랜덤으로 몽타주 하나 재생
 
