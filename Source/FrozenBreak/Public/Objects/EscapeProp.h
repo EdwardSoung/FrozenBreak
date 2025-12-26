@@ -17,6 +17,10 @@ public:
 	// Sets default values for this actor's properties
 	AEscapeProp();
 
+public:
+	UFUNCTION(BlueprintPure, Category = "Prop|Data")
+	EPropType GetPropType() const;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

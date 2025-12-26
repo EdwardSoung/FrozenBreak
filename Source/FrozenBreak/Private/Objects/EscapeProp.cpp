@@ -101,3 +101,7 @@ void AEscapeProp::OnSelect_Implementation(bool bIsStart)
 	}
 }
 
+EPropType AEscapeProp::GetPropType() const
+{
+	return Data->PropType;
+}

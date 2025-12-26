@@ -36,6 +36,8 @@
 #include "Tools/AxeActor.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "Data/PropData.h"
+
 
 // Sets default values
 AActionCharacter::AActionCharacter()
@@ -505,6 +507,22 @@ void AActionCharacter::OnInteration()
 {
 	if (bLandingLocked)
 		return;
+
+	if (InteractionComponent)
+	{
+		AActor* FocusedActor = InteractionComponent->GetCurrentInteractionActor();
+		if (FocusedActor)
+		{
+			if (CurrentHeldItemType == EItemType::Axe)
+			{
+				SetPendingHarvestTarget(FocusedActor);
+			}
+			if (CurrentHeldItemType == EItemType::Pickaxe)
+			{
+				SetPendingMiningTarget(FocusedActor);
+			}
+		}
+	}
 
 	const bool bToolStarted = OnToolActionStarted();
 	if (bToolStarted)

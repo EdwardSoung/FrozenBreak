@@ -170,38 +170,42 @@ void UInteractionComponent::DoAction_Implementation() // 플레이어가 상호�
 			// 일반 바위 / 나무 일 때
 			if (const AWorldProp* Prop = Cast<AWorldProp>(CurrentInteractionActor))
 			{
-				// 상호작용 물체가 나무나 바위면 플레이어한테 정보 넘겨주고 리턴 (나무나 바위에 피해 입히는건 애님노티파이가 처리)
+				// 바라보는게 나무 / 바위이면 그냥 리턴. 나무나 바위면 플레이어쪽에서 알아서 한다.
 				if (Prop->GetPropType() == EPropType::Tree || Prop->GetPropType() == EPropType::Rock)
 				{
-					if (AActionCharacter* Player = Cast<AActionCharacter>(UGameplayStatics::GetPlayerPawn(this, 0)))
-					{
-						if (Prop->GetPropType() == EPropType::Tree)
-						{
-							Player->SetPendingHarvestTarget(CurrentInteractionActor);
-						}
-
-						if (Prop->GetPropType() == EPropType::Rock)
-						{
-							Player->SetPendingMiningTarget(CurrentInteractionActor);
-						}
-					}
+					//if (AActionCharacter* Player = Cast<AActionCharacter>(UGameplayStatics::GetPlayerPawn(this, 0)))
+					//{
+					//	if (Prop->GetPropType() == EPropType::Tree)
+					//	{
+					//		Player->SetPendingHarvestTarget(CurrentInteractionActor);
+					//	}
+					//
+					//	if (Prop->GetPropType() == EPropType::Rock)
+					//	{
+					//		Player->SetPendingMiningTarget(CurrentInteractionActor);
+					//	}
+					//}
 					return;
 				}
 			}
-			
-			// 탈출 바위 일 때
+
+			// 탈출 바위 일 때에도 동일
 			if (const AEscapeProp* EscapeProp = Cast<AEscapeProp>(CurrentInteractionActor))
 			{
-				if (AActionCharacter* Player = Cast<AActionCharacter>(UGameplayStatics::GetPlayerPawn(this, 0)))
+				if (EscapeProp->GetPropType() == EPropType::Rock)
 				{
-					Player->SetPendingMiningTarget(CurrentInteractionActor);
+					//if (AActionCharacter* Player = Cast<AActionCharacter>(UGameplayStatics::GetPlayerPawn(this, 0)))
+					//{
+					//	Player->SetPendingMiningTarget(CurrentInteractionActor);
+					//	return;
+					//}
 					return;
 				}
 			}
-			
-			// "너가 할 수 있는거 하셈" 알림
+
+			// 나무 / 바위 / 탈바위가 아니면 그냥 인터렉트
 			UE_LOG(LogTemp, Log, TEXT("인컴 : 인터페이스 받고 바라보고 있는 액터에게 인터페이스 보냄"));
-				IInteractable::Execute_DoAction(CurrentInteractionActor);
+			IInteractable::Execute_DoAction(CurrentInteractionActor);
 
 			// 초기화
 			CurrentInteractionActor = nullptr;
