@@ -33,6 +33,7 @@ public:
 
 	UFUNCTION()
 	inline AActor* GetCurrentInteractionActor() const { return CurrentInteractionActor; }
+	EItemType GetCurrentActorInteractableToolType();
 private:
 	// 바라본 대상이 WorldProp / Item 인지 구분해주는 함수
 	void ProcessInteractableTarget();

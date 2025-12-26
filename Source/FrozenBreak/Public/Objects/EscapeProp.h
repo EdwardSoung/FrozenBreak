@@ -21,6 +21,8 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Prop|Data")
 	EPropType GetPropType() const;
 
+	UFUNCTION(BlueprintPure, Category = "Prop|Data")
+	EItemType GetInteractableToolType() const;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

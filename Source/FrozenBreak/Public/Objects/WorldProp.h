@@ -32,7 +32,7 @@ public:
 	void InitStat(float InAttack, float InHealth);
 
 	UFUNCTION(BlueprintPure, Category = "Prop|Data")
-	inline EItemType GetInteractableToolType() const;
+	EItemType GetInteractableToolType() const;
 	
 	UFUNCTION(BlueprintPure, Category = "Prop|Data")
 	EPropType GetPropType() const;

@@ -510,16 +510,20 @@ void AActionCharacter::OnInteration()
 
 	if (InteractionComponent)
 	{
-		AActor* FocusedActor = InteractionComponent->GetCurrentInteractionActor();
-		if (FocusedActor)
+		if (AActor* FocusedActor = InteractionComponent->GetCurrentInteractionActor())
 		{
-			if (CurrentHeldItemType == EItemType::Axe)
+			const EItemType ToolType = InteractionComponent->GetCurrentActorInteractableToolType();
+
+			if (FocusedActor)
 			{
-				SetPendingHarvestTarget(FocusedActor);
-			}
-			if (CurrentHeldItemType == EItemType::Pickaxe)
-			{
-				SetPendingMiningTarget(FocusedActor);
+				if (CurrentHeldItemType == EItemType::Axe && ToolType == EItemType::Axe)
+				{
+					SetPendingHarvestTarget(FocusedActor);
+				}
+				if (CurrentHeldItemType == EItemType::Pickaxe && ToolType == EItemType::Pickaxe)
+				{
+					SetPendingMiningTarget(FocusedActor);
+				}
 			}
 		}
 	}

@@ -105,3 +105,8 @@ EPropType AEscapeProp::GetPropType() const
 {
 	return Data->PropType;
 }
+
+EItemType AEscapeProp::GetInteractableToolType() const
+{
+	return Data->InteractableToolType;
+}

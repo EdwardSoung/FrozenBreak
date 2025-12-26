@@ -220,6 +220,19 @@ void UInteractionComponent::DoAction_Implementation() // 플레이어가 상호�
 	}
 }
 
+EItemType UInteractionComponent::GetCurrentActorInteractableToolType()
+{
+	if (const AWorldProp* WorldProp = Cast<AWorldProp>(CurrentInteractionActor))
+	{
+		return WorldProp->GetInteractableToolType();
+	}
+	if (const AEscapeProp* EscapeProp = Cast<AEscapeProp>(CurrentInteractionActor))
+	{
+		return EscapeProp->GetInteractableToolType();
+	}
+	return EItemType::None;
+}
+
 void UInteractionComponent::ProcessInteractableTarget()
 {
 	// 바라보고 있는 대상이 일반 바위 / 나무 일 때
