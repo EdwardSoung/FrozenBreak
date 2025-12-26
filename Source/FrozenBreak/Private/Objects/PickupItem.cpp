@@ -102,8 +102,16 @@ void APickupItem::OnSelect_Implementation(bool bIsStarted)
 	// 라인 트레이스에 맞은 시점에 위젯 텍스트를 업데이트 한 뒤, 보여준다.
 	if (auto Widget = Cast<UInteractionWidget>(InteractionWidget->GetUserWidgetObject()))
 	{
-		Widget->UpdateInteraction(Data->ItemType, Data->InteractionKey);
-		InteractionWidget->SetVisibility(bIsStarted);
+		if (Data)
+		{
+			Widget->UpdateInteraction(Data->ItemType, Data->InteractionKey);
+			InteractionWidget->SetVisibility(bIsStarted);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("데이터가 설정되어 있지 않은 아이템"));
+		}
+	
 	}
 }
 

@@ -12,6 +12,13 @@ void AThirdPersonPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	
+}
+
+void AThirdPersonPlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
 	if (UUISubSystem* UISystem = UUISubSystem::Get(this))
 	{
 		UISystem->ShowWidget(EWidgetType::HUD);

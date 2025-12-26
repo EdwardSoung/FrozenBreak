@@ -28,8 +28,14 @@ public:
 
 	void DoAction_Implementation();
 
+	UFUNCTION()
 	inline void SetPlayerCurrentTool(EItemType InType) { PlayerCurrentTool = InType; }
 
+	UFUNCTION()
+	AActor* GetCurrentInteractionActor() const;
+
+	UFUNCTION()
+	EItemType GetCurrentActorInteractableToolType();
 private:
 	// 바라본 대상이 WorldProp / Item 인지 구분해주는 함수
 	void ProcessInteractableTarget();

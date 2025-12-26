@@ -39,6 +39,8 @@
 #include "Tools/AxeActor.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "Data/PropData.h"
+
 
 // Sets default values
 AActionCharacter::AActionCharacter()
@@ -509,6 +511,28 @@ void AActionCharacter::OnInteration()
 	if (bLandingLocked)
 		return;
 
+	// 플레이어가 PendingHarvest(Mining)Target을 직접 설정할떄의 코드
+	// 반대되는 코드는 Interaction Component -> DoAction()에 있다.
+	if (InteractionComponent)
+	{
+		if (AActor* FocusedActor = InteractionComponent->GetCurrentInteractionActor())
+		{
+			const EItemType ToolType = InteractionComponent->GetCurrentActorInteractableToolType();
+
+			if (FocusedActor)
+			{
+				if (CurrentHeldItemType == EItemType::Axe && ToolType == EItemType::Axe)
+				{
+					SetPendingHarvestTarget(FocusedActor);
+				}
+				if (CurrentHeldItemType == EItemType::Pickaxe && ToolType == EItemType::Pickaxe)
+				{
+					SetPendingMiningTarget(FocusedActor);
+				}
+			}
+		}
+	}
+
 	const bool bToolStarted = OnToolActionStarted();
 	if (bToolStarted)
 		return;
@@ -686,6 +710,10 @@ void AActionCharacter::HandEquip(UInventoryItem* InItem)
 {
 	if (CurrentTools)
 	{
+		// 도구가 내구도가 닳아 없어지면 End~~~() 실행 (End~~~() 안되면 카메라가 안 돌아온다)
+		if (bIsHarvesting) { EndHarvest(); }
+		if (bIsMining) { EndMining(); }
+
 		CurrentTools->Destroy();
 		CurrentTools = nullptr;
 		SetHeldItemType(EItemType::None);
@@ -934,19 +962,19 @@ void AActionCharacter::OnActionPressed()
 {
 
 	UE_LOG(LogTemp, Warning, TEXT("[INPUT] Pressed!"));
-	bIsActionHeld = true;
+	//bIsActionHeld = true;
 
 	// 누르면 Start부터 재생 시작
-	PlayActionMontage_Start();
+	//PlayActionMontage_Start();
 }
 
 void AActionCharacter::OnActionReleased()
 {
 	UE_LOG(LogTemp, Warning, TEXT("[INPUT] Released!"));
-	bIsActionHeld = false;
+	//bIsActionHeld = false;
 
 	// 떼면 End로 빠져나감
-	JumpToEndSection_IfPlaying();
+	//JumpToEndSection_IfPlaying();
 }
 
 UAnimInstance* AActionCharacter::GetMyAnimInstance() const

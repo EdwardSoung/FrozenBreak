@@ -415,12 +415,12 @@ void AWorldProp::BedActionWidgetFinished()
 	}
 }
 
-inline EItemType AWorldProp::GetInteractableToolType() const
+EItemType AWorldProp::GetInteractableToolType() const
 {
 	return Data->InteractableToolType;
 }
 
-inline EPropType AWorldProp::GetPropType() const
+EPropType AWorldProp::GetPropType() const
 {
 	return Data->PropType;
 }

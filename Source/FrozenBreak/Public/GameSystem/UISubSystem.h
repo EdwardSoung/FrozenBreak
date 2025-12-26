@@ -22,7 +22,7 @@ public:
 	static UUISubSystem* Get(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintCallable)
-	UUserWidget* ShowWidget(EWidgetType InWidgetType);
+	UUserWidget* ShowWidget(EWidgetType InWidgetType, EInputModeType InInputMode = EInputModeType::GameAndUI);
 
 	UFUNCTION(BlueprintCallable)
 	void HideWidget(EWidgetType InWidgetType);
@@ -35,5 +35,5 @@ private:
 	UPROPERTY()
 	TMap<EWidgetType, UUserWidget*> OpenedWidgets;
 
-	TObjectPtr<class APlayerController> CurrentPlayerController = nullptr;
+	TWeakObjectPtr<class APlayerController> CurrentPlayerController = nullptr;
 };

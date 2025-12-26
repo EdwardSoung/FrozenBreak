@@ -32,10 +32,10 @@ public:
 	void InitStat(float InAttack, float InHealth);
 
 	UFUNCTION(BlueprintPure, Category = "Prop|Data")
-	inline EItemType GetInteractableToolType() const;
+	EItemType GetInteractableToolType() const;
 	
 	UFUNCTION(BlueprintPure, Category = "Prop|Data")
-	inline EPropType GetPropType() const;
+	EPropType GetPropType() const;
 
 	virtual void CampfireAction() {};
 private:
