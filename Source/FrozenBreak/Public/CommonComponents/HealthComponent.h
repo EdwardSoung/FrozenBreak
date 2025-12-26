@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CommonComponents/StatComponent.h"
+#include "Components/AudioComponent.h"
 #include "HealthComponent.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -42,5 +43,32 @@ protected:
 	// ------------------------------------------------------------------------------|	
 
 private:
+
+protected:
+	// 심장박동 사운드
+	UPROPERTY(EditAnywhere, Category = "Stat|Health|Sound")
+	USoundBase* LowHealthHeartbeatSound = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Stat|Health|Sound") // 체력이 20%에 가까우면 소리가 작아지고
+	float HeartbeatVolumeMin = 0.15f;
+
+	UPROPERTY(EditAnywhere, Category = "Stat|Health|Sound") // 0%로 갈수록 소리가 커짐
+	float HeartbeatVolumeMax = 0.9f;
+
+	UPROPERTY(EditAnywhere, Category = "Stat|Health|Sound") // 피치로 긴박한 느낌조절
+	float HeartbeatPitchMin = 1.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Stat|Health|Sound")
+	float HeartbeatPitchMax = 1.35f;
+
+	// 실제 재생용 컴포넌트
+	UPROPERTY()
+	UAudioComponent* HeartbeatAudioComponent = nullptr;
+
+	// 현재 저체력 상태인지
+	bool bIsLowHealth = false;
+
+	// 임계 비율
+	float LowHealthThreshold = 0.2f;
 
 };
