@@ -33,4 +33,5 @@ void UEquipmentSlotWidget::RefreshSlot(UInventoryItem* InItem)
 void UEquipmentSlotWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+	RefreshSlot(nullptr);
 }
