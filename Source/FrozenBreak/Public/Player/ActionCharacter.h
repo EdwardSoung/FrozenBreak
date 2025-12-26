@@ -223,6 +223,22 @@ protected: // 아이템 관련
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Test")
 	bool InvincibleTester = true; // 테스트용 무적 플래그
 
+private:
+	// 캐릭터 기본 걷기 속도(원본) 저장
+	UPROPERTY()
+	float BaseWalkSpeed = 0.0f;
+
+	// 인벤 무게 업데이트 수신
+	UFUNCTION()
+	void OnInventoryWeightUpdated(float InWeight, float InMaxWeight);
+
+	// 비율 기준값들 
+    UPROPERTY(EditAnywhere, Category = "Movement|WeightPenalty")
+	float BlockThreshold = 1.0f;      // 100% (초과면 이동불가)
+
+	UPROPERTY(EditAnywhere, Category = "Movement|WeightPenalty")
+	float SlowThreshold = 0.7f;      // 70%
+
 protected:
 	// ===== Input Functions =====
 	void OnMove(const FInputActionValue& Value);

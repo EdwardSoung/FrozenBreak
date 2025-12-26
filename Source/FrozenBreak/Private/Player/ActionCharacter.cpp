@@ -140,6 +140,19 @@ void AActionCharacter::BeginPlay()
 				PC->PlayerCameraManager->ViewPitchMax = 45.0f;
 			}
 		}
+		if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+		{
+			BaseWalkSpeed = MoveComp->MaxWalkSpeed;
+		}
+
+		// 인벤 무게 숫자 이벤트 바인딩
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		{
+			EventSystem->Character.OnUpdateInventoryWeight.AddDynamic(
+				this,
+				&AActionCharacter::OnInventoryWeightUpdated
+			);
+		}
 	}
 
 	OnTakeAnyDamage.AddDynamic(this, &AActionCharacter::OnPlayerTakeDamage);
@@ -335,6 +348,7 @@ void AActionCharacter::Landed(const FHitResult& Hit) // 착지
 
 
 
+
 // ===== Movement =====
 void AActionCharacter::OnMove(const FInputActionValue& Value)
 {
@@ -382,6 +396,47 @@ void AActionCharacter::OnMove(const FInputActionValue& Value)
 
 	AddMovementInput(GetActorForwardVector(), Input.Y);
 	AddMovementInput(GetActorRightVector(), Input.X);
+}
+
+
+void AActionCharacter::OnInventoryWeightUpdated(float InWeight, float InMaxWeight)
+{
+	if (InMaxWeight <= 0.0f)
+	{
+		return;
+	}
+
+	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
+	if (!MoveComp)
+	{
+		return;
+	}
+
+	// 혹시 BaseWalkSpeed가 0으로 들어왔으면 한 번 더 잡아둠
+	if (BaseWalkSpeed <= 0.0f)
+	{
+		BaseWalkSpeed = MoveComp->MaxWalkSpeed;
+	}
+
+	const float Ratio = InWeight / InMaxWeight;
+
+	// 100% 초과면 이동 불가
+	if (Ratio > BlockThreshold)
+	{
+		MoveComp->StopMovementImmediately();
+		MoveComp->MaxWalkSpeed = 0.0f;
+		return;
+	}
+
+	// 70% 이상이면 속도 50%
+	if (Ratio >= SlowThreshold)
+	{
+		MoveComp->MaxWalkSpeed = BaseWalkSpeed * BlockThreshold;
+		return;
+	}
+
+	// 정상
+	MoveComp->MaxWalkSpeed = BaseWalkSpeed;
 }
 
 
