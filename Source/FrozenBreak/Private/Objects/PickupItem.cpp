@@ -105,6 +105,10 @@ void APickupItem::OnSelect_Implementation(bool bIsStarted)
 		Widget->UpdateInteraction(Data->ItemType, Data->InteractionKey);
 		InteractionWidget->SetVisibility(bIsStarted);
 	}
+	else
+	{
+		return;
+	}
 }
 
 void APickupItem::SetExistValues(int32 InAmount, float InDurability)

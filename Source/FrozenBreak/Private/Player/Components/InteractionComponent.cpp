@@ -235,6 +235,19 @@ EItemType UInteractionComponent::GetCurrentActorInteractableToolType()
 
 void UInteractionComponent::ProcessInteractableTarget()
 {
+	// 이미 표시 중인 동일 액터에 대한 중복 호출 방지
+	if (bIsInteracting && CurrentInteractionActor == LastInteractionActor)
+	{
+		return;
+	}
+
+	// 현재 액터가 유효하고 인터페이스를 구현했는지 확인
+	if (!IsValid(CurrentInteractionActor) ||
+		!CurrentInteractionActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+	{
+		return;
+	}
+
 	// 바라보고 있는 대상이 일반 바위 / 나무 일 때
 	if (const AWorldProp* Prop = Cast<AWorldProp>(CurrentInteractionActor))
 	{
