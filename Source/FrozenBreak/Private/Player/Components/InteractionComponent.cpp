@@ -30,17 +30,12 @@ void UInteractionComponent::BeginPlay()
 
 	ComponentOwner = GetOwner();
 	Camera = ComponentOwner->FindComponentByClass<UCameraComponent>();
-	if (ComponentOwner && Camera)
-	{
-
-	}
-	else
+	if (!ComponentOwner && !Camera)
 	{
 		// 이런 일이 있을 수가 있나
 		UE_LOG(LogTemp, Warning, TEXT("플레이어 혹은 카메라 컴포넌트가 없습니다"));
 		return;
 	}
-
 }
 
 
@@ -173,6 +168,7 @@ void UInteractionComponent::DoAction_Implementation() // 플레이어가 상호�
 				// 바라보는게 나무 / 바위이면 그냥 리턴. 나무나 바위면 플레이어쪽에서 알아서 한다.
 				if (Prop->GetPropType() == EPropType::Tree || Prop->GetPropType() == EPropType::Rock)
 				{
+					// InteractionComponent가 PendingHarvest(Mining)Target을 Set 해줄때의 코드
 					//if (AActionCharacter* Player = Cast<AActionCharacter>(UGameplayStatics::GetPlayerPawn(this, 0)))
 					//{
 					//	if (Prop->GetPropType() == EPropType::Tree)
@@ -194,6 +190,7 @@ void UInteractionComponent::DoAction_Implementation() // 플레이어가 상호�
 			{
 				if (EscapeProp->GetPropType() == EPropType::Rock)
 				{
+					// InteractionComponent가 PendingMiningTarget을 Set 해줄때의 코드
 					//if (AActionCharacter* Player = Cast<AActionCharacter>(UGameplayStatics::GetPlayerPawn(this, 0)))
 					//{
 					//	Player->SetPendingMiningTarget(CurrentInteractionActor);
@@ -218,6 +215,19 @@ void UInteractionComponent::DoAction_Implementation() // 플레이어가 상호�
 			return;
 		}
 	}
+}
+
+AActor* UInteractionComponent::GetCurrentInteractionActor() const
+{
+	if (BetweenDistance <= ActivateInteractDistance)
+	{
+		return CurrentInteractionActor;
+	}
+	else
+	{
+		return nullptr;
+	}
+	
 }
 
 EItemType UInteractionComponent::GetCurrentActorInteractableToolType()

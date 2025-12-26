@@ -508,6 +508,8 @@ void AActionCharacter::OnInteration()
 	if (bLandingLocked)
 		return;
 
+	// 플레이어가 PendingHarvest(Mining)Target을 직접 설정할떄의 코드
+	// 반대되는 코드는 Interaction Component -> DoAction()에 있다.
 	if (InteractionComponent)
 	{
 		if (AActor* FocusedActor = InteractionComponent->GetCurrentInteractionActor())
