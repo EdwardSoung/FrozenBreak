@@ -588,9 +588,10 @@ void AActionCharacter::OnInteration()
 		}
 	}
 
-	const bool bToolStarted = OnToolActionStarted();
-	if (bToolStarted)
+	if (bIsMining || bIsHarvesting)
 		return;
+
+	OnToolActionStarted();
 
 	IInteractable::Execute_DoAction(InteractionComponent);
 }
