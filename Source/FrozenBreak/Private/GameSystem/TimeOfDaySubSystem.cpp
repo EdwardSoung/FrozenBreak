@@ -18,6 +18,7 @@ void UTimeOfDaySubSystem::Initialize(FSubsystemCollectionBase& Collection)
 	if (UGameManager* GameMgr = UGameManager::Get(this))
 	{
 		TimeNormalized = GameMgr->GetInGameStartTime();
+		EventSystem->Status.OnDayChanged.Broadcast(Day);
 	}
 }
 
@@ -40,6 +41,8 @@ void UTimeOfDaySubSystem::Tick(float DeltaTime)
 	TimeNormalized += DeltaTime / DayLengthSeconds;
 	if (TimeNormalized >= 1.0f)
 	{
+		Day++;
+		EventSystem->Status.OnDayChanged.Broadcast(Day);
 		TimeNormalized = FMath::Fmod(TimeNormalized, 1.0f);
 	}
 

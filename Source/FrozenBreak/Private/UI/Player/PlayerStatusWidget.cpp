@@ -21,6 +21,7 @@ void UPlayerStatusWidget::NativeConstruct()
 		statusEvent->Status.OnTemperatureDefenceChanged.AddDynamic(this, &UPlayerStatusWidget::SetTemperatureDefence);
 		statusEvent->Character.OnEquipHandItem.AddDynamic(this, &UPlayerStatusWidget::SetHandEquipment);
 		statusEvent->Character.OnEquipBodyItem.AddDynamic(this, &UPlayerStatusWidget::SetBodyEquipment);
+		statusEvent->Status.OnDayChanged.AddDynamic(this, &UPlayerStatusWidget::SetDay);
 	}
 	CloseStatButton->OnClicked.AddDynamic(this, &UPlayerStatusWidget::HideWidget);
 }
@@ -89,6 +90,11 @@ void UPlayerStatusWidget::HideWidget()
 	{
 		UISystem->HideWidget(EWidgetType::CharacterState);
 	}
+}
+
+void UPlayerStatusWidget::SetDay(int32 InDay)
+{
+	DayText->SetText(FText::AsNumber(InDay));
 }
 
 

@@ -64,4 +64,6 @@ private:
 	TWeakObjectPtr<class ADirectionalLight> CachedDirectionalLight;
 
 	float SunPitchOffsetDeg = 15.0f; // 6시에 태양을 지평선보다 15도 위로
+
+	int32 Day = 1;
 };

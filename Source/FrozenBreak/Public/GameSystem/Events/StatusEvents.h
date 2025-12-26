@@ -14,6 +14,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHungerPointChanged, float, InCurr
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInGameTimeChanged, FText, InTime);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTemperatureDefenceChanged, FText, InDefenceValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCurrentCraftCostChanged, float, InCurrentCraftCost);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDayChanged, int32, InDay);
 
 // 스테이터스 값 세팅 델리게이트
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSetHealth, float, InHealthValue);
@@ -69,4 +70,6 @@ struct FStatusEvents
 	// 작업량 변화량
 	UPROPERTY(BlueprintAssignable)
 	FOnCurrentCraftCostChanged OnCurrentCraftCostChanged;
+
+	FOnDayChanged OnDayChanged;
 };

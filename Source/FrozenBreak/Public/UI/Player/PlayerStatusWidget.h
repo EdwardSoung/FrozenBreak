@@ -34,6 +34,9 @@ protected:
 	UFUNCTION()
 	void HideWidget();
 
+	UFUNCTION()
+	void SetDay(int32 InDay);
+
 public:
 	void OpenWidget_Implementation();
 	void CloseWidget_Implementation();
@@ -53,6 +56,8 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))	
 	TObjectPtr<class UButton> CloseStatButton = nullptr;
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UTextBlock> DayText = nullptr;
 private:
 	// 초기화용 기본 아이콘 : null
 	UTexture2D* DefaultItemIcon = nullptr;
