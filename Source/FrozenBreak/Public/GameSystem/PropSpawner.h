@@ -24,7 +24,7 @@ protected:
 
     // 생성할 블루프린트 클래스
     UPROPERTY(EditAnywhere, Category = "Settings")
-    TSubclassOf<AActor> ActorToSpawn;
+    TArray<TSubclassOf<AActor>> ActorToSpawn;
 
     // 몇 개나 뿌릴지
     UPROPERTY(EditAnywhere, Category = "Settings")

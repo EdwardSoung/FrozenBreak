@@ -21,7 +21,7 @@ APropSpawner::APropSpawner()
 
 void APropSpawner::SpawnActors()
 {
-    if (!ActorToSpawn) return;
+    if (ActorToSpawn.Num() <= 0) return;
 
     // 박스의 원점과 크기(반지름 개념) 가져오기
     FVector Origin = SpawnVolume->GetComponentLocation();
@@ -60,8 +60,12 @@ void APropSpawner::SpawnActors()
             {
                 SpawnRotation.Yaw = FMath::RandRange(0.0f, 360.0f);
             }
+            
+            //랜덤 한개 가져오기
+            int32 RandomIndex = FMath::RandRange(0, ActorToSpawn.Num() - 1);
+            auto SpawnActor = ActorToSpawn[RandomIndex];
 
-            AActor* NewActor = GetWorld()->SpawnActor<AActor>(ActorToSpawn, HitResult.Location, SpawnRotation);
+            AActor* NewActor = GetWorld()->SpawnActor<AActor>(SpawnActor, HitResult.Location, SpawnRotation);
 
             if (NewActor)
             {

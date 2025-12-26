@@ -100,13 +100,15 @@ protected:
 
 protected:
 	// 작업시 소모시킬 피로도 (최종(확정된) 값이 아님)
-	const float FatigueCostPerWork = -0.5f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Data")
+	float FatigueCostPerWork = -0.5f;
 
 	// 침대 사용시 회복시킬 피로도 (최대치)
 	const float FatigueRecoveryAmount = 100.f;
 
 	// 침대 사용시 감소시킬 배고픔
-	const float HungerReductionAmount = -30.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Data")
+	float HungerReductionAmount = -30.f;
 
 	bool bIsBedTime = false;
 
@@ -117,9 +119,11 @@ protected:
 	float MaxDurability = 0;
 
 	// Rock 용 StoneSpawnCount. Stone 을 몇번 생성 시켰냐
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Prop|Data")
 	int32 CurrentSpawnCount = 0;
 	// Stone이 MaxSpawnCount가 되면 Rock은 파괴 됨.
-	const int32 MaxSpawnCount = 10;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Data")
+	int32 MaxSpawnCount = 10;
 
 	// BedActionWidget에 보낼 n일차 텍스트
 	int32 DayCount = 0;
