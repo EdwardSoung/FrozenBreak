@@ -685,6 +685,7 @@ void AActionCharacter::OnHarvestHit()
 		{
 			UGameplayStatics::PlaySoundAtLocation(this, AxeHitSound, PendingHarvestImpactPoint);
 		}
+		IInteractable::Execute_DoAction(Target);
 	}
 }
 
