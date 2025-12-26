@@ -701,6 +701,10 @@ void AActionCharacter::HandEquip(UInventoryItem* InItem)
 {
 	if (CurrentTools)
 	{
+		// 도구가 내구도가 닳아 없어지면 End~~~() 실행 (End~~~() 안되면 카메라가 안 돌아온다)
+		if (bIsHarvesting) { EndHarvest(); }
+		if (bIsMining) { EndMining(); }
+
 		CurrentTools->Destroy();
 		CurrentTools = nullptr;
 		SetHeldItemType(EItemType::None);
