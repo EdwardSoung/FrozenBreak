@@ -395,7 +395,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Hit|Montage")
 	bool bAvoidSameHitMontage = true;
 
+
 	int32 LastHitMontageIndex = INDEX_NONE;
+	
 public: // 무기쪽
 	UPROPERTY(EditDefaultsOnly, Category = "Combat|Montage")
 	TObjectPtr<class UAnimMontage> UnarmedAttackMontage;
