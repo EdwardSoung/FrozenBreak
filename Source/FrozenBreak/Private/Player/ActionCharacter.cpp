@@ -695,39 +695,65 @@ void AActionCharacter::OnHarvestHit()
 void AActionCharacter::OnPickaxeStarted() // 곡괭이 전용
 {
 	
-	if (GetCharacterMovement()->IsFalling())
+	// 공중이면 채굴 금지
+	if (GetCharacterMovement() && GetCharacterMovement()->IsFalling())
 	{
-		
 		return;
 	}
 
-	if (bIsMining)
+	// 필수 체크
+	if (!PickaxeMontage)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Mining] PickaxeMontage is NULL"));
 		return;
+	}
 
-	
+	UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	if (!Anim)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Mining] AnimInstance is NULL"));
+		return;
+	}
 
+	// 이미 이 몽타주 재생 중이면 연타 무시
+	if (Anim->Montage_IsPlaying(PickaxeMontage))
+	{
+		UE_LOG(LogTemp, Verbose, TEXT("[Mining] PickaxeMontage already playing -> ignore"));
+		return;
+	}
+
+	// 상태 플래그로도 한번 더 방어
+	if (bIsMining)
+	{
+		return;
+	}
+
+	// 여기서부터 "채굴 시작" 확정
 	bIsMining = true;
 
-	if (GetCharacterMovement())
+	// 이동 잠금 (원래 속도 저장)
+	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
 	{
-		GetCharacterMovement()->MaxWalkSpeed = 0.0f; // 채굴시 움직이지 못하게 
+		SavedWalkSpeed = MoveComp->MaxWalkSpeed;
+		MoveComp->MaxWalkSpeed = 0.0f;
+		bMoveLockedByMining = true;
 	}
+
+	// Yaw 잠금(마우스로 캐릭터 회전 금지)
 	if (!bToolYawLocked)
 	{
 		SaveToolLockSnapshot();
-		bUseControllerRotationYaw = false;      // 캐릭터가 마우스에 안 돌아감
+		bUseControllerRotationYaw = false;
 		bToolYawLocked = true;
 	}
 
+	// EndDelegate는 "이번 재생 1회"에만 걸리게 세팅
+	FOnMontageEnded EndDel;
+	EndDel.BindUObject(this, &AActionCharacter::OnToolMontageEnded);
+	Anim->Montage_SetEndDelegate(EndDel, PickaxeMontage);
 
-	if (UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr)
-	{
-		FOnMontageEnded EndDel;
-		EndDel.BindUObject(this, &AActionCharacter::OnToolMontageEnded); 
-		Anim->Montage_SetEndDelegate(EndDel, PickaxeMontage);            
-	}
-
-	PlayAnimMontage(PickaxeMontage);
+	// 몽타주 재생
+	Anim->Montage_Play(PickaxeMontage);
 
 }
 

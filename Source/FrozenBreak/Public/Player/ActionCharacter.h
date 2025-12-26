@@ -207,6 +207,11 @@ protected: // 곡괭이질
 
 	UPROPERTY(EditAnywhere, Category = "Mining|Sound")
 	USoundBase* PickaxeHitSound = nullptr;
+	
+	float SavedWalkSpeed = 0.0f;
+
+	// 채굴 중 이동 잠금 걸려있는지 (안전장치)
+	bool bMoveLockedByMining = false;
 
 protected: // 아이템 관련
 
