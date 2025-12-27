@@ -82,3 +82,12 @@ enum class EInputModeType : uint8
 	UIOnly,
 	GameAndUI,
 };
+
+UENUM(BlueprintType)
+enum class EGameState : uint8
+{
+	Lobby,
+	Playing,
+	Fail,
+	Success,
+};

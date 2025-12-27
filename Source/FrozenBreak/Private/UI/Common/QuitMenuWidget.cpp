@@ -3,11 +3,13 @@
 
 #include "UI/Common/QuitMenuWidget.h"
 #include "Components/Button.h"
+#include "GameSystem/FrozenForestGameState.h"
 #include <GameSystem/EventSubSystem.h>
 
 void UQuitMenuWidget::NativeConstruct()
 {
 	ResumeButton->OnClicked.AddDynamic(this, &UQuitMenuWidget::OnResumeClicked);
+	QuitButton->OnClicked.AddDynamic(this, &UQuitMenuWidget::OnQuitClicked);
 }
 
 void UQuitMenuWidget::OnResumeClicked()
@@ -21,6 +23,9 @@ void UQuitMenuWidget::OnResumeClicked()
 
 void UQuitMenuWidget::OnQuitClicked()
 {
-	//UKismetSystemLibrary::QuitGame(GetWorld(), GetWorld()->GetFirstPlayerController(), EQuitPreference::Quit);
-	//씬 전환..메뉴로
+	auto State = GetWorld()->GetGameState<AFrozenForestGameState>();
+	if (State)
+	{
+		State->SetGameState(EGameState::Lobby);
+	}
 }

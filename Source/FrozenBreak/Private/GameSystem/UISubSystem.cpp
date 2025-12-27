@@ -128,3 +128,11 @@ bool UUISubSystem::IsOpenedWidget(EWidgetType InWidgetType)
 {
 	return OpenedWidgets.Contains(InWidgetType);
 }
+
+void UUISubSystem::HideAllWiget()
+{
+	for (auto opened : OpenedWidgets)
+	{
+		HideWidget(opened.Key);
+	}
+}

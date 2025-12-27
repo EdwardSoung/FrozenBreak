@@ -203,13 +203,23 @@ void AWorldProp::TreeAction()
 		{
 			const float ZGap = 75.f;
 
+			for (auto GenItem : Data->GenerateItems)
+			{
+				int32 GenCount = FMath::RandRange(1, GenItem.Value);
+				for (int32 i = 0; i < GenCount; ++i)
+				{
+					const FVector SpawnLocation = GetActorLocation() + FVector(0.f, 0.f, ZGap * i);
+
+					Factory->Spawn(GenItem.Key, SpawnLocation);
+				}
+			}
 			// Timber가 ZGap 만큼 Z축으로 벌어져서 스폰시키게 함 (꼴랑 하나만 나오는 것이 아니니까)
-			for (int32 i = 0; i < Data->GenerateItemCount; ++i)
+			/*for (int32 i = 0; i < Data->GenerateItemCount; ++i)
 			{
 				const FVector SpawnLocation = GetActorLocation() + FVector(0.f, 0.f, ZGap * i);
 
 				Factory->Spawn(Data->GenerateItemType, SpawnLocation, i);
-			}
+			}*/
 		}
 		else
 		{
@@ -270,37 +280,46 @@ void AWorldProp::RockAction()
 				FVector SpawnLocation = GetActorLocation() + FVector(0, 0, 85);
 
 				// ItemFactory로 스폰, 밑에 작업을 위해 저장해놓는다
-				APickupItem* SpawnedItem = Factory->Spawn(Data->GenerateItemType, SpawnLocation, Data->GenerateItemCount);
-
-				// 스폰된 아이템을 플레이어 쪽으로 튀게 해주는 작업
-				if (SpawnedItem)
+				for (auto GenItem : Data->GenerateItems)
 				{
-					// 플레이어 위치
-					AActor* Player = UGameplayStatics::GetPlayerPawn(this, 0);
-					const FVector PlayerLocation = Player->GetActorLocation();
-
-					// 방향 벡터
-					FVector LaunchDirection = (PlayerLocation - SpawnLocation).GetSafeNormal();
-
-					// 약간 위로 튀게
-					LaunchDirection = (LaunchDirection + FVector(0, 0, 1.f)).GetSafeNormal();
-
-					// 얼마나 세게?
-					const float ImpulseStrength = 750.f;
-
-					// 스폰된 아이템 클래스 안에 있는 메시를 가져온다
-					if (UStaticMeshComponent* SpawnedItemMesh = Cast<UStaticMeshComponent>(
-						SpawnedItem->GetComponentByClass(UStaticMeshComponent::StaticClass())))
+					int32 GenCount = FMath::RandRange(1, GenItem.Value);
+					for (int32 i = 0; i < GenCount; i++)
 					{
-						// 그 메시가 물리 시뮬레이션을 하고있지 않으면 
-						// (PickupItem 클래스에서 설정은 했지만 이중으로 보장)
-						if (!SpawnedItemMesh->IsSimulatingPhysics())
+						APickupItem* SpawnedItem = Factory->Spawn(GenItem.Key, SpawnLocation);
+
+						// 스폰된 아이템을 플레이어 쪽으로 튀게 해주는 작업
+						if (SpawnedItem)
 						{
-							SpawnedItemMesh->SetSimulatePhysics(true);
+							// 플레이어 위치
+							AActor* Player = UGameplayStatics::GetPlayerPawn(this, 0);
+							const FVector PlayerLocation = Player->GetActorLocation();
+
+							// 방향 벡터
+							FVector LaunchDirection = (PlayerLocation - SpawnLocation).GetSafeNormal();
+
+							// 약간 위로 튀게
+							LaunchDirection = (LaunchDirection + FVector(0, 0, 1.f)).GetSafeNormal();
+
+							// 얼마나 세게?
+							const float ImpulseStrength = 750.f;
+
+							// 스폰된 아이템 클래스 안에 있는 메시를 가져온다
+							if (UStaticMeshComponent* SpawnedItemMesh = Cast<UStaticMeshComponent>(
+								SpawnedItem->GetComponentByClass(UStaticMeshComponent::StaticClass())))
+							{
+								// 그 메시가 물리 시뮬레이션을 하고있지 않으면 
+								// (PickupItem 클래스에서 설정은 했지만 이중으로 보장)
+								if (!SpawnedItemMesh->IsSimulatingPhysics())
+								{
+									SpawnedItemMesh->SetSimulatePhysics(true);
+								}
+								SpawnedItemMesh->AddImpulseAtLocation((LaunchDirection * ImpulseStrength), SpawnLocation);
+							}
 						}
-						SpawnedItemMesh->AddImpulseAtLocation((LaunchDirection * ImpulseStrength), SpawnLocation);
 					}
+					
 				}
+				
 				CurrentDurability = MaxDurability;
 				CurrentSpawnCount++;
 				Durability->SetDurabilityProgress(GetDurabilityRadio());
