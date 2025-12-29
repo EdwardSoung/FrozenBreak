@@ -14,6 +14,7 @@ enum class EWidgetType : uint8
 	CharacterState,
 	QuitMenu,
 	Lobby,
+	PlayResult,
 };
 
 

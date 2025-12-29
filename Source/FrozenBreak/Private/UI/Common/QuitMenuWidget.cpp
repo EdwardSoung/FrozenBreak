@@ -5,11 +5,14 @@
 #include "Components/Button.h"
 #include "GameSystem/FrozenForestGameState.h"
 #include <GameSystem/EventSubSystem.h>
+#include <Kismet/KismetSystemLibrary.h>
 
 void UQuitMenuWidget::NativeConstruct()
 {
 	ResumeButton->OnClicked.AddDynamic(this, &UQuitMenuWidget::OnResumeClicked);
+	RecipeButton->OnClicked.AddDynamic(this, &UQuitMenuWidget::OnRecipeClicked);
 	QuitButton->OnClicked.AddDynamic(this, &UQuitMenuWidget::OnQuitClicked);
+	LobbyButton->OnClicked.AddDynamic(this, &UQuitMenuWidget::OnLobbyClicked);
 }
 
 void UQuitMenuWidget::OnResumeClicked()
@@ -21,11 +24,21 @@ void UQuitMenuWidget::OnResumeClicked()
 	}
 }
 
-void UQuitMenuWidget::OnQuitClicked()
+void UQuitMenuWidget::OnRecipeClicked()
+{
+
+}
+
+void UQuitMenuWidget::OnLobbyClicked()
 {
 	auto State = GetWorld()->GetGameState<AFrozenForestGameState>();
 	if (State)
 	{
 		State->SetGameState(EGameState::Lobby);
 	}
+}
+
+void UQuitMenuWidget::OnQuitClicked()
+{
+	UKismetSystemLibrary::QuitGame(GetWorld(), GetWorld()->GetFirstPlayerController(), EQuitPreference::Quit, true);
 }
