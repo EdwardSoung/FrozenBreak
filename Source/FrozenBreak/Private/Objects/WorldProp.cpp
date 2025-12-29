@@ -44,7 +44,7 @@ AWorldProp::AWorldProp()
 
 	InteractionWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("TextWidget"));
 	InteractionWidget->SetupAttachment(RootComponent);
-	InteractionWidget->SetRelativeLocation(FVector(0, 0, 0));
+	InteractionWidget->SetRelativeLocation(FVector(0, 0, 25));
 	InteractionWidget->SetWidgetSpace(EWidgetSpace::Screen);
 	InteractionWidget->SetVisibility(false);
 
@@ -59,6 +59,8 @@ AWorldProp::AWorldProp()
 void AWorldProp::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	EventSystem = UEventSubSystem::Get(this);
 	if (!EventSystem)
@@ -76,8 +78,7 @@ void AWorldProp::BeginPlay()
 void AWorldProp::DoAction_Implementation()
 {
 	UE_LOG(LogTemp, Log, TEXT("WorldProp : 인터페이스 받았음"));
-	// 주석 == ToDo
-	// 어느정도 작성되면 타입별로 분리해 함수로 뺄 예정
+
 	if (Data)
 	{
 		if (Data->PropType == EPropType::Tree)
@@ -120,8 +121,6 @@ void AWorldProp::DoAction_Implementation()
 		}
 		if (Data->PropType == EPropType::Campfire)
 		{
-			// HUD : 요리 UI를 띄워야 한다.
-			// 중복실행을 막아야 함
 			CampfireAction();
 			UE_LOG(LogTemp, Log, TEXT("모닥불과 상호작용"));
 			return;
@@ -153,7 +152,6 @@ void AWorldProp::OnSelect_Implementation(bool bIsStarted)
 
 void AWorldProp::TreeAction()
 {
-	// 중복실행을 막아야 함
 	UE_LOG(LogTemp, Log, TEXT("나무와 상호작용"));
 
 	if (EventSystem)
@@ -210,13 +208,6 @@ void AWorldProp::TreeAction()
 					Factory->Spawn(GenItem.Key, SpawnLocation);
 				}
 			}
-			// Timber가 ZGap 만큼 Z축으로 벌어져서 스폰시키게 함 (꼴랑 하나만 나오는 것이 아니니까)
-			/*for (int32 i = 0; i < Data->GenerateItemCount; ++i)
-			{
-				const FVector SpawnLocation = GetActorLocation() + FVector(0.f, 0.f, ZGap * i);
-
-				Factory->Spawn(Data->GenerateItemType, SpawnLocation, i);
-			}*/
 		}
 		else
 		{
@@ -230,8 +221,6 @@ void AWorldProp::TreeAction()
 
 void AWorldProp::RockAction()
 {
-	// Player : 채굴하는 애님
-	// 중복실행을 막아야 함
 	UE_LOG(LogTemp, Log, TEXT("바위와 상호작용"));
 
 	if (EventSystem)
@@ -341,7 +330,6 @@ void AWorldProp::RockAction()
 
 void AWorldProp::BedAction()
 {
-	// BedActionWidget 띄우기
 	if (BedActionWidgetClass)
 	{
 		if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0))

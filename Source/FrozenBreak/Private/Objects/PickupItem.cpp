@@ -27,6 +27,7 @@ APickupItem::APickupItem()
 	SetRootComponent(Mesh);
 
 	// 트레이스가 맞고, 물리 시뮬레이션을 하도록 쿼리와 피직스 활성화
+	Mesh->SetCollisionProfileName(TEXT("Custom"));
 	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	// 플레이어(캐릭터) 채널 무시
@@ -48,6 +49,8 @@ APickupItem::APickupItem()
 void APickupItem::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		
 	EventSystem = UEventSubSystem::Get(this);
 	if (!EventSystem)
@@ -65,10 +68,6 @@ void APickupItem::BeginPlay()
 			{
 				Attack = *AttackStats;
 			}
-			else
-			{
-				UE_LOG(LogTemp, Log, TEXT("아이템에 Attack 스텟이 설정되어 있지 않거나, 필요없는 아이템 입니다."));
-			}
 			// 데이터 에셋에 작성된 데이터를 StatComponent로 보낸다.
 			StatComponent->InitStat(ExistDurability, Data->Durability, Attack);
 		}
@@ -84,7 +83,8 @@ void APickupItem::DoAction_Implementation() // 아이템을 획득
 	if (Data)
 	{
 		// 플레이어 Inventory Component에 Item List가 세팅되어 있어야 한다.
-		EventSystem->Character.OnGetPickupItem.Broadcast(Data->ItemType, ExistAmount > 0 ? ExistAmount : 1, ExistDurability > 0 ? ExistDurability : 0);
+		EventSystem->Character.OnGetPickupItem.Broadcast(
+			Data->ItemType, ExistAmount > 0 ? ExistAmount : 1, ExistDurability > 0 ? ExistDurability : 0);
 
 		SetActorHiddenInGame(true);
 		SetLifeSpan(0.001f);
