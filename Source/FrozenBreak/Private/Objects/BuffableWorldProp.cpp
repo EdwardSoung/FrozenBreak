@@ -22,11 +22,19 @@ ABuffableWorldProp::ABuffableWorldProp()
 
 void ABuffableWorldProp::OnSelect_Implementation(bool bIsStarted)
 {
-	if (Meets.IsEmpty() || Meets[0]->GetAmount() <= 0)
+	bool MeetAvailable = false;
+	if (!Meets.IsEmpty())
 	{
-		return;
+		for (auto& SingleMeet : Meets)
+		{
+			if (SingleMeet->GetAmount() > 0)
+			{
+				MeetAvailable = true;
+				break;
+			}
+		}
 	}
-	Super::OnSelect_Implementation(bIsStarted);
+	if (MeetAvailable) Super::OnSelect_Implementation(bIsStarted);
 }
 
 void ABuffableWorldProp::BeginPlay()
@@ -45,8 +53,16 @@ void ABuffableWorldProp::BeginPlay()
 		{
 			EventSystem->Character.OnSendRawMeet.AddDynamic(this, &ABuffableWorldProp::SetMeets);
 		}
-		CampfireLifeBar = Cast<UPropDurabilityWidget>(DurabilityWidget->GetUserWidgetObject());
-		StartCampfireTimer();
+		
+		if (UWidget* Widget = DurabilityWidget->GetUserWidgetObject())
+		{
+			CampfireLifeBar = Cast<UPropDurabilityWidget>(DurabilityWidget->GetUserWidgetObject());
+		}
+
+		if (MaxDurability >= 0)
+		{
+			StartCampfireTimer();
+		}
 	}
 }
 
@@ -79,11 +95,18 @@ void ABuffableWorldProp::EndBuff(
 
 void ABuffableWorldProp::CampfireAction()
 {
-	if (!Meets.IsEmpty() && Meets[0]->GetAmount() > 0)
+	if (!Meets.IsEmpty())
 	{
-		EventSystem->Character.OnCookRequested.Broadcast(Meets[0]);
+		for (auto& SingleMeet : Meets)
+		{
+			if (SingleMeet->GetAmount() > 0)
+			{
+				EventSystem->Character.OnCookRequested.Broadcast(SingleMeet);
+				IsCookValid();
+				break;
+			}
+		}
 	}
-	IsCookValid();
 }
 
 void ABuffableWorldProp::IsCookValid()
