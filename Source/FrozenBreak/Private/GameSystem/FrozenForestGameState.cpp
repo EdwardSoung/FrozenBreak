@@ -3,23 +3,28 @@
 
 #include "GameSystem/FrozenForestGameState.h"
 #include "GameSystem/UISubSystem.h"
+#include "GameSystem/GameManager.h"
 #include <Kismet/GameplayStatics.h>
 
 AFrozenForestGameState::AFrozenForestGameState()
 {
-	CurrentState = EGameState::Lobby;
+	
 }
 
 void AFrozenForestGameState::SetGameState(EGameState InState)
 {
-	CurrentState = InState;
+	if (UGameManager* Manager = UGameManager::Get(this))
+	{
+		Manager->SetState(InState);
 
-	OnGameStateChanged();
+		OnGameStateChanged(InState);
+	}
+
 }
 
-void AFrozenForestGameState::OnGameStateChanged()
+void AFrozenForestGameState::OnGameStateChanged(EGameState InState)
 {
-	switch (CurrentState)
+	switch (InState)
 	{
 	case EGameState::Lobby:
 		if (UUISubSystem* UISystem = UUISubSystem::Get(this))
@@ -39,6 +44,10 @@ void AFrozenForestGameState::OnGameStateChanged()
 		//레벨 전환
 		break;
 	case EGameState::Success:
+		if (UUISubSystem* UISystem = UUISubSystem::Get(this))
+		{
+			UISystem->HideAllWiget();
+		}
 		//탈출 성공 시
 		//플레이어 조작 막기
 		//성공 애니메이션
@@ -46,6 +55,10 @@ void AFrozenForestGameState::OnGameStateChanged()
 		break;
 	case EGameState::Fail:
 		//사망 시
+		if (UUISubSystem* UISystem = UUISubSystem::Get(this))
+		{
+			UISystem->HideAllWiget();
+		}
 		//플레이어 조작 막기
 		//재시작 UI
 		break;

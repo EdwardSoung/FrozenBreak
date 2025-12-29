@@ -4,6 +4,7 @@
 #include "Player/ThirdPersonPlayerController.h"
 #include "GameSystem/UISubSystem.h"
 #include "GameSystem/EventSubSystem.h"
+#include "GameSystem/GameManager.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include <Kismet/GameplayStatics.h>
@@ -89,11 +90,21 @@ void AThirdPersonPlayerController::ToggleQuitMenu()
 
 void AThirdPersonPlayerController::OnPauseTriggered(const FInputActionValue& Value)
 {
+	if (UGameManager* Manager = UGameManager::Get(this))
+	{
+		if (Manager->GetGameState() != EGameState::Playing)
+			return;
+	}
 	ToggleQuitMenu();
 }
 
 void AThirdPersonPlayerController::OnInventoryTriggered(const FInputActionValue& Value)
 {
+	if (UGameManager* Manager = UGameManager::Get(this))
+	{
+		if (Manager->GetGameState() != EGameState::Playing)
+			return;
+	}
 	if (UUISubSystem* UISystem = UUISubSystem::Get(this))
 	{
 		UISystem->ShowWidget(EWidgetType::Inventory);
@@ -102,6 +113,11 @@ void AThirdPersonPlayerController::OnInventoryTriggered(const FInputActionValue&
 
 void AThirdPersonPlayerController::OnPlayerStatusTriggered(const FInputActionValue& Value)
 {
+	if (UGameManager* Manager = UGameManager::Get(this))
+	{
+		if (Manager->GetGameState() != EGameState::Playing)
+			return;
+	}
 	if (UUISubSystem* UISystem = UUISubSystem::Get(this))
 	{
 		UISystem->ShowWidget(EWidgetType::CharacterState);

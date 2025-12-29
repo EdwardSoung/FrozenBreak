@@ -66,3 +66,8 @@ uint32 UGameManager::GetUID()
 {
     return CurrentUID++;
 }
+
+void UGameManager::SetState(EGameState InState)
+{
+    CurrentState = InState;
+}

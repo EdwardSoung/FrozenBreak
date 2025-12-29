@@ -33,6 +33,9 @@ public:
 	uint32 GetUID();
 
 	inline float GetInGameStartTime() { return InGameStartTime; }
+
+	void SetState(EGameState InState);
+	inline EGameState GetGameState() { return CurrentState; }
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
@@ -50,6 +53,9 @@ protected:
 	// 인게임 시작 시간(0~1 : 0.25 = 6시, 0.5 = 12시, 0.75 = 18시, 1.0 = 00시)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	float InGameStartTime = 0.5f;
+
+	UPROPERTY(BlueprintReadOnly, Category = "GameData")
+	EGameState CurrentState;
 
 private:
 	uint32 CurrentUID = 1;

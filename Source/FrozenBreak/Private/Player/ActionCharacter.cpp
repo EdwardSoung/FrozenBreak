@@ -20,6 +20,7 @@
 
 #include "GameSystem/ItemFactorySubSystem.h"
 #include "GameSystem/EventSubSystem.h"
+#include "GameSystem/GameManager.h"
 #include "GameSystem/FrozenForestGameState.h"
 
 #include "Interface/Interactable.h"
@@ -1040,9 +1041,9 @@ void AActionCharacter::OnPlayerTakeDamage(
 	AController* InstigatedBy,
 	AActor* DamageCauser)
 {
-	if (auto GameState = GetWorld()->GetGameState<AFrozenForestGameState>())
+	if (auto Manager = UGameManager::Get(this))
 	{
-		if (GameState->GetGameState() != EGameState::Playing)
+		if (Manager->GetGameState() != EGameState::Playing)
 		{
 			return;
 		}
@@ -1071,6 +1072,12 @@ void AActionCharacter::PlayDead()
 				Anim->Montage_Play(DeadAnimation);
 
 				bIsDead = true;
+				auto State = GetWorld()->GetGameState<AFrozenForestGameState>();
+				if (State)
+				{
+					State->SetGameState(EGameState::Fail);
+				}
+
 				// 입력 차단
 				/*if (APlayerController* PC = Cast<APlayerController>(GetController())) DisableInput(PC);
 				FTimerHandle DeadTimerHandle;

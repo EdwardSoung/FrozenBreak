@@ -49,6 +49,7 @@ protected:
 	UPROPERTY()
 	class UEventSubSystem* EventSystem = nullptr;
 
+	class AFrozenForestGameState* GameState = nullptr;
 private:
 	// 시간 (0~1)
 	float TimeNormalized = 0.25f; // 06:00 시작

@@ -7,6 +7,7 @@
 #include "EngineUtils.h"
 #include "Engine/DirectionalLight.h"
 #include "Components/LightComponent.h"
+#include "GameSystem/FrozenForestGameState.h"
 #include "GameSystem/GameManager.h"
 
 void UTimeOfDaySubSystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -14,6 +15,7 @@ void UTimeOfDaySubSystem::Initialize(FSubsystemCollectionBase& Collection)
 	Super::Initialize(Collection);
 	FindDirectionalLight();
 	EventSystem = UEventSubSystem::Get(this);
+	
 
 	if (UGameManager* GameMgr = UGameManager::Get(this))
 	{
@@ -36,6 +38,14 @@ bool UTimeOfDaySubSystem::IsGameWorldSafe() const
 
 void UTimeOfDaySubSystem::Tick(float DeltaTime)
 {
+	if (auto Manager = UGameManager::Get(this))
+	{
+		if (Manager->GetGameState() != EGameState::Playing)
+			return;
+	}
+	else
+		return;
+
 	if (DayLengthSeconds <= KINDA_SMALL_NUMBER) return;
 
 	TimeNormalized += DeltaTime / DayLengthSeconds;
