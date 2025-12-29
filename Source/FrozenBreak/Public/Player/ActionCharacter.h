@@ -436,54 +436,77 @@ public:
 
 	int32 LastHitMontageIndex = INDEX_NONE;
 	
-public: // 무기쪽
-	UPROPERTY(EditDefaultsOnly, Category = "Combat|Montage")
-	TObjectPtr<class UAnimMontage> UnarmedAttackMontage;
-
-
-protected: // 공격
-	// ===== Input callbacks =====
+public:
+	// ===== 공격 입력 =====
 	void OnAttackStarted();
-
-
-	// ===== Combo helpers =====
-	void StartAttackCombo();
-	bool bComboRequested = false;
 	bool bComboWindowOpen = false;
 
-	
-public:
-
-	// (AnimNotifyState에서 콤보 점프 호출)
-	void Notify_TryComboJump();
-	UFUNCTION()
-	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	// (AnimNotifyState에서 호출할 공격 윈도우)
+	void BeginKnifeHitWindow();
+	void EndKnifeHitWindow();
 	FORCEINLINE void SetComboWindowOpen(bool bOpen) { bComboWindowOpen = bOpen; }
 	FORCEINLINE bool IsComboWindowOpen() const { return bComboWindowOpen; }
 
-private:
+	// (AnimNotifyState에서 콤보 점프 호출)
+	void Notify_TryComboJump();
 
+	UFUNCTION()
+	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+private:
+	// ===== Combo helpers =====
+	void StartAttackCombo();
+
+	// ===== Attack window tick =====
+	void TickKnifeHitWindow();
+
+private:
 	// ====== Weapon state ======
 	UPROPERTY(EditAnywhere, Category = "Weapon")
-	bool bHasKnife = false; // 네 프로젝트에서 실제 나이프 장착 상태로 갱신해줘야 함
+	bool bHasKnife = false;
 
 	// ====== Attack montage ======
 	UPROPERTY(EditDefaultsOnly, Category = "Combat|Montage")
-	TObjectPtr<UAnimMontage> KnifeAttackMontage;
+	TObjectPtr<UAnimMontage> KnifeAttackMontage = nullptr;
 
 	// ====== Attack gating ======
 	UPROPERTY(VisibleAnywhere, Category = "Combat")
 	bool bIsAttacking = false;
 
-	// ====== Combo ======
 	UPROPERTY(VisibleAnywhere, Category = "Combat|Combo")
 	int32 CurrentCombo = 0;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Combat|Combo")
 	int32 MaxCombo = 2;
 
+	UPROPERTY(VisibleAnywhere, Category = "Combat|Combo")
+	bool bComboRequested = false;
 
-	// 섹션 이름 규칙: Attack1, Attack2, Attack3 ...
-	UPROPERTY(EditDefaultsOnly, Category = "Combat|Combo")
-	FName ComboSectionPrefix = TEXT("Attack");
+	// Knife trace params
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|KnifeTrace")
+	float KnifeTraceRadius = 60.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|KnifeTrace")
+	float KnifeTraceDistance = 160.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|KnifeTrace")
+	float KnifeTraceUp = 50.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|KnifeTrace")
+	float KnifeTraceForwardOffset = 40.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|KnifeTrace")
+	float KnifeDamage = 20.0f;
+
+	// 트레이스 주기(윈도우 동안 몇 초마다 한 번씩)
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|KnifeTrace")
+	float KnifeTraceInterval = 0.02f;
+
+	// ====== Knife hit window state ======
+	bool bKnifeHitWindowOpen = false;
+
+	TSet<TWeakObjectPtr<AActor>> KnifeHitActors;
+
+	FTimerHandle KnifeTraceTimerHandle;
+
 };
