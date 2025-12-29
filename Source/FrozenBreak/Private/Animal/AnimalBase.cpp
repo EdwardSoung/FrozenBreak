@@ -4,6 +4,7 @@
 #include "Animal/AnimalBase.h"
 #include "Animal/AI/AnimalAIControllerBase.h"
 #include "GameSystem/ItemFactorySubSystem.h"
+#include "GameSystem/AnimalTrackingSubSystem.h"
 #include "Components/WidgetComponent.h"
 #include "UI/Enemy/EnemyHealthBarWidget.h"
 
@@ -138,6 +139,10 @@ void AAnimalBase::DestroyAnimal()
 		{
 			ItemFactory->Spawn(EItemType::RawMeat, GetActorLocation() + FVector(-10, -10, 50), DefaultMinimum);
 		}
+	}
+	if (AnimalType != EAnimalType::None)
+	{
+		GetWorld()->GetSubsystem<UAnimalTrackingSubSystem>()->DecreaseCurrentAnimalNumber(AnimalType);
 	}
 	Destroy();
 }

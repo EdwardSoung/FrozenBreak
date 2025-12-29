@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interface/Damageable.h"
+#include "Data/Enums.h"
 #include "AnimalBase.generated.h"
 
 UCLASS()
@@ -15,6 +16,8 @@ class FROZENBREAK_API AAnimalBase : public ACharacter, public IDamageable
 public:
 	// Sets default values for this character's properties
 	AAnimalBase();
+
+	inline void SetAnimalType(EAnimalType  InType) { AnimalType = InType; }
 
 protected:
 	// Called when the game starts or when spawned
@@ -69,6 +72,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float AnimalDamage = 0.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	EAnimalType AnimalType = EAnimalType::None;
 
 private:
 	FTimerHandle HealthBarTimerHandle;

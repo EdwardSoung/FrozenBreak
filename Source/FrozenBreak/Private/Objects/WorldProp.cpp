@@ -360,6 +360,8 @@ void AWorldProp::BedAction()
 				BedActionWidgetInstance->SetDayCountText(DayCount);
 				BedActionWidgetInstance->SetVisibility(ESlateVisibility::Visible);
 				BedActionWidgetInstance->AddToViewport();
+
+				EventSystem->Character.OnPlayerSleep.Broadcast();
 			}
 		}
 	}

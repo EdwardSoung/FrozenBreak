@@ -91,3 +91,13 @@ enum class EGameState : uint8
 	Fail,
 	Success,
 };
+
+UENUM(BlueprintType)
+enum class EAnimalType : uint8
+{
+	None,
+	DeerStag,
+	DeerDoe,
+	Fox,
+	Crow,
+};
