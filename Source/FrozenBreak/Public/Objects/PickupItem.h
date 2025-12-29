@@ -41,8 +41,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item|Mesh")
 	TObjectPtr<class UStaticMeshComponent> Mesh = nullptr;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item|Root")
-	TObjectPtr<class USceneComponent> Root = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item|Widget")
 	TObjectPtr<class UWidgetComponent> InteractionWidget = nullptr;

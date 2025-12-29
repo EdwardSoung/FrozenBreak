@@ -228,21 +228,33 @@ protected: // 아이템 관련
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Test")
 	bool InvincibleTester = true; // 테스트용 무적 플래그
 
+protected:
+		UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weight|Penalty")
+		float BlockThreshold = 1.0f;
+		UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weight|Penalty")
+		float SlowThreshold = 0.7f;
+		UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weight|Penalty")
+		float SlowSpeedMultiplier = 0.5f;
 private:
-	// 캐릭터 기본 걷기 속도(원본) 저장
-	UPROPERTY()
-	float BaseWalkSpeed = 0.0f;
+	
+	// 인벤 무게로 인한 배율
+	float WeightSpeedMultiplier = 1.0f;
 
-	// 인벤 무게 업데이트 수신
+	// 과적 상태(이동 완전 차단)
+	bool bOverweightBlocked = false;
+
+	// “툴 액션 중 이동 잠금” (도끼용도 추가하는게 좋아)
+	bool bMoveLockedByHarvest = false;
+
+	// 속도 최종 재계산(딱 한 군데에서만 MaxWalkSpeed 만짐)
+	void RecalcMoveSpeed(const FVector2D& LastMoveInput);
+
+	// 무게 패널티가 시작되면 달리기 금지.
+	bool bSprintBlockedByWeight = false;
+
+	// 무게 이벤트
 	UFUNCTION()
 	void OnInventoryWeightUpdated(float InWeight, float InMaxWeight);
-
-	// 비율 기준값들 
-    UPROPERTY(EditAnywhere, Category = "Movement|WeightPenalty")
-	float BlockThreshold = 1.0f;      // 100% (초과면 이동불가)
-
-	UPROPERTY(EditAnywhere, Category = "Movement|WeightPenalty")
-	float SlowThreshold = 0.7f;      // 70%
 
 protected:
 	// ===== Input Functions =====
@@ -403,8 +415,13 @@ public:
 	FName BloodSocketName = TEXT("spine_03");
 
 	UFUNCTION(BlueprintCallable)
-	void Debug_Hit(); // 디버그용 나중에 지우기
+	void PlayHitReaction();
 
+	// Hit 락
+	bool bHitLocked = false;
+
+	UFUNCTION()
+	void OnHitMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 	//중복되는 효과 방지용 인덱스 
 	int32 LastBloodVFXIndex = INDEX_NONE;
 	int32 LastHitSoundIndex = INDEX_NONE;
