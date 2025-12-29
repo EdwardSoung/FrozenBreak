@@ -1380,34 +1380,42 @@ void AActionCharacter::OnHitMontageEnded(UAnimMontage* Montage, bool bInterrupte
 
 void AActionCharacter::OnAttackStarted()
 {
-	if (bHitLocked) 
+	if (bHitLocked)
+	{
 		return;
+	}
+
 	if (!bHasKnife)
+	{
 		return;
+	}
 
 	UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
 	if (!Anim || !KnifeAttackMontage)
+	{
 		return;
+	}
 
-	// 공격 중이면 그냥 무시 (콤보는 애님에서 처리)
+	// 공격 중이면: 몽타주 재생 중이면 콤보 예약만
 	if (bIsAttacking)
 	{
 		if (!Anim->Montage_IsPlaying(KnifeAttackMontage))
 		{
+			// 상태 꼬였으면 리셋
 			bIsAttacking = false;
 			bComboRequested = false;
 			CurrentCombo = 0;
 		}
-		else 
+		else
 		{
 			bComboRequested = true;
 			return;
 		}
-		
 	}
 
 	StartAttackCombo();
 }
+
 
 
 void AActionCharacter::StartAttackCombo()
@@ -1429,36 +1437,162 @@ void AActionCharacter::StartAttackCombo()
 	Anim->Montage_JumpToSection(TEXT("Attack1"), KnifeAttackMontage);
 }
 
+
 void AActionCharacter::Notify_TryComboJump()
 {
-	if (!bComboRequested)   
+	if (!bComboRequested)
+	{
 		return;
-	
-	UE_LOG(LogTemp, Warning, TEXT("[Notify] TryComboJump CALLED"));
-	UAnimInstance* Anim = GetMesh()->GetAnimInstance();
-	if (!Anim)
+	}
+
+	UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	if (!Anim || !KnifeAttackMontage)
+	{
 		return;
-
-
+	}
 
 	if (CurrentCombo >= MaxCombo)
+	{
 		return;
+	}
+
 	bComboRequested = false;
-	CurrentCombo++;
+	CurrentCombo = CurrentCombo + 1;
 
-	const FName NextSection =
-		FName(*FString::Printf(TEXT("Attack%d"), CurrentCombo));
-
+	const FName NextSection = FName(*FString::Printf(TEXT("Attack%d"), CurrentCombo));
 	Anim->Montage_JumpToSection(NextSection, KnifeAttackMontage);
 }
 
 void AActionCharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-	UE_LOG(LogTemp, Warning, TEXT("[Attack] MontageEnded"));
 	if (Montage != KnifeAttackMontage)
+	{
 		return;
+	}
+	EndKnifeHitWindow();
 
 	bIsAttacking = false;
 	bComboRequested = false;
 	CurrentCombo = 0;
+}
+void AActionCharacter::BeginKnifeHitWindow()
+{
+	if (!bIsAttacking)
+	{
+		return;
+	}
+
+	// 이미 열려있으면 중복 방지
+	if (bKnifeHitWindowOpen)
+	{
+		return;
+	}
+
+	bKnifeHitWindowOpen = true;
+	KnifeHitActors.Empty();
+
+	// 주기적으로 트레이스
+	if (GetWorld())
+	{
+		GetWorldTimerManager().SetTimer(
+			KnifeTraceTimerHandle,
+			this,
+			&AActionCharacter::TickKnifeHitWindow,
+			KnifeTraceInterval,
+			true
+		);
+	}
+}
+
+void AActionCharacter::EndKnifeHitWindow()
+{
+	if (!bKnifeHitWindowOpen)
+	{
+		return;
+	}
+
+	bKnifeHitWindowOpen = false;
+	KnifeHitActors.Empty();
+
+	if (GetWorld())
+	{
+		GetWorldTimerManager().ClearTimer(KnifeTraceTimerHandle);
+	}
+}
+
+void AActionCharacter::TickKnifeHitWindow()
+{
+	if (!bKnifeHitWindowOpen)
+	{
+		return;
+	}
+
+	// 혹시 공격이 끝났는데 타이머만 남아있으면 정리
+	if (!bIsAttacking)
+	{
+		EndKnifeHitWindow();
+		return;
+	}
+
+	// 캐릭터 기준 앞쪽 SphereTraceMulti
+	const FVector Forward = GetActorForwardVector();
+	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, KnifeTraceUp) + Forward * KnifeTraceForwardOffset;
+	const FVector End = Start + Forward * KnifeTraceDistance;
+
+	TArray<FHitResult> Hits;
+
+	// 트레이스 무시 목록
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+
+	const bool bHit = UKismetSystemLibrary::SphereTraceMulti(
+		this,
+		Start,
+		End,
+		KnifeTraceRadius,
+		UEngineTypes::ConvertToTraceType(ECC_Pawn),
+		false,
+		ActorsToIgnore,
+		EDrawDebugTrace::None,
+		Hits,
+		true
+	);
+
+	if (!bHit)
+	{
+		return;
+	}
+
+	for (const FHitResult& Hit : Hits)
+	{
+		AActor* HitActor = Hit.GetActor();
+		if (!HitActor)
+		{
+			continue;
+		}
+
+		// 나 자신 제외
+		if (HitActor == this)
+		{
+			continue;
+		}
+
+		// “한 윈도우 내 중복 타격 방지”
+		TWeakObjectPtr<AActor> Key(HitActor);
+		if (KnifeHitActors.Contains(Key))
+		{
+			continue;
+		}
+
+		KnifeHitActors.Add(Key);
+
+		// 데미지 적용
+		UGameplayStatics::ApplyDamage(
+			HitActor,
+			KnifeDamage,
+			GetController(),
+			this,
+			UDamageType::StaticClass()
+		);
+	}
 }
