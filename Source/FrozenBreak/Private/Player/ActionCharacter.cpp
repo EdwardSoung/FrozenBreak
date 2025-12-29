@@ -334,6 +334,7 @@ void AActionCharacter::Landed(const FHitResult& Hit) // 착지
 // ===== Movement =====
 void AActionCharacter::OnMove(const FInputActionValue& Value)
 {
+	if (bHitLocked) return;
 	const FVector2D Input = Value.Get<FVector2D>();
 
 	// 완전 차단 조건들
@@ -519,6 +520,7 @@ void AActionCharacter::OnLook(const FInputActionValue& Value)
 }
 void AActionCharacter::PlayJumpSFX()
 {
+	if (bHitLocked) return;
 	// 무음 확률
 	if (JumpSkipChance > 0.0f && FMath::FRand() < JumpSkipChance)
 	{
@@ -598,6 +600,8 @@ void AActionCharacter::OnCrouchToggle()
 
 void AActionCharacter::OnSprintStarted()
 {
+	if (bHitLocked) 
+		return;
 	if (bIsCrouched)
 		return;
 
@@ -624,6 +628,8 @@ void AActionCharacter::OnSprintStopped()
 
 void AActionCharacter::OnInteration()
 {
+	if (bHitLocked) 
+		return;
 	if (bLandingLocked)
 		return;
 
@@ -885,7 +891,7 @@ void AActionCharacter::HandEquip(UInventoryItem* InItem)
 
 	if (UItemFactorySubSystem* ItemFactory = UItemFactorySubSystem::Get(this))
 	{
-		const EItemType ItemType = InItem->GetType(); // ✅ 진짜 타입은 이걸로
+		const EItemType ItemType = InItem->GetType(); //진짜 타입은 이걸로
 
 		CurrentTools = ItemFactory->SpawnTool(ItemType, InItem->GetDurability());
 
@@ -954,7 +960,7 @@ void AActionCharacter::OnPlayerTakeDamage(
 	{
 		Event->Status.OnSetHealth.Broadcast(-Damage);
 	}
-
+	PlayHitReaction();
 }
 
 void AActionCharacter::PlayDead()
@@ -1201,12 +1207,16 @@ void AActionCharacter::JumpToEndSection_IfPlaying()
 }
 
 
-void AActionCharacter::Debug_Hit() // 디버그 용이에용 
+void AActionCharacter::PlayHitReaction()
 {
 	UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
-	
-	
-	
+
+	// 여기서 return 하면 VFX/SFX까지 막혀서 제거
+	// if (Anim && Anim->IsAnyMontagePlaying())
+	// {
+	//     return;
+	// }
+
 	// 위치 계산: 소켓 있으면 소켓 위치, 없으면 액터 위치
 	FVector SpawnLocation = GetActorLocation();
 	FRotator SpawnRotation = GetActorRotation();
@@ -1218,8 +1228,8 @@ void AActionCharacter::Debug_Hit() // 디버그 용이에용
 		SpawnRotation = MeshComp->GetSocketRotation(BloodSocketName);
 	}
 
-	// VFX 랜덤으로 하나 재생 , 중복재생 안되게 
-	if (BloodVFXList.Num() >0)
+	// VFX는 항상 재생 
+	if (BloodVFXList.Num() > 0)
 	{
 		int32 PickedIndex = FMath::RandRange(0, BloodVFXList.Num() - 1);
 
@@ -1230,7 +1240,9 @@ void AActionCharacter::Debug_Hit() // 디버그 용이에용
 				PickedIndex = FMath::RandRange(0, BloodVFXList.Num() - 1);
 			}
 		}
+
 		LastBloodVFXIndex = PickedIndex;
+
 		UNiagaraSystem* PickedVFX = BloodVFXList[PickedIndex];
 		if (PickedVFX)
 		{
@@ -1243,11 +1255,12 @@ void AActionCharacter::Debug_Hit() // 디버그 용이에용
 		}
 	}
 
-	// SFX 랜덤으로 하나 재생 중복재생 안되게
-	if (HitSoundList.Num() >0)
+	// SFX도 항상 재생 
+	if (HitSoundList.Num() > 0)
 	{
 		int32 PickedIndex = FMath::RandRange(0, HitSoundList.Num() - 1);
-		if (bAvoidSameHitSound && HitSoundList.Num() >1)
+
+		if (bAvoidSameHitSound && HitSoundList.Num() > 1)
 		{
 			while (PickedIndex == LastHitSoundIndex)
 			{
@@ -1268,52 +1281,107 @@ void AActionCharacter::Debug_Hit() // 디버그 용이에용
 				HitPitchMultiplier
 			);
 		}
-		
 	}
 
+	// 여기부터는 "히트 몽타주"만 가능하면 재생 
 
-	if (Anim && Anim->Montage_IsPlaying(nullptr))
+	// 애님 인스턴스 없으면 몽타주는 못 틀지만, VFX/SFX는 이미 나갔으니 종료
+	if (!Anim || HitMontages.Num() <= 0)
 	{
-		return; // 몽타주만 막음
+		return;
 	}
 
-
-	// 랜덤으로 몽타주 하나 재생
-
-	
-	if (Anim && HitMontages.Num() > 0)
+	// 다른 몽타주가 돌고 있으면 "히트 몽타주만" 스킵
+	if (Anim->IsAnyMontagePlaying())
 	{
-		int32 PickedIndex = FMath::RandRange(0, HitMontages.Num() - 1);
+		return;
+	}
 
-		//같은 몽타주 연속방지
-		if (bAvoidSameHitMontage && HitMontages.Num() > 1)
+	int32 PickedIndex = FMath::RandRange(0, HitMontages.Num() - 1);
+
+	if (bAvoidSameHitMontage && HitMontages.Num() > 1)
+	{
+		while (PickedIndex == LastHitMontageIndex)
 		{
-			while (PickedIndex == LastHitMontageIndex)
+			PickedIndex = FMath::RandRange(0, HitMontages.Num() - 1);
+		}
+	}
+	LastHitMontageIndex = PickedIndex;
+
+	UAnimMontage* PickedMontage = HitMontages[PickedIndex];
+	if (!PickedMontage)
+	{
+		return;
+	}
+
+	if (Anim->Montage_IsPlaying(PickedMontage))
+	{
+		return;
+	}
+
+	// 히트 액션 시작 → 이동 금지
+	bHitLocked = true;
+
+	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+	{
+		MoveComp->StopMovementImmediately();
+		MoveComp->DisableMovement();
+	}
+
+	// delegate 안정화: Play 먼저, 성공하면 EndDelegate
+	const float PlayedLen = Anim->Montage_Play(PickedMontage);
+	if (PlayedLen <= 0.0f)
+	{
+		bHitLocked = false;
+
+		if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+		{
+			if (!bOverweightBlocked && !bLandingLocked && !bMoveLockedByMining && !bMoveLockedByHarvest)
 			{
-				PickedIndex = FMath::RandRange(0, HitMontages.Num() - 1);
+				MoveComp->SetMovementMode(MOVE_Walking);
 			}
-			
+			else
+			{
+				MoveComp->DisableMovement();
+			}
 		}
 
-		LastHitMontageIndex = PickedIndex;
+		RecalcMoveSpeed(FVector2D::ZeroVector);
+		return;
+	}
 
-		UAnimMontage* PickedMontage = HitMontages[PickedIndex];
+	FOnMontageEnded EndDel;
+	EndDel.BindUObject(this, &AActionCharacter::OnHitMontageEnded);
+	Anim->Montage_SetEndDelegate(EndDel, PickedMontage);
 
-		if (Anim->Montage_IsPlaying(PickedMontage))
+}
+
+void AActionCharacter::OnHitMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	bHitLocked = false;
+
+	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+	{
+		// 과적/착지락 같은 다른 “진짜 락”이 없으면 걷기 복구
+		if (!bOverweightBlocked && !bLandingLocked && !bMoveLockedByMining && !bMoveLockedByHarvest)
 		{
-			return;
+			MoveComp->SetMovementMode(MOVE_Walking);
 		}
-		if (PickedMontage)
+		else
 		{
-			Anim->Montage_Play(PickedMontage);
+			// 여전히 막혀야 하는 상황이면 계속 막기
+			MoveComp->DisableMovement();
 		}
 	}
-	
+
+	// 무게/스프린트/뒤로 제한 포함해서 최종 속도 다시 계산
+	RecalcMoveSpeed(FVector2D::ZeroVector);
 }
 
 void AActionCharacter::OnAttackStarted()
 {
-	
+	if (bHitLocked) 
+		return;
 	if (!bHasKnife)
 		return;
 

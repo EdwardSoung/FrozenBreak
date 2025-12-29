@@ -415,8 +415,13 @@ public:
 	FName BloodSocketName = TEXT("spine_03");
 
 	UFUNCTION(BlueprintCallable)
-	void Debug_Hit(); // 디버그용 나중에 지우기
+	void PlayHitReaction();
 
+	// Hit 락
+	bool bHitLocked = false;
+
+	UFUNCTION()
+	void OnHitMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 	//중복되는 효과 방지용 인덱스 
 	int32 LastBloodVFXIndex = INDEX_NONE;
 	int32 LastHitSoundIndex = INDEX_NONE;
