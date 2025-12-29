@@ -17,12 +17,15 @@ class FROZENBREAK_API AFrozenForestGameState : public AGameStateBase
 	
 public:
 	AFrozenForestGameState();
+	
+protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "GameData")
 	EGameState CurrentState;
 
 public:
 	void SetGameState(EGameState InState);
+	inline EGameState GetGameState() { return CurrentState; }
 
 protected:
 	UFUNCTION()
