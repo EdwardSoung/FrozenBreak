@@ -69,6 +69,34 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<UCameraComponent> FollowCamera = nullptr;
 
+private:
+	// 현재 목표값
+	float TargetArmLength = 350.0f;
+	float TargetFOV = 90.0f;
+
+	// 보간 속도 (8~15 추천)
+	UPROPERTY(EditAnywhere, Category = "Camera|Zoom")
+	float CameraZoomInterpSpeed = 8.0f;
+
+	// 집 안/밖 프리셋
+	UPROPERTY(EditAnywhere, Category = "Camera|Zoom")
+	float OutdoorArmLength = 350.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera|Zoom")
+	float IndoorArmLength = 100.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera|Zoom")
+	float OutdoorFOV = 90.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera|Zoom")
+	float IndoorFOV = 70.0f;
+
+public:
+	// 트리거에서 이거만 호출하면 됨
+	UFUNCTION(BlueprintCallable, Category = "Camera|Zoom")
+	void SetIndoorCameraZoom(bool bIndoor);
+
+
 	// ===== Enhanced Input =====
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> IA_Move = nullptr;
@@ -511,5 +539,6 @@ private:
 	TSet<TWeakObjectPtr<AActor>> KnifeHitActors;
 
 	FTimerHandle KnifeTraceTimerHandle;
+
 
 };

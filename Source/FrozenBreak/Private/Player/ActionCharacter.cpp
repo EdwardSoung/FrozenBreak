@@ -105,6 +105,7 @@ AActionCharacter::AActionCharacter()
 		Event->Character.OnEquipHandItem.AddDynamic(this, &AActionCharacter::HandEquip);
 		Event->Character.OnPlayerDead.AddDynamic(this, &AActionCharacter::PlayDead);
 	}
+
 }
 
 
@@ -174,6 +175,8 @@ void AActionCharacter::BeginPlay()
 	// 데미지 바인딩
 	OnTakeAnyDamage.AddDynamic(this, &AActionCharacter::OnPlayerTakeDamage);
 
+	TargetArmLength = CameraBoom ? CameraBoom->TargetArmLength : OutdoorArmLength;
+	TargetFOV = FollowCamera ? FollowCamera->FieldOfView : OutdoorFOV;
 }
 
 
@@ -182,6 +185,29 @@ void AActionCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (CameraBoom)
+	{
+		const float NewArm = FMath::FInterpTo(
+			CameraBoom->TargetArmLength,
+			TargetArmLength,
+			DeltaTime,
+			CameraZoomInterpSpeed
+		);
+
+		CameraBoom->TargetArmLength = NewArm;
+	}
+
+	if (FollowCamera)
+	{
+		const float NewFOV = FMath::FInterpTo(
+			FollowCamera->FieldOfView,
+			TargetFOV,
+			DeltaTime,
+			CameraZoomInterpSpeed
+		);
+
+		FollowCamera->SetFieldOfView(NewFOV);
+	}
 }
 
 
@@ -308,6 +334,20 @@ void AActionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 			&AActionCharacter::OnAttackStarted);
 	}
 	
+}
+
+void AActionCharacter::SetIndoorCameraZoom(bool bIndoor)
+{
+	if (bIndoor)
+	{
+		TargetArmLength = IndoorArmLength;
+		TargetFOV = IndoorFOV;
+	}
+	else
+	{
+		TargetArmLength = OutdoorArmLength;
+		TargetFOV = OutdoorFOV;
+	}
 }
 
 
@@ -1665,3 +1705,4 @@ void AActionCharacter::TickKnifeHitWindow()
 		);
 	}
 }
+
