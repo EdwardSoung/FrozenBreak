@@ -25,15 +25,15 @@ UUISubSystem* UUISubSystem::Get(const UObject* WorldContextObject)
 
 UUserWidget* UUISubSystem::ShowWidget(EWidgetType InWidgetType, EInputModeType InInputMode)
 {
+	//컨트롤러에 붙여주기 때문에 없으면 다시 연결 시도
 	if (CurrentPlayerController.IsValid() == false)
 	{
 		CurrentPlayerController = GetWorld()->GetFirstPlayerController();
 	}
 
-	//GameMode로 막을지 여부...
-
 	UUserWidget* Widget = nullptr;
 
+	//생성된 적이 있으면 켜주고, 없으면 생성[Lazy Initialziation]
 	if (CreatedWidgets.Contains(InWidgetType))
 	{
 		Widget = CreatedWidgets[InWidgetType];
@@ -91,6 +91,7 @@ UUserWidget* UUISubSystem::ShowWidget(EWidgetType InWidgetType, EInputModeType I
 			}
 		}
 		
+		//열린 위젯인지 체크용
 		OpenedWidgets.Add(InWidgetType, Widget);
 	}
 
