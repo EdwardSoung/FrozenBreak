@@ -620,8 +620,23 @@ void AActionCharacter::OnHarvestStarted()
 		//UE_LOG(LogTemp, Warning, TEXT("Blocked: Already Harvesting"));
 		return;
 	}
+	if (!HarvestMontage)
+	{
+		return;
+	}
+	UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
 
+	if (!Anim)
+	{
+		
+		return;
+	}
 	
+	if (Anim->Montage_IsPlaying(HarvestMontage))
+	{
+		
+		return;
+	}
 
 	// 여기서부터 수확 시작
 	bIsHarvesting = true;
@@ -635,15 +650,12 @@ void AActionCharacter::OnHarvestStarted()
 		bUseControllerRotationYaw = false;      // 몽타주가 재생중일때 캐릭터가 마우스에 안 돌아감
 		bToolYawLocked = true;
 	}
-	if (UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr)
-	{
-		FOnMontageEnded EndDel;
-		EndDel.BindUObject(this, &AActionCharacter::OnToolMontageEnded);
-		Anim->Montage_SetEndDelegate(EndDel, HarvestMontage);
+	FOnMontageEnded EndDel;
+	EndDel.BindUObject(this, &AActionCharacter::OnToolMontageEnded);
+	Anim->Montage_SetEndDelegate(EndDel, HarvestMontage);
 
-	}
-	PlayAnimMontage(HarvestMontage);
-	
+	// 몽타주 재생
+	Anim->Montage_Play(HarvestMontage);
 }
 
 
