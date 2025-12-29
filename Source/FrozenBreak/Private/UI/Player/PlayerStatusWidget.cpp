@@ -22,6 +22,9 @@ void UPlayerStatusWidget::NativeConstruct()
 		statusEvent->Character.OnEquipHandItem.AddDynamic(this, &UPlayerStatusWidget::SetHandEquipment);
 		statusEvent->Character.OnEquipBodyItem.AddDynamic(this, &UPlayerStatusWidget::SetBodyEquipment);
 		statusEvent->Status.OnDayChanged.AddDynamic(this, &UPlayerStatusWidget::SetDay);
+		statusEvent->Character.OnEquipRefresh.AddDynamic(this, &UPlayerStatusWidget::RefreshEquipment);
+
+		statusEvent->Character.OnRequestStatusInit.Broadcast();
 	}
 	CloseStatButton->OnClicked.AddDynamic(this, &UPlayerStatusWidget::HideWidget);
 }
@@ -95,6 +98,15 @@ void UPlayerStatusWidget::HideWidget()
 void UPlayerStatusWidget::SetDay(int32 InDay)
 {
 	DayText->SetText(FText::AsNumber(InDay));
+}
+
+void UPlayerStatusWidget::RefreshEquipment(UInventoryItem* InHandItem, UInventoryItem* InBodyItem)
+{
+	if (InHandItem)
+		SetHandEquipment(InHandItem);
+
+	if (InBodyItem)
+		SetBodyEquipment(InBodyItem);
 }
 
 

@@ -40,6 +40,9 @@ protected:
 	UFUNCTION()
 	void EquipHandItemUsed();
 
+	UFUNCTION()
+	void RefreshEquipments();
+
 public:
 
 protected:
