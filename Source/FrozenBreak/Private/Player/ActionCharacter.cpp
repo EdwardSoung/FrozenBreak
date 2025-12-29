@@ -113,7 +113,13 @@ void AActionCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//입력 세팅은 로컬만
+	// ===== 기본 초기값(무게/락 관련) =====
+	WeightSpeedMultiplier = 1.0f;
+	bOverweightBlocked = false;
+	bMoveLockedByHarvest = false; 
+	
+
+	// ===== 입력 세팅은 로컬만 =====
 	if (IsLocallyControlled())
 	{
 		APlayerController* PC = Cast<APlayerController>(GetController());
@@ -140,12 +146,8 @@ void AActionCharacter::BeginPlay()
 				PC->PlayerCameraManager->ViewPitchMax = 45.0f;
 			}
 		}
-		if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
-		{
-			BaseWalkSpeed = MoveComp->MaxWalkSpeed;
-		}
 
-		// 인벤 무게 숫자 이벤트 바인딩
+		// ===== 인벤 무게 이벤트 바인딩 =====
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
 			EventSystem->Character.OnUpdateInventoryWeight.AddDynamic(
@@ -153,39 +155,23 @@ void AActionCharacter::BeginPlay()
 				&AActionCharacter::OnInventoryWeightUpdated
 			);
 		}
+
+		// ===== 시작 시 이동 상태 정리(안전) =====
+		if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+		{
+			// 혹시라도 MOVE_None로 시작하는 상황 방지
+			if (MoveComp->MovementMode == MOVE_None)
+			{
+				MoveComp->SetMovementMode(MOVE_Walking);
+			}
+
+			// 시작 속도는 Recalc 구조가 처리 (입력 없으니 (0,0))
+			RecalcMoveSpeed(FVector2D::ZeroVector);
+		}
 	}
 
+	// 데미지 바인딩
 	OnTakeAnyDamage.AddDynamic(this, &AActionCharacter::OnPlayerTakeDamage);
-
-	//초기 세팅으로 하면 안됨...
-	//if (DefaultToolsClass && GetMesh())
-	//{
-	//	FActorSpawnParameters Params;
-	//	Params.Owner = this;
-	//	Params.Instigator = this;
-
-	//	CurrentTools = GetWorld()->SpawnActor<AToolActor>(DefaultToolsClass, Params);
-
-	//	if (CurrentTools)
-	//	{
-	//		CurrentTools->AttachToComponent(
-	//			GetMesh(),
-	//			FAttachmentTransformRules::SnapToTargetNotIncludingScale,
-	//			TEXT("WeaponSocket")
-	//		);
-
-	//		
-	//		SetHeldItemType(CurrentTools->ToolType); // 내가 지금 뭘 들고 있는지 
-
-	//		UE_LOG(LogTemp, Warning, TEXT("[Tool] Equipped: %s Type=%d"),
-	//			*CurrentTools->GetName(), (int32)CurrentTools->ToolType);
-	//	}
-	//	else
-	//	{
-	//		SetHeldItemType(EItemType::None);
-	//	}
-	//}
-
 
 }
 
@@ -345,17 +331,13 @@ void AActionCharacter::Landed(const FHitResult& Hit) // 착지
 	}
 }
 
-
-
-
-
 // ===== Movement =====
 void AActionCharacter::OnMove(const FInputActionValue& Value)
 {
 	const FVector2D Input = Value.Get<FVector2D>();
 
-	// 먼저 락이면 이동 자체 차단
-	if (bLandingLocked)
+	// 완전 차단 조건들
+	if (bLandingLocked || bOverweightBlocked || bMoveLockedByMining || bMoveLockedByHarvest)
 	{
 		return;
 	}
@@ -365,78 +347,143 @@ void AActionCharacter::OnMove(const FInputActionValue& Value)
 		return;
 	}
 
-	// 여기서 "뒤로 달리기" 막기: Input.Y < 0 이면 뒤로
-	if (GetCharacterMovement())
-	{
-		if (bIsCrouched)
-		{
-			// 앉기는 기존 MaxWalkSpeedCrouched가 알아서 처리하지만
-			// 혹시 스프린트 값이 남아있을 수 있으니 워크로 내려줌
-			GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-		}
-		else
-		{
-			if (Input.Y < -0.1f) // 뒤로 입력
-			{
-				GetCharacterMovement()->MaxWalkSpeed = BackwardMaxSpeed;
-			}
-			else
-			{
-				if (bWantsSprint)
-				{
-					GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
-				}
-				else
-				{
-					GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-				}
-			}
-		}
-	}
+	// 여기서부터는 “이동 입력”만 처리하고,
+	// 속도(MaxWalkSpeed)는 RecalcMoveSpeed 한 군데에서만 최종 결정한다.
+	RecalcMoveSpeed(Input);
 
 	AddMovementInput(GetActorForwardVector(), Input.Y);
 	AddMovementInput(GetActorRightVector(), Input.X);
 }
 
 
-void AActionCharacter::OnInventoryWeightUpdated(float InWeight, float InMaxWeight)
+void AActionCharacter::RecalcMoveSpeed(const FVector2D& LastMoveInput)
 {
-	if (InMaxWeight <= 0.0f)
-	{
-		return;
-	}
-
 	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
 	if (!MoveComp)
 	{
 		return;
 	}
 
-	// 혹시 BaseWalkSpeed가 0으로 들어왔으면 한 번 더 잡아둠
-	if (BaseWalkSpeed <= 0.0f)
-	{
-		BaseWalkSpeed = MoveComp->MaxWalkSpeed;
-	}
-
-	const float Ratio = InWeight / InMaxWeight;
-
-	// 100% 초과면 이동 불가
-	if (Ratio > BlockThreshold)
+	// (1) 착지/과적/툴락이면 그냥 완전 차단
+	if (bLandingLocked || bOverweightBlocked || bMoveLockedByMining || bMoveLockedByHarvest)
 	{
 		MoveComp->StopMovementImmediately();
-		MoveComp->MaxWalkSpeed = 0.0f;
+		MoveComp->DisableMovement(); // MOVE_None
 		return;
 	}
 
-	// 70% 이상이면 속도 50%
+	// (2) 움직일 수 있는 상태라면 Walking 보장
+	if (MoveComp->MovementMode == MOVE_None)
+	{
+		MoveComp->SetMovementMode(MOVE_Walking);
+	}
+
+	// (3) 기본 속도 결정(걷기/스프린트/뒤로/앉기)
+	float BaseSpeed = WalkSpeed;
+
+	if (bIsCrouched)
+	{
+		BaseSpeed = MoveComp->MaxWalkSpeedCrouched; // 150 세팅해둔 값
+	}
+	else
+	{
+		// 뒤로 이동 제한
+		if (LastMoveInput.Y < -0.1f)
+		{
+			BaseSpeed = BackwardMaxSpeed; // 200
+		}
+		else
+		{
+			// 스프린트
+			if (bWantsSprint)
+			{
+				BaseSpeed = SprintSpeed; // 650
+			}
+			else
+			{
+				BaseSpeed = WalkSpeed; // 200
+			}
+		}
+	}
+
+	// (4) 인벤 무게 배율 적용
+	float FinalSpeed = BaseSpeed * WeightSpeedMultiplier;
+
+	// 안전장치
+	if (FinalSpeed < 0.0f)
+	{
+		FinalSpeed = 0.0f;
+	}
+
+	MoveComp->MaxWalkSpeed = FinalSpeed;
+}
+
+void AActionCharacter::OnInventoryWeightUpdated(float InWeight, float InMaxWeight)
+{
+	
+	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
+	if (!MoveComp)
+	{
+		return;
+	}
+
+	if (InMaxWeight <= 0.0f)
+	{
+		// 비정상이면 페널티 해제
+		WeightSpeedMultiplier = 1.0f;
+		bOverweightBlocked = false;
+
+		// 현재 입력 상태 기반으로 속도 재계산 (입력값이 없으니 (0,0) 넣음)
+		RecalcMoveSpeed(FVector2D::ZeroVector);
+		return;
+	}
+
+	float Ratio = InWeight / InMaxWeight;
+	Ratio = FMath::Clamp(Ratio, 0.0f, 10.0f);
+
+	// Block: 과적 -> 이동 완전 차단
+	if (Ratio >= BlockThreshold)
+	{
+		bOverweightBlocked = true;
+		WeightSpeedMultiplier = 0.0f;
+
+		MoveComp->StopMovementImmediately();
+		MoveComp->DisableMovement(); // MOVE_None
+
+		UE_LOG(LogTemp, Warning, TEXT("[WeightUpdated] BLOCK Ratio=%.2f  W=%.1f/%.1f"), Ratio, InWeight, InMaxWeight);
+		return;
+	}
+
+	// 여기까지 왔으면 Block 해제 상태
+	if (bOverweightBlocked)
+	{
+		bOverweightBlocked = false;
+
+		// 다시 걷기 모드 복구
+		if (MoveComp->MovementMode == MOVE_None)
+		{
+			MoveComp->SetMovementMode(MOVE_Walking);
+		}
+	}
+
+	// Slow: 감속 배율 적용
 	if (Ratio >= SlowThreshold)
 	{
-		MoveComp->MaxWalkSpeed = BaseWalkSpeed * BlockThreshold;
-		return;
+		WeightSpeedMultiplier = SlowSpeedMultiplier; // 예: 0.5
+		UE_LOG(LogTemp, Warning, TEXT("[WeightUpdated] SLOW Ratio=%.2f Mul=%.2f  W=%.1f/%.1f"),
+			Ratio, WeightSpeedMultiplier, InWeight, InMaxWeight);
+	}
+	else
+	{
+		WeightSpeedMultiplier = 1.0f;
+		UE_LOG(LogTemp, Warning, TEXT("[WeightUpdated] NORMAL Ratio=%.2f Mul=%.2f  W=%.1f/%.1f"),
+			Ratio, WeightSpeedMultiplier, InWeight, InMaxWeight);
 	}
 
-	// 정상
-	MoveComp->MaxWalkSpeed = BaseWalkSpeed;
+	// 최종 속도 재계산 (현재 입력 벡터를 알 수 없으니 0 넣고,
+	// 실제 이동 중이면 다음 OnMove에서 Recalc가 다시 한 번 들어가면서 정확히 갱신됨)
+	RecalcMoveSpeed(FVector2D::ZeroVector);
+	
 }
 
 
@@ -534,31 +581,26 @@ void AActionCharacter::OnCrouchToggle()
 
 void AActionCharacter::OnSprintStarted()
 {
-	if (bIsCrouched) // 앉아있으면 달리기 불가
-	{
+	if (bIsCrouched)
 		return;
-	}
 
-	GetCharacterMovement()->MaxWalkSpeed = 650.0f; //달리기 속도
-
-	if (bLandingLocked)
-	{
+	if (bLandingLocked || bOverweightBlocked || bMoveLockedByMining || bMoveLockedByHarvest)
 		return;
-	}
 
 	bWantsSprint = true;
+
+	
+	RecalcMoveSpeed(FVector2D(0.0f, 1.0f));
 }
 
 void AActionCharacter::OnSprintStopped()
 {
-	GetCharacterMovement()->MaxWalkSpeed = 200.0f; //기본속도로 복귀 시킴
-
-	if (bLandingLocked)
-	{
-		return;
-	}
-	
 	bWantsSprint = false;
+
+	if (bLandingLocked || bOverweightBlocked || bMoveLockedByMining || bMoveLockedByHarvest)
+		return;
+
+	RecalcMoveSpeed(FVector2D(0.0f, 1.0f));
 }
 
 void AActionCharacter::OnInteration()
@@ -661,20 +703,23 @@ void AActionCharacter::OnHarvestStarted()
 
 void AActionCharacter::EndHarvest()
 {
-	// 잠금 OFF
 	bIsHarvesting = false;
+	bMoveLockedByHarvest = false;
 
 	PendingHarvestTarget = nullptr;
-	UE_LOG(LogTemp, Log, TEXT("PendingHarvestTarget = null"));
 	PendingHarvestImpactPoint = FVector::ZeroVector;
 
-	// 이동 복구
-	if (GetCharacterMovement())
+	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
 	{
-		 GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		if (MoveComp->MovementMode == MOVE_None)
+		{
+			MoveComp->SetMovementMode(MOVE_Walking);
+		}
 
-		 GetCharacterMovement()->MaxWalkSpeed = 200.0f;
+		// 무게/스프린트 상태 반영해서 최종 속도 갱신
+		RecalcMoveSpeed(FVector2D::ZeroVector);
 	}
+
 	if (bToolYawLocked)
 	{
 		RestoreToolLockSnapshot();
@@ -926,23 +971,27 @@ void AActionCharacter::PlayDead()
 void AActionCharacter::EndMining()
 {
 	bIsMining = false;
+	bMoveLockedByMining = false;
 
 	PendingMiningTarget = nullptr;
-	UE_LOG(LogTemp, Log, TEXT("PendingMiningTarget = null"));
 	PendingMiningImpactPoint = FVector::ZeroVector;
 
-	if (GetCharacterMovement())
+	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
 	{
-		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-		GetCharacterMovement()->MaxWalkSpeed = 200.0f;
+		if (MoveComp->MovementMode == MOVE_None)
+		{
+			MoveComp->SetMovementMode(MOVE_Walking);
+		}
+
+		RecalcMoveSpeed(FVector2D::ZeroVector);
 	}
 
 	if (bToolYawLocked)
 	{
 		RestoreToolLockSnapshot();
 	}
-}
 
+}
 
 void AActionCharacter::SetHeldItemType(EItemType NewType) // 지금 뭐들고 있는지 
 {
