@@ -54,7 +54,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	float InGameStartTime = 0.5f;
 
-	UPROPERTY(BlueprintReadOnly, Category = "GameData")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GameData")
 	EGameState CurrentState;
 
 private:
