@@ -51,7 +51,8 @@ void AAnimalBase::OnTakeDamage(
 	AController* InstigatedBy, 
 	AActor* DamageCauser)
 {
-	PlayHit();
+	if (CurrentHealth > DefaultMinimum) PlayHit();
+	
 	
 	CurrentHealth = FMath::Max(CurrentHealth - Damage, DefaultMinimum);
 	if (HealthBar)
@@ -107,7 +108,7 @@ void AAnimalBase::PlayDead()
 		MyController->UnPossess();
 	}
 
-	if (AnimalDeadAnimation)
+	if (AnimalDeadAnimation && !IsDeadAlready)
 	{
 		if (USkeletalMeshComponent* MeshComp = GetMesh())
 		{
@@ -116,15 +117,15 @@ void AAnimalBase::PlayDead()
 				Anim->Montage_Play(AnimalDeadAnimation);
 			}
 		}
+		GetWorldTimerManager().SetTimer(
+			DeadTimerHandle,
+			this,
+			&AAnimalBase::DestroyAnimal,
+			2.5f,
+			false
+		);
+		IsDeadAlready = true;
 	}
-
-	GetWorldTimerManager().SetTimer(
-		DeadTimerHandle,
-		this,
-		&AAnimalBase::DestroyAnimal,
-		2.5f,
-		false
-	);
 }
 
 void AAnimalBase::DestroyAnimal()

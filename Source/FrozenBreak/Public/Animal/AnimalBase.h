@@ -80,4 +80,6 @@ private:
 	FTimerHandle HealthBarTimerHandle;
 	FTimerHandle DeadTimerHandle;
 	float HealthBarVisibleTime = 5.0f;
+
+	bool IsDeadAlready = false;
 };
