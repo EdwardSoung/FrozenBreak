@@ -249,6 +249,9 @@ private:
 	// 속도 최종 재계산(딱 한 군데에서만 MaxWalkSpeed 만짐)
 	void RecalcMoveSpeed(const FVector2D& LastMoveInput);
 
+	// 무게 패널티가 시작되면 달리기 금지.
+	bool bSprintBlockedByWeight = false;
+
 	// 무게 이벤트
 	UFUNCTION()
 	void OnInventoryWeightUpdated(float InWeight, float InMaxWeight);

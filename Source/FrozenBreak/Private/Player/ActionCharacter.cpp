@@ -364,7 +364,7 @@ void AActionCharacter::RecalcMoveSpeed(const FVector2D& LastMoveInput)
 		return;
 	}
 
-	// (1) 착지/과적/툴락이면 그냥 완전 차단
+	// 착지/과적/툴락이면 그냥 완전 차단
 	if (bLandingLocked || bOverweightBlocked || bMoveLockedByMining || bMoveLockedByHarvest)
 	{
 		MoveComp->StopMovementImmediately();
@@ -372,13 +372,13 @@ void AActionCharacter::RecalcMoveSpeed(const FVector2D& LastMoveInput)
 		return;
 	}
 
-	// (2) 움직일 수 있는 상태라면 Walking 보장
+	// 움직일 수 있는 상태라면 Walking 보장
 	if (MoveComp->MovementMode == MOVE_None)
 	{
 		MoveComp->SetMovementMode(MOVE_Walking);
 	}
 
-	// (3) 기본 속도 결정(걷기/스프린트/뒤로/앉기)
+	// 기본 속도 결정(걷기/스프린트/뒤로/앉기)
 	float BaseSpeed = WalkSpeed;
 
 	if (bIsCrouched)
@@ -406,13 +406,23 @@ void AActionCharacter::RecalcMoveSpeed(const FVector2D& LastMoveInput)
 		}
 	}
 
-	// (4) 인벤 무게 배율 적용
+	// 인벤 무게 배율 적용
 	float FinalSpeed = BaseSpeed * WeightSpeedMultiplier;
 
 	// 안전장치
 	if (FinalSpeed < 0.0f)
 	{
 		FinalSpeed = 0.0f;
+	}
+
+	// 과적시 달리기 금지 
+	if (bWantsSprint && !bSprintBlockedByWeight)
+	{
+		BaseSpeed = SprintSpeed;
+	}
+	else
+	{
+		BaseSpeed = WalkSpeed;
 	}
 
 	MoveComp->MaxWalkSpeed = FinalSpeed;
@@ -472,12 +482,19 @@ void AActionCharacter::OnInventoryWeightUpdated(float InWeight, float InMaxWeigh
 		WeightSpeedMultiplier = SlowSpeedMultiplier; // 예: 0.5
 		UE_LOG(LogTemp, Warning, TEXT("[WeightUpdated] SLOW Ratio=%.2f Mul=%.2f  W=%.1f/%.1f"),
 			Ratio, WeightSpeedMultiplier, InWeight, InMaxWeight);
+		bSprintBlockedByWeight = true;
+		if (bWantsSprint)
+		{
+			bWantsSprint = false;
+
+		}
 	}
 	else
 	{
 		WeightSpeedMultiplier = 1.0f;
 		UE_LOG(LogTemp, Warning, TEXT("[WeightUpdated] NORMAL Ratio=%.2f Mul=%.2f  W=%.1f/%.1f"),
 			Ratio, WeightSpeedMultiplier, InWeight, InMaxWeight);
+		bSprintBlockedByWeight = false;
 	}
 
 	// 최종 속도 재계산 (현재 입력 벡터를 알 수 없으니 0 넣고,
@@ -585,6 +602,8 @@ void AActionCharacter::OnSprintStarted()
 		return;
 
 	if (bLandingLocked || bOverweightBlocked || bMoveLockedByMining || bMoveLockedByHarvest)
+		return;
+	if (bSprintBlockedByWeight)
 		return;
 
 	bWantsSprint = true;
