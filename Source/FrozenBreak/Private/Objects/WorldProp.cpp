@@ -36,6 +36,7 @@ AWorldProp::AWorldProp()
 	SetRootComponent(Mesh);
 
 	// 트레이스가 맞도록 쿼리 활성화
+	Mesh->SetCollisionProfileName(TEXT("Custom"));
 	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	// 인터랙션 트레이스 채널 Block (InteractionComponent와 동일 채널)
@@ -109,10 +110,6 @@ void AWorldProp::DoAction_Implementation()
 		}
 		if (Data->PropType == EPropType::CraftingTable)
 		{
-			// HUD : 제작대 UI를 띄워야 한다.
-			// 중복실행을 막아야 함
-
-
 			if (UUISubSystem* UISystem = UUISubSystem::Get(this))
 			{
 				UISystem->ShowWidget(EWidgetType::CraftInventory);
@@ -277,7 +274,7 @@ void AWorldProp::RockAction()
 			if (auto Durability = Cast<UPropDurabilityWidget>(DurabilityWidget->GetUserWidgetObject()))
 			{
 				// Rock 메시 위에서 스폰
-				FVector SpawnLocation = GetActorLocation() + FVector(0, 0, 85);
+				FVector SpawnLocation = GetActorLocation() + FVector(0, 0, 125);
 
 				// ItemFactory로 스폰, 밑에 작업을 위해 저장해놓는다
 				for (auto GenItem : Data->GenerateItems)
