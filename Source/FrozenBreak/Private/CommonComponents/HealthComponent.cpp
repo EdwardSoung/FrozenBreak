@@ -25,47 +25,50 @@ void UHealthComponent::SetPlayerHealth(float InHealthValue)
 			{
 				EventSystem->Character.OnPlayerDead.Broadcast();
 
+				return;
 			}
 		}
-	}
 
-	const float HealthRatio = (MaxHealth > 0.0f) ? (CurrentHealth / MaxHealth) : 0.0f;
+		const float HealthRatio = (MaxHealth > 0.0f) ? (CurrentHealth / MaxHealth) : 0.0f;
 
-	// 20% 미만 진입
-	if (!bIsLowHealth && HealthRatio <= LowHealthThreshold)
-	{
-		bIsLowHealth = true;
-
-		if (LowHealthHeartbeatSound && HeartbeatAudioComponent)
+		// 20% 미만 진입
+		if (!bIsLowHealth && HealthRatio <= LowHealthThreshold)
 		{
-			HeartbeatAudioComponent->SetSound(LowHealthHeartbeatSound);
-			HeartbeatAudioComponent->FadeIn(0.25f, 1.0f);
+			bIsLowHealth = true;
+
+			if (LowHealthHeartbeatSound && HeartbeatAudioComponent)
+			{
+				HeartbeatAudioComponent->SetSound(LowHealthHeartbeatSound);
+				HeartbeatAudioComponent->FadeIn(0.25f, 1.0f);
+			}
+		}
+		// 20% 이상 회복
+		else if (bIsLowHealth && HealthRatio > LowHealthThreshold)
+		{
+			bIsLowHealth = false;
+
+			if (HeartbeatAudioComponent && HeartbeatAudioComponent->IsPlaying())
+			{
+				HeartbeatAudioComponent->FadeOut(0.25f, 0.0f);
+			}
+		}
+
+		//저체력 상태면 “체력에 따라” 볼륨/피치 계속 갱신
+		if (bIsLowHealth && HeartbeatAudioComponent && HeartbeatAudioComponent->IsPlaying())
+		{
+			// HealthRatio: 0.2 -> 0.0 로 내려갈수록 강해져야 함
+			// t: 0 (0.2일 때) ~ 1 (0.0일 때)
+			const float t = FMath::Clamp((LowHealthThreshold - HealthRatio) / LowHealthThreshold, 0.0f, 1.0f);
+
+			const float NewVolume = FMath::Lerp(HeartbeatVolumeMin, HeartbeatVolumeMax, t);
+			const float NewPitch = FMath::Lerp(HeartbeatPitchMin, HeartbeatPitchMax, t);
+
+			HeartbeatAudioComponent->SetVolumeMultiplier(NewVolume);
+			HeartbeatAudioComponent->SetPitchMultiplier(NewPitch);
 		}
 	}
-	// 20% 이상 회복
-	else if (bIsLowHealth && HealthRatio > LowHealthThreshold)
-	{
-		bIsLowHealth = false;
 
-		if (HeartbeatAudioComponent && HeartbeatAudioComponent->IsPlaying())
-		{
-			HeartbeatAudioComponent->FadeOut(0.25f, 0.0f);
-		}
-	}
-
-	//저체력 상태면 “체력에 따라” 볼륨/피치 계속 갱신
-	if (bIsLowHealth && HeartbeatAudioComponent && HeartbeatAudioComponent->IsPlaying())
-	{
-		// HealthRatio: 0.2 -> 0.0 로 내려갈수록 강해져야 함
-		// t: 0 (0.2일 때) ~ 1 (0.0일 때)
-		const float t = FMath::Clamp((LowHealthThreshold - HealthRatio) / LowHealthThreshold, 0.0f, 1.0f);
-
-		const float NewVolume = FMath::Lerp(HeartbeatVolumeMin, HeartbeatVolumeMax, t);
-		const float NewPitch = FMath::Lerp(HeartbeatPitchMin, HeartbeatPitchMax, t);
-
-		HeartbeatAudioComponent->SetVolumeMultiplier(NewVolume);
-		HeartbeatAudioComponent->SetPitchMultiplier(NewPitch);
-	}
+	
 }
 
 // Called when the game starts

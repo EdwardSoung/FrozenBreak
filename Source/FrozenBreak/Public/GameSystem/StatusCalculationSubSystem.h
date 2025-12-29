@@ -60,6 +60,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StartStatLoop();
 
+	UFUNCTION()
+	void StopAllTimer();
+
 private:
 	// 체온 지속 셋팅 타이머 시작
 	void StartTemperatureLoop();

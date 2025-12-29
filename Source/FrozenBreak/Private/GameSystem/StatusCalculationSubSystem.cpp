@@ -8,6 +8,11 @@ void UStatusCalculationSubSystem::Initialize(FSubsystemCollectionBase& Collectio
 {
 	Super::Initialize(Collection);
 	EventSystem = UEventSubSystem::Get(this);
+
+	if (EventSystem)
+	{
+		EventSystem->Character.OnPlayerDead.AddDynamic(this, &UStatusCalculationSubSystem::StopAllTimer);
+	}
 }
 
 void UStatusCalculationSubSystem::Deinitialize()
@@ -46,6 +51,13 @@ void UStatusCalculationSubSystem::StartStatLoop()
 	StartTemperatureLoop();
 	StartFatigueLoop();
 	StartHungerLoop();
+}
+
+void UStatusCalculationSubSystem::StopAllTimer()
+{
+	GetWorld()->GetTimerManager().ClearTimer(TemperatureTimer);
+	GetWorld()->GetTimerManager().ClearTimer(HungerTimer);
+	GetWorld()->GetTimerManager().ClearTimer(FatigueTimer);
 }
 
 void UStatusCalculationSubSystem::StartTemperatureLoop()

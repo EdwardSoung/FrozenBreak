@@ -20,6 +20,7 @@
 
 #include "GameSystem/ItemFactorySubSystem.h"
 #include "GameSystem/EventSubSystem.h"
+#include "GameSystem/FrozenForestGameState.h"
 
 #include "Interface/Interactable.h"
 #include "Player/Components/InteractionComponent.h"
@@ -334,7 +335,10 @@ void AActionCharacter::Landed(const FHitResult& Hit) // 착지
 // ===== Movement =====
 void AActionCharacter::OnMove(const FInputActionValue& Value)
 {
-	if (bHitLocked) return;
+	if (bIsDead)
+	{
+		return;
+	}
 	const FVector2D Input = Value.Get<FVector2D>();
 
 	// 완전 차단 조건들
@@ -508,7 +512,10 @@ void AActionCharacter::OnInventoryWeightUpdated(float InWeight, float InMaxWeigh
 // ===== Look =====
 void AActionCharacter::OnLook(const FInputActionValue& Value)
 {
-
+	if (bIsDead)
+	{
+		return;
+	}
 	const FVector2D Input = Value.Get<FVector2D>();
 	if (!Controller)
 	{
@@ -520,6 +527,10 @@ void AActionCharacter::OnLook(const FInputActionValue& Value)
 }
 void AActionCharacter::PlayJumpSFX()
 {
+	if (bIsDead)
+	{
+		return;
+	}
 	if (bHitLocked) return;
 	// 무음 확률
 	if (JumpSkipChance > 0.0f && FMath::FRand() < JumpSkipChance)
@@ -562,6 +573,10 @@ void AActionCharacter::PlayJumpSFX()
 
 void AActionCharacter::OnJumpStarted()
 {
+	if (bIsDead)
+	{
+		return;
+	}
 	UE_LOG(LogTemp, Warning, TEXT("[Jump] Jump() CALLED"));
 	if(GetCharacterMovement()->IsFalling())
 	{
@@ -573,21 +588,37 @@ void AActionCharacter::OnJumpStarted()
 
 void AActionCharacter::OnJumpStopped()
 {
+	if (bIsDead)
+	{
+		return;
+	}
 	StopJumping();
 }
 
 void AActionCharacter::OnCrouchHoldStarted()
 {
+	if (bIsDead)
+	{
+		return;
+	}
 	Crouch();
 }
 
 void AActionCharacter::OnCrouchHoldCompleted()
 {
+	if (bIsDead)
+	{
+		return;
+	}
 	UnCrouch();
 }
 
 void AActionCharacter::OnCrouchToggle()
 {
+	if (bIsDead)
+	{
+		return;
+	}
 	if (bIsCrouched)
 	{
 		UnCrouch();
@@ -600,6 +631,10 @@ void AActionCharacter::OnCrouchToggle()
 
 void AActionCharacter::OnSprintStarted()
 {
+	if (bIsDead)
+	{
+		return;
+	}
 	if (bHitLocked) 
 		return;
 	if (bIsCrouched)
@@ -618,6 +653,10 @@ void AActionCharacter::OnSprintStarted()
 
 void AActionCharacter::OnSprintStopped()
 {
+	if (bIsDead)
+	{
+		return;
+	}
 	bWantsSprint = false;
 
 	if (bLandingLocked || bOverweightBlocked || bMoveLockedByMining || bMoveLockedByHarvest)
@@ -628,6 +667,11 @@ void AActionCharacter::OnSprintStopped()
 
 void AActionCharacter::OnInteration()
 {
+	if (bIsDead)
+	{
+		return;
+	}
+
 	if (bHitLocked) 
 		return;
 	if (bLandingLocked)
@@ -956,6 +1000,14 @@ void AActionCharacter::OnPlayerTakeDamage(
 	AController* InstigatedBy,
 	AActor* DamageCauser)
 {
+	if (auto GameState = GetWorld()->GetGameState<AFrozenForestGameState>())
+	{
+		if (GameState->GetGameState() != EGameState::Playing)
+		{
+			return;
+		}
+	}
+
 	if (UEventSubSystem* Event = UEventSubSystem::Get(this))
 	{
 		Event->Status.OnSetHealth.Broadcast(-Damage);
@@ -965,16 +1017,22 @@ void AActionCharacter::OnPlayerTakeDamage(
 
 void AActionCharacter::PlayDead()
 {
-	if (!InvincibleTester && DeadAnimation)
+	if (bIsDead || InvincibleTester)
+	{
+		return;
+	}
+
+	if (DeadAnimation)
 	{
 		if (USkeletalMeshComponent* MeshComp = GetMesh())
 		{
 			if (UAnimInstance* Anim = MeshComp->GetAnimInstance())
-			{
+			{				
 				Anim->Montage_Play(DeadAnimation);
 
+				bIsDead = true;
 				// 입력 차단
-				if (APlayerController* PC = Cast<APlayerController>(GetController())) DisableInput(PC);
+				/*if (APlayerController* PC = Cast<APlayerController>(GetController())) DisableInput(PC);
 				FTimerHandle DeadTimerHandle;
 				GetWorldTimerManager().SetTimer(
 					DeadTimerHandle,
@@ -986,7 +1044,7 @@ void AActionCharacter::PlayDead()
 					},
 					2.5f,
 					false
-				);
+				);*/
 
 			}
 		}
@@ -1089,6 +1147,17 @@ void AActionCharacter::OnToolMontageEnded(UAnimMontage* Montage, bool bInterrupt
 		EndMining();
 		RestoreToolLockSnapshot();
 	}
+}
+
+void AActionCharacter::OnDeadMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (USkeletalMeshComponent* MeshComp = GetMesh())
+	{
+		if (UAnimInstance* Anim = MeshComp->GetAnimInstance())
+		{
+			Anim->Montage_Pause(Montage);
+		}
+	}	
 }
 
 void AActionCharacter::OnToolHit() // 지금 들고있는 무기에 맞춰 행동

@@ -252,6 +252,8 @@ private:
 	// 무게 패널티가 시작되면 달리기 금지.
 	bool bSprintBlockedByWeight = false;
 
+
+
 	// 무게 이벤트
 	UFUNCTION()
 	void OnInventoryWeightUpdated(float InWeight, float InMaxWeight);
@@ -294,7 +296,8 @@ protected:
 
 	UFUNCTION()
 	void OnToolMontageEnded(UAnimMontage* Montage, bool bInterrupted);
-	
+	UFUNCTION()
+	void OnDeadMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 
 
@@ -332,9 +335,6 @@ public:
 	void OnActionPressed(); // 맨손일때 방어키 누른상태
 	UFUNCTION()
 	void OnActionReleased(); // 맨손일 때 방어키 땔 때 
-
-
-	
 
 
 public:
@@ -435,6 +435,9 @@ public:
 
 
 	int32 LastHitMontageIndex = INDEX_NONE;
+
+	//사망
+	bool bIsDead = false;
 	
 public:
 	// ===== 공격 입력 =====
