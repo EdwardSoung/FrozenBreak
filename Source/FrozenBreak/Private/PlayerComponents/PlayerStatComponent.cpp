@@ -161,6 +161,14 @@ void UPlayerStatComponent::RefreshEquipments()
 	}
 }
 
+void UPlayerStatComponent::SendCurrentFatigue()
+{
+	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+	{
+		EventSystem->Character.OnFatigueChecked.Broadcast(CurrentFatigue);
+	}
+}
+
 void UPlayerStatComponent::SetPlayerTemperature(float InTemperatureValue)
 {
 	if (CurrentTemperature > 0 || InTemperatureValue > 0)

@@ -43,6 +43,8 @@ protected:
 	UFUNCTION()
 	void RefreshEquipments();
 
+	void SendCurrentFatigue();
+
 public:
 
 protected:
