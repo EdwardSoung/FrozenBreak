@@ -90,7 +90,7 @@ FString AFrozenForestGameState::TimeToText()
 	{
 		TimeText = FString::Printf(TEXT("%02d시간 "), Hour);
 	}
-	TimeText + FString::Printf(TEXT("%02d분"), Minute);
+	TimeText += FString::Printf(TEXT("%02d분"), Minute);
 
 	return TimeText;
 }
