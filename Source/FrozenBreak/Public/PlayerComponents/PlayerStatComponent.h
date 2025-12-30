@@ -48,34 +48,34 @@ protected:
 public:
 
 protected:
-	// ------------------------------------------------------------------------------ �÷��̾� �µ� ��
-	// �÷��̾� �ִ� �µ� ��
+	// ------------------------------------------------------------------------------ 플레이어 온도 값
+	// 최대 온도 수치
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Status|Temperature")
 	float MaxTemperature = 100.0f;
 
-	// �÷��̾� ���� �µ� ��
+	// 현재 온도 수치
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Temperature")
 	float CurrentTemperature = 0.0f;
 	// ------------------------------------------------------------------------------|
 
 
-	// ------------------------------------------------------------------------------ �÷��̾� �Ƿε� ��
-	// �÷��̾� �ִ� �µ� ��
+	// ------------------------------------------------------------------------------ 플레이어 활동력 값
+	// 최대 활동력 수치
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Status|Fatigue")
 	float MaxFatigue = 100.0f;
 
-	// �÷��̾� ���� �µ� ��
+	// 현재 활동력 수치
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Fatigue")
 	float CurrentFatigue = 0.0f;
 	// ------------------------------------------------------------------------------|
 
 
-	// ------------------------------------------------------------------------------ �÷��̾� ������ ��
-	// �÷��̾� �ִ� �µ� ��
+	// ------------------------------------------------------------------------------ 플레이어 포만감 값
+	// 최대 포만감 수치
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Status|Hunger")
 	float MaxHunger = 100.0f;
 
-	// �÷��̾� ���� �µ� ��
+	// 현재 포만감 수치
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status|Hunger")
 	float CurrentHunger = 0.0f;
 	// ------------------------------------------------------------------------------|
