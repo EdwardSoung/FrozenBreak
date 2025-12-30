@@ -50,7 +50,8 @@ public:
 	void OnSelect_Implementation(bool bIsStart) override;
 
 private:
-	const float FatigueCostPerWork = -0.5f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Data")
+	float FatigueCostPerWork = -50.0f;
 
 	float ToolAtkPower = 0.f;
 

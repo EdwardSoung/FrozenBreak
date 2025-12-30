@@ -197,14 +197,14 @@ void UPlayerStatComponent::SetPlayerFatigue(float InFatigueValue)
 		{
 			EventSystem->Status.OnFatiguePointChanged.Broadcast(CurrentFatigue / MaxFatigue);
 		}
-	}
+	}/*
 	else
 	{
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
 			EventSystem->Status.OnSetHealth.Broadcast(InFatigueValue);
 		}
-	}
+	}*/
 
 }
 
