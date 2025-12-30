@@ -53,6 +53,7 @@ void UPlayerStatComponent::BindStatSettingEvents()
 		EventSystem->Status.OnSetFatigue.AddDynamic(this, &UPlayerStatComponent::SetPlayerFatigue);
 		EventSystem->Status.OnSetHunger.AddDynamic(this, &UPlayerStatComponent::SetPlayerHunger);
 
+		EventSystem->Character.OnRequesetFatigueCheck.AddDynamic(this, &UPlayerStatComponent::SendCurrentFatigue);
 		EventSystem->Character.OnUseItem.AddDynamic(this, &UPlayerStatComponent::ItemUsed);
 		EventSystem->Character.OnEquipHandItemUsed.AddDynamic(this, &UPlayerStatComponent::EquipHandItemUsed);
 
@@ -197,15 +198,7 @@ void UPlayerStatComponent::SetPlayerFatigue(float InFatigueValue)
 		{
 			EventSystem->Status.OnFatiguePointChanged.Broadcast(CurrentFatigue / MaxFatigue);
 		}
-	}/*
-	else
-	{
-		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
-		{
-			EventSystem->Status.OnSetHealth.Broadcast(InFatigueValue);
-		}
-	}*/
-
+	}
 }
 
 void UPlayerStatComponent::SetPlayerHunger(float InHungerValue)
@@ -220,7 +213,6 @@ void UPlayerStatComponent::SetPlayerHunger(float InHungerValue)
 	}
 	else
 	{
-
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
 			EventSystem->Status.OnSetHealth.Broadcast(InHungerValue);
