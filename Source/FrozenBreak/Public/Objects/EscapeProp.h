@@ -49,10 +49,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnSelect_Implementation(bool bIsStart) override;
 
-private:
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Data")
 	float FatigueCostPerWork = -50.0f;
-
+private:
 	float ToolAtkPower = 0.f;
 
 	float MaxDurability = 0.0f;
