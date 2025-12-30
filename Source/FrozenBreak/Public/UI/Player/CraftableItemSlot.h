@@ -27,6 +27,4 @@ protected:
 	TObjectPtr<class UImage> CraftSelected;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UImage> CraftItemIcon;
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UTextBlock> CraftableAmount;
 };

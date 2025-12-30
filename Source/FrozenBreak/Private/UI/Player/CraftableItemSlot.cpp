@@ -20,8 +20,6 @@ void UCraftableItemSlot::NativeOnListItemObjectSet(UObject* ListItemObject)
 		{
 			CraftItemIcon->SetBrushFromTexture(ItemData->GetData()->ItemIcon.Get());
 		}
-
-		CraftableAmount->SetText(FText::AsNumber(ItemData->GetAmount()));
 	}
 
 	if (CraftSelected)
