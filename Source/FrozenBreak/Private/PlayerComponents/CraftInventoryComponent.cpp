@@ -4,7 +4,6 @@
 #include "GameSystem/ItemFactorySubSystem.h"
 #include "Data/ItemDataList.h"
 #include <GameSystem/UISubSystem.h>
-#include <GameSystem/StatusCalculationSubSystem.h>
 
 UCraftInventoryComponent::UCraftInventoryComponent()
 {
@@ -23,9 +22,6 @@ void UCraftInventoryComponent::BeginPlay()
 		EventSystem->Character.OnSendInventoryData.AddDynamic(this, &UCraftInventoryComponent::OnReceiveInventoryData);
 		EventSystem->Character.OnCraftRequested.AddDynamic(this, &UCraftInventoryComponent::StartCrafting);
 		EventSystem->Character.OnCookRequested.AddDynamic(this, &UCraftInventoryComponent::StartCooking);
-		EventSystem->Character.OnFatigueChecked.AddDynamic(this, &UCraftInventoryComponent::SetCurrentFatigue);
-
-		EventSystem->Character.OnRequesetFatigueCheck.Broadcast();
 	}
 }
 
@@ -260,9 +256,12 @@ UInventoryItem* UCraftInventoryComponent::GetItem(EItemType Type)
 
 void UCraftInventoryComponent::StartCrafting(UInventoryItem* ItemToCraft)
 {
+	UE_LOG(LogTemp, Log, TEXT("StartCrafting : %d"), ItemToCraft->GetData()->ItemType);
+	
 	MAxCraftCost = ItemToCraft->GetData()->CraftCost;
+	UE_LOG(LogTemp, Log, TEXT("StartCrafting cost : %.2f"), MAxCraftCost);
 
-	if (MAxCraftCost > 0 && HasEnoughFatigue())
+	if (MAxCraftCost > 0)
 	{
 		CurrentItemToCraft = ItemToCraft;
 		GetWorld()->GetTimerManager().ClearTimer(CraftHandle);
@@ -271,8 +270,6 @@ void UCraftInventoryComponent::StartCrafting(UInventoryItem* ItemToCraft)
 		{
 			UISystem->ShowWidget(EWidgetType::CraftProcessBar);
 		}
-
-		GetWorld()->GetSubsystem<UStatusCalculationSubSystem>()->IncreaseFatigue(FatigueUse);
 
 		GetWorld()->GetTimerManager().SetTimer(
 			CraftHandle,
@@ -302,6 +299,9 @@ void UCraftInventoryComponent::StartCooking(UInventoryItem* InIngredient)
 		UE_LOG(LogTemp, Log, TEXT("[Cooking] No cookable recipe yet."));
 		return;
 	}
+
+	UE_LOG(LogTemp, Log, TEXT("[Cooking] First cookable recipe found. Result=%d"),
+		(int32)FirstRecipe->ResultItemType);
 
 	// 결과 아이템을 만들어서 StartCrafting으로 넘긴다
 	if (UInventoryItem* ResultItem = GetOrCreateCraftableItem(FirstRecipe->ResultItemType))
@@ -444,6 +444,9 @@ void UCraftInventoryComponent::SetCraftProcess()
 		CurrentCraftCost / MAxCraftCost
 	);
 
+	UE_LOG(LogTemp, Verbose, TEXT("Crafting... %.2f / %.2f"),
+		CurrentCraftCost, MAxCraftCost);
+
 	// 완료 체크
 	if (CurrentCraftCost >= MAxCraftCost)
 	{
@@ -455,6 +458,8 @@ void UCraftInventoryComponent::FinishCraft()
 {
 	UEventSubSystem* EventSystem = UEventSubSystem::Get(this);
 	if (!EventSystem) return;
+
+	UE_LOG(LogTemp, Log, TEXT("제작 완료!"));
 
 	if (CurrentItemToCraft.IsValid() && CurrentItemToCraft->GetData())
 	{
@@ -472,6 +477,7 @@ void UCraftInventoryComponent::FinishCraft()
 			}
 		}
 
+
 		// 초기화
 		CurrentCraftCost = 0.0f;
 		CurrentItemToCraft = nullptr;
@@ -484,9 +490,7 @@ void UCraftInventoryComponent::FinishCraft()
 			UISystem->HideWidget(EWidgetType::CraftProcessBar);
 		}
 	}
-	GetWorld()->GetSubsystem<UStatusCalculationSubSystem>()->DecreaseFatigue(FatigueUse);
 	GetWorld()->GetTimerManager().ClearTimer(CraftHandle);
-	EventSystem->Character.OnRequesetFatigueCheck.Broadcast();
 }
 
 bool UCraftInventoryComponent::CanConsumeRecipeOnce(const FCraftingRecipeRow& R) const
@@ -536,9 +540,4 @@ void UCraftInventoryComponent::ConsumeRecipeOnce(const FCraftingRecipeRow& R)
 		int32& Count = ItemCounts.FindOrAdd(Req.ItemType);
 		Count = FMath::Max(0, Count - Req.Count);
 	}
-}
-
-void UCraftInventoryComponent::SetCurrentFatigue(float InValue)
-{
-	CurrentFatigue = InValue;
 }
