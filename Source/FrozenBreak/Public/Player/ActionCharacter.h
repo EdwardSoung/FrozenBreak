@@ -263,6 +263,18 @@ protected:
 		float SlowThreshold = 0.7f;
 		UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weight|Penalty")
 		float SlowSpeedMultiplier = 0.5f;
+
+		UPROPERTY(EditDefaultsOnly, Category = "Floor Check")
+		TObjectPtr<UStaticMesh> LogcabinFloorMeshA;
+
+		UPROPERTY(EditDefaultsOnly, Category = "Floor Check")
+		TObjectPtr<UStaticMesh> LogcabinFloorMeshB;
+
+		UPROPERTY(EditDefaultsOnly, Category = "Floor Check")
+		TObjectPtr<UStaticMesh> LogcabinPorchMesh;
+
+		UPROPERTY(EditDefaultsOnly, Category = "Floor Check")
+		float TraceExtraDistance = 30.f;
 private:
 	
 	// 인벤 무게로 인한 배율
@@ -343,6 +355,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void PlayDead();
+
+	void CheckFloor();
+	void OnFloorDetected(bool bIsFloor);
 
 public:
 	//곡괭이질
@@ -539,6 +554,11 @@ private:
 	TSet<TWeakObjectPtr<AActor>> KnifeHitActors;
 
 	FTimerHandle KnifeTraceTimerHandle;
+
+	bool IsInHouse = false;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Floor Check")
+	float HouseTemperatureGaurd = 3.0f;
 
 public: // 적 공격 사운드
 	// 칼이 맞을 때 "금속/날카로운" 느낌

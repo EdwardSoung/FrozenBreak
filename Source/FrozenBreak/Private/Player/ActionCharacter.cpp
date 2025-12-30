@@ -22,6 +22,7 @@
 #include "GameSystem/EventSubSystem.h"
 #include "GameSystem/GameManager.h"
 #include "GameSystem/FrozenForestGameState.h"
+#include "GameSystem/StatusCalculationSubSystem.h"
 
 #include "Interface/Interactable.h"
 #include "Player/Components/InteractionComponent.h"
@@ -399,6 +400,8 @@ void AActionCharacter::OnMove(const FInputActionValue& Value)
 
 	AddMovementInput(GetActorForwardVector(), Input.Y);
 	AddMovementInput(GetActorRightVector(), Input.X);
+	
+	CheckFloor();
 }
 
 
@@ -1096,6 +1099,61 @@ void AActionCharacter::PlayDead()
 			}
 		}
 	}
+}
+
+void AActionCharacter::CheckFloor()
+{
+	const FVector Start = GetActorLocation();
+	const float HalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	const FVector End = Start - FVector(0, 0, HalfHeight + TraceExtraDistance);
+
+	FHitResult Hit;
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(FloorTrace), false);
+	Params.AddIgnoredActor(this);
+
+	const bool bHit = GetWorld()->LineTraceSingleByChannel(
+		Hit,
+		Start,
+		End,
+		ECC_Visibility,   // 필요하면 ECC_WorldStatic 등으로 변경
+		Params
+	);
+
+#if ENABLE_DRAW_DEBUG
+	DrawDebugLine(GetWorld(), Start, End, bHit ? FColor::Green : FColor::Red, false, 0.f, 0, 2.f);
+#endif
+
+	if (!bHit) return;
+
+	UStaticMeshComponent* SMC = Cast<UStaticMeshComponent>(Hit.GetComponent());
+	if (!SMC) return;
+
+	UStaticMesh* HitMesh = SMC->GetStaticMesh();
+	if (!HitMesh) return;
+
+	// 핵심: 특정 메시 2개 중 하나면 트리거
+	if (LogcabinFloorMeshA && LogcabinFloorMeshB && LogcabinPorchMesh)
+	{
+		if ((HitMesh == LogcabinFloorMeshA || HitMesh == LogcabinFloorMeshB) && !IsInHouse)
+		{
+			IsInHouse = true;
+
+			UE_LOG(LogTemp, Log, TEXT("OnFloorDetected"));
+			OnFloorDetected(IsInHouse);
+		}
+		else if (HitMesh == LogcabinPorchMesh && IsInHouse)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Outside"));
+			IsInHouse = false;
+			OnFloorDetected(IsInHouse);
+		}
+	}
+}
+
+void AActionCharacter::OnFloorDetected(bool bIsFloor)
+{
+	if (bIsFloor) GetWorld()->GetSubsystem<UStatusCalculationSubSystem>()->IncreaseTemperature(HouseTemperatureGaurd);
+	else GetWorld()->GetSubsystem<UStatusCalculationSubSystem>()->DecreaseTemperature(HouseTemperatureGaurd);
 }
 
 void AActionCharacter::EndMining()
