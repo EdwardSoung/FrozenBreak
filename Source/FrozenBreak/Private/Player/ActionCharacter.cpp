@@ -1593,17 +1593,24 @@ void AActionCharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterru
 }
 void AActionCharacter::BeginKnifeHitWindow()
 {
-	if (!bHasKnife)
+	if (!bIsAttacking)
+	{
 		return;
+	}
+
+	// 이미 열려있으면 중복 방지
+	if (bKnifeHitWindowOpen)
+	{
+		return;
+	}
 
 	bKnifeHitWindowOpen = true;
 	KnifeHitActors.Empty();
 
-	// 타이머로 일정 주기마다 트레이스
-	if (UWorld* World = GetWorld())
+	// 주기적으로 트레이스
+	if (GetWorld())
 	{
-		World->GetTimerManager().ClearTimer(KnifeTraceTimerHandle);
-		World->GetTimerManager().SetTimer(
+		GetWorldTimerManager().SetTimer(
 			KnifeTraceTimerHandle,
 			this,
 			&AActionCharacter::TickKnifeHitWindow,
@@ -1615,141 +1622,94 @@ void AActionCharacter::BeginKnifeHitWindow()
 
 void AActionCharacter::EndKnifeHitWindow()
 {
-	bKnifeHitWindowOpen = false;
-
-	if (UWorld* World = GetWorld())
+	if (!bKnifeHitWindowOpen)
 	{
-		World->GetTimerManager().ClearTimer(KnifeTraceTimerHandle);
+		return;
 	}
 
+	bKnifeHitWindowOpen = false;
 	KnifeHitActors.Empty();
+
+	if (GetWorld())
+	{
+		GetWorldTimerManager().ClearTimer(KnifeTraceTimerHandle);
+	}
 }
 
 void AActionCharacter::TickKnifeHitWindow()
 {
 	if (!bKnifeHitWindowOpen)
+	{
 		return;
+	}
 
-	UWorld* World = GetWorld();
-	if (!World)
+	// 혹시 공격이 끝났는데 타이머만 남아있으면 정리
+	if (!bIsAttacking)
+	{
+		EndKnifeHitWindow();
 		return;
+	}
 
-	// 트레이스 시작/끝 계산
+	// 캐릭터 기준 앞쪽 SphereTraceMulti
 	const FVector Forward = GetActorForwardVector();
-	const FVector Start = GetActorLocation()
-		+ FVector(0.0f, 0.0f, KnifeTraceUp)
-		+ Forward * KnifeTraceForwardOffset;
-
+	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, KnifeTraceUp) + Forward * KnifeTraceForwardOffset;
 	const FVector End = Start + Forward * KnifeTraceDistance;
 
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
+	TArray<FHitResult> Hits;
 
-	FHitResult Hit;
+	// 트레이스 무시 목록
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
 
-	// 구체 스윕
-	const bool bHit = World->SweepSingleByChannel(
-		Hit,
+	const bool bHit = UKismetSystemLibrary::SphereTraceMulti(
+		this,
 		Start,
 		End,
-		FQuat::Identity,
-		ECC_Pawn, //적이 Pawn/Character
-		FCollisionShape::MakeSphere(KnifeTraceRadius),
-		Params
+		KnifeTraceRadius,
+		UEngineTypes::ConvertToTraceType(ECC_Pawn),
+		false,
+		ActorsToIgnore,
+		EDrawDebugTrace::None,
+		Hits,
+		true
 	);
-
-	// 디버그 보고 싶으면 켜
-	// DrawDebugLine(World, Start, End, bHit ? FColor::Red : FColor::Green, false, 0.05f, 0, 1.0f);
-	// DrawDebugSphere(World, bHit ? Hit.ImpactPoint : End, KnifeTraceRadius, 12, bHit ? FColor::Red : FColor::Green, false, 0.05f);
 
 	if (!bHit)
-		return;
-
-	AActor* HitActor = Hit.GetActor();
-	if (!HitActor)
-		return;
-
-	// 이미 이번 공격 윈도우에서 맞춘 적이면 무시 (중복 데미지/소리 방지)
-	if (KnifeHitActors.Contains(HitActor))
-		return;
-
-	// 자기 자신/무기 등 추가 무시하고 싶으면 여기서 체크 가능
-
-	//데미지 적용 (맞았을 때만)
-	UGameplayStatics::ApplyDamage(
-		HitActor,
-		KnifeDamage,
-		GetController(),
-		this,
-		nullptr
-	);
-
-	KnifeHitActors.Add(HitActor);
-	PlayKnifeHitSFX(Hit.ImpactPoint);
-}
-
-void AActionCharacter::PlayKnifeHitSFX(const FVector& ImpactPoint)
-{
-	UWorld* World = GetWorld();
-	if (!World)
-		return;
-
-	USoundBase* Sharp = PickRandomNoRepeat(KnifeHitSharpSounds, LastKnifeSharpIndex);
-	USoundBase* Flesh = PickRandomNoRepeat(KnifeHitFleshSounds, LastKnifeFleshIndex);
-
-	// 둘 다 없으면 종료
-	if (!Sharp && !Flesh)
-		return;
-
-	const float Volume = (KnifeHitVolumeMax >= KnifeHitVolumeMin)
-		? FMath::FRandRange(KnifeHitVolumeMin, KnifeHitVolumeMax)
-		: 1.0f;
-
-	const float Pitch = (KnifeHitPitchMax >= KnifeHitPitchMin)
-		? FMath::FRandRange(KnifeHitPitchMin, KnifeHitPitchMax)
-		: 1.0f;
-
-	// 같은 타격 느낌으로 묶이게 볼륨/피치는 같은 값으로 통일
-	if (Sharp)
 	{
-		UGameplayStatics::PlaySoundAtLocation(World, Sharp, ImpactPoint, Volume, Pitch);
-	}
-	if (Flesh)
-	{
-		UGameplayStatics::PlaySoundAtLocation(World, Flesh, ImpactPoint, Volume, Pitch);
-	}
-}
-
-USoundBase* AActionCharacter::PickRandomNoRepeat(const TArray<TObjectPtr<USoundBase>>& List, int32& LastIndex) const
-{
-	const int32 Count = List.Num();
-	if (Count <= 0)
-		return nullptr;
-
-	if (Count == 1)
-	{
-		USoundBase* Only = List[0].Get();
-		LastIndex = 0;
-		return Only;
+		return;
 	}
 
-	int32 Picked = FMath::RandRange(0, Count - 1);
-
-	// 바로 직전과 같으면 한 번 더 뽑고, 그래도 같으면 옆으로
-	if (Picked == LastIndex)
+	for (const FHitResult& Hit : Hits)
 	{
-		Picked = FMath::RandRange(0, Count - 1);
-		if (Picked == LastIndex)
+		AActor* HitActor = Hit.GetActor();
+		if (!HitActor)
 		{
-			Picked = (LastIndex + 1) % Count;
+			continue;
 		}
+
+		// 나 자신 제외
+		if (HitActor == this)
+		{
+			continue;
+		}
+
+		// “한 윈도우 내 중복 타격 방지”
+		TWeakObjectPtr<AActor> Key(HitActor);
+		if (KnifeHitActors.Contains(Key))
+		{
+			continue;
+		}
+
+		KnifeHitActors.Add(Key);
+
+		// 데미지 적용
+		UGameplayStatics::ApplyDamage(
+			HitActor,
+			KnifeDamage,
+			GetController(),
+			this,
+			UDamageType::StaticClass()
+		);
 	}
-
-	USoundBase* PickedSound = List[Picked].Get();
-	if (!PickedSound)
-		return nullptr;
-
-	LastIndex = Picked;
-	return PickedSound;
 }
 

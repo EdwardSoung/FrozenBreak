@@ -27,8 +27,6 @@ public:
 	virtual bool IsTickable() const override { return bEnableTimeFlow && IsGameWorldSafe(); }
 	virtual TStatId GetStatId() const override { RETURN_QUICK_DECLARE_CYCLE_STAT(UInGameTimeSubsystem, STATGROUP_Tickables); }
 
-	int32 GetDay() { return Day; }
-
 	UFUNCTION(BlueprintCallable)
 	void SetTimeNormalized(float InNormalized);
 

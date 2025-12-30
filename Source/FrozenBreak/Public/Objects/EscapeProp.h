@@ -29,6 +29,8 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<class UHealthComponent> HealthComponent = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<class UStaticMeshComponent> MeshComponent = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Data")
@@ -42,6 +44,7 @@ protected:
 
 	const ECollisionChannel InteractableActorChannel = ECollisionChannel::ECC_GameTraceChannel1;
 public:
+	void OnDamage(float InDamage);
 	void RockAction();
 
 	UFUNCTION(BlueprintCallable)
@@ -53,8 +56,5 @@ private:
 	const float FatigueCostPerWork = -0.5f;
 
 	float ToolAtkPower = 0.f;
-
-	float MaxDurability = 0.0f;
-	float CurrentDurability = 0.0f;
 
 };

@@ -4,10 +4,6 @@
 #include "GameSystem/FrozenForestGameState.h"
 #include "GameSystem/UISubSystem.h"
 #include "GameSystem/GameManager.h"
-#include "GameSystem/TimeOfDaySubSystem.h"
-
-#include "UI/Common/PlayResultWidget.h"
-
 #include <Kismet/GameplayStatics.h>
 
 AFrozenForestGameState::AFrozenForestGameState()
@@ -51,36 +47,19 @@ void AFrozenForestGameState::OnGameStateChanged(EGameState InState)
 		if (UUISubSystem* UISystem = UUISubSystem::Get(this))
 		{
 			UISystem->HideAllWiget();
-
-			auto Result = Cast<UPlayResultWidget>(UISystem->ShowWidget(EWidgetType::PlayResult));
-
-			auto TimeSystem = GetWorld()->GetSubsystem<UTimeOfDaySubSystem>();
-			float TimeNormalized = TimeSystem->GetTimeNormalized();
-			int32 RemainDay = TimeSystem->GetDay();
-			const int32 TotalMinutes = FMath::FloorToInt(TimeNormalized * 24.0f * 60.0f);
-			const int32 Hour = (TotalMinutes / 60) % 24;
-			const int32 Minute = TotalMinutes % 60;
-
-			Result->SetResult(true)->UpdateRecord(RemainDay - 1, Hour - 12, Minute);
 		}
+		//탈출 성공 시
+		//플레이어 조작 막기
+		//성공 애니메이션
+		//기록 표기? x일 x시간x분 만에 탈출
 		break;
 	case EGameState::Fail:
 		//사망 시
 		if (UUISubSystem* UISystem = UUISubSystem::Get(this))
 		{
 			UISystem->HideAllWiget();
-
-			auto Result = Cast<UPlayResultWidget>(UISystem->ShowWidget(EWidgetType::PlayResult));
-
-			auto TimeSystem = GetWorld()->GetSubsystem<UTimeOfDaySubSystem>();
-			float TimeNormalized = TimeSystem->GetTimeNormalized();
-			int32 RemainDay = TimeSystem->GetDay();
-			const int32 TotalMinutes = FMath::FloorToInt(TimeNormalized * 24.0f * 60.0f);
-			const int32 Hour = (TotalMinutes / 60) % 24;
-			const int32 Minute = TotalMinutes % 60;
-
-			Result->SetResult(false)->UpdateRecord(RemainDay - 1, Hour - 12, Minute);
 		}
+		//플레이어 조작 막기
 		//재시작 UI
 		break;
 	}

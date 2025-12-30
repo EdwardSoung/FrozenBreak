@@ -37,9 +37,6 @@ protected:
 	UFUNCTION()
 	void SetDay(int32 InDay);
 
-	UFUNCTION()
-	void RefreshEquipment(UInventoryItem* InHandItem, UInventoryItem* InBodyItem);
-
 public:
 	void OpenWidget_Implementation();
 	void CloseWidget_Implementation();

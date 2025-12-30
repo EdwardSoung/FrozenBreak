@@ -540,38 +540,5 @@ private:
 
 	FTimerHandle KnifeTraceTimerHandle;
 
-public: // 적 공격 사운드
-	// 칼이 맞을 때 "금속/날카로운" 느낌
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat|Knife|HitSFX")
-	TArray<TObjectPtr<USoundBase>> KnifeHitSharpSounds;
-
-	// 칼이 살에 닿는 "고기 자르는" 느낌
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat|Knife|HitSFX")
-	TArray<TObjectPtr<USoundBase>> KnifeHitFleshSounds;
-
-	// 볼륨/피치 랜덤 범위
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat|Knife|HitSFX", meta = (ClampMin = "0.0"))
-	float KnifeHitVolumeMin = 0.95f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat|Knife|HitSFX", meta = (ClampMin = "0.0"))
-	float KnifeHitVolumeMax = 1.10f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat|Knife|HitSFX", meta = (ClampMin = "0.01"))
-	float KnifeHitPitchMin = 0.95f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat|Knife|HitSFX", meta = (ClampMin = "0.01"))
-	float KnifeHitPitchMax = 1.05f;
-
-	// 연속 중복 방지용(각 리스트별로 마지막 인덱스 기억)
-	UPROPERTY(Transient)
-	int32 LastKnifeSharpIndex = INDEX_NONE;
-
-	UPROPERTY(Transient)
-	int32 LastKnifeFleshIndex = INDEX_NONE;
-
-private:
-	void PlayKnifeHitSFX(const FVector& ImpactPoint);
-	USoundBase* PickRandomNoRepeat(const TArray<TObjectPtr<USoundBase>>& List, int32& LastIndex) const;
-
 
 };
