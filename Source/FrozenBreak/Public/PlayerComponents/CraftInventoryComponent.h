@@ -97,7 +97,7 @@ private:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float FatigueUse = -1.0f;
+	float FatigueUse = 1.0f;
 
 private:
 	// ===== 레시피 =====

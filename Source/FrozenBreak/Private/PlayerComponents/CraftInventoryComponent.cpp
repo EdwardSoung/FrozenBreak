@@ -273,7 +273,7 @@ void UCraftInventoryComponent::StartCrafting(UInventoryItem* ItemToCraft)
 			UISystem->ShowWidget(EWidgetType::CraftProcessBar);
 		}
 
-		GetWorld()->GetSubsystem<UStatusCalculationSubSystem>()->IncreaseFatigue(FatigueUse);
+		GetWorld()->GetSubsystem<UStatusCalculationSubSystem>()->DecreaseFatigue(FatigueUse);
 
 		GetWorld()->GetTimerManager().SetTimer(
 			CraftHandle,
@@ -428,7 +428,7 @@ void UCraftInventoryComponent::FinishCraft()
 			UISystem->HideWidget(EWidgetType::CraftProcessBar);
 		}
 	}
-	GetWorld()->GetSubsystem<UStatusCalculationSubSystem>()->DecreaseFatigue(FatigueUse);
+	GetWorld()->GetSubsystem<UStatusCalculationSubSystem>()->IncreaseFatigue(FatigueUse);
 	GetWorld()->GetTimerManager().ClearTimer(CraftHandle);
 	EventSystem->Character.OnRequesetFatigueCheck.Broadcast();
 }
