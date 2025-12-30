@@ -56,6 +56,8 @@ void UPlayerStatComponent::BindStatSettingEvents()
 		EventSystem->Character.OnRequesetFatigueCheck.AddDynamic(this, &UPlayerStatComponent::SendCurrentFatigue);
 		EventSystem->Character.OnUseItem.AddDynamic(this, &UPlayerStatComponent::ItemUsed);
 		EventSystem->Character.OnEquipHandItemUsed.AddDynamic(this, &UPlayerStatComponent::EquipHandItemUsed);
+
+		EventSystem->Character.OnRequestStatusInit.AddDynamic(this, &UPlayerStatComponent::RefreshEquipments);
 	}
 }
 
@@ -149,11 +151,23 @@ void UPlayerStatComponent::EquipHandItemUsed()
 	}
 }
 
+
 void UPlayerStatComponent::SendCurrentFatigue()
 {
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
 		EventSystem->Character.OnFatigueChecked.Broadcast(CurrentFatigue);
+	}
+}
+
+void UPlayerStatComponent::RefreshEquipments()
+{
+	if (HandEquip || BodyEquip)
+	{
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		{
+			EventSystem->Character.OnEquipRefresh.Broadcast(HandEquip, BodyEquip);
+		}
 	}
 }
 

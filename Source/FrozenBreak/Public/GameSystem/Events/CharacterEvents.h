@@ -18,6 +18,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInitInventoryUI, TArray<UInventor
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAddItemToInventoryUI, UInventoryItem*, InItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUpdateInventoryItem, EItemType, InType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRequestInventoryInit);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRequestStatusInit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTrashItem, UInventoryItem*, InItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDropItem, UInventoryItem*, InItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSendInventoryData, TArray<UInventoryItem*>, InData);
@@ -25,6 +26,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUpdateInventoryWeight, float, In
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEquipHandItem, UInventoryItem*, InData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEquipBodyItem, UInventoryItem*, InData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEquipRefresh, UInventoryItem*, InHandItem, UInventoryItem*, InBodyItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEquippedItemUsed);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUseItem, UInventoryItem*, InData);
@@ -74,6 +76,7 @@ struct FCharacterEvents
 	FOnAddItemToInventoryUI OnAddItemToInventoryUI;
 	FOnUpdateInventoryItem OnUpdateInventoryItem;
 	FOnRequestInventoryInit OnRequestInventoryInit;
+	FOnRequestStatusInit OnRequestStatusInit;
 	FOnTrashItem OnTrashItem;
 	FOnDropItem OnDropItem;
 	FOnSendInventoryData OnSendInventoryData;
@@ -83,6 +86,7 @@ struct FCharacterEvents
 	FOnEquipBodyItem OnEquipBodyItem;
 	FOnEquippedItemUsed OnEquipHandItemUsed;
 	FOnUpdateItem OnUpdateItem;
+	FOnEquipRefresh OnEquipRefresh;
 	
 	//새로 만듦
 	FOnUseItem OnUseItem;
