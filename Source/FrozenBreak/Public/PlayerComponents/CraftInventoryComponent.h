@@ -92,12 +92,12 @@ private:
 
 	inline bool HasEnoughFatigue() 
 	{
-		return MAxCraftCost <= CurrentFatigue;
+		return MaxCraftCost <= CurrentFatigue;
 	}
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float FatigueUse = 1.0f;
+	float FatigueUse = 10.0f;
 
 private:
 	// ===== 레시피 =====
@@ -136,10 +136,9 @@ private:
 	// 제작 타이머 관련 변수
 	FTimerHandle CraftHandle;
 	float CraftRate = 0.1f;
-	float CraftSpeedPerSecond = 10.0f;
 
 	// 작업량 : 기본 0(0일 시 작업 실패)
-	float MAxCraftCost = 0.0f;
+	float MaxCraftCost = 0.0f;
 
 	// 현재 작업량(0 ~ MAxCraftCost)
 	float CurrentCraftCost = 0.0f;

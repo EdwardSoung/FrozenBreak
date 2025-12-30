@@ -261,9 +261,9 @@ UInventoryItem* UCraftInventoryComponent::GetItem(EItemType Type)
 void UCraftInventoryComponent::StartCrafting(UInventoryItem* ItemToCraft)
 {	
 	if (!ItemToCraft || !ItemToCraft->GetData()) return;
-	MAxCraftCost = ItemToCraft->GetData()->CraftCost;
+	MaxCraftCost = ItemToCraft->GetData()->CraftCost;
 
-	if (MAxCraftCost > 0 && HasEnoughFatigue())
+	if (MaxCraftCost > 0 && HasEnoughFatigue())
 	{
 		CurrentItemToCraft = ItemToCraft;
 		GetWorld()->GetTimerManager().ClearTimer(CraftHandle);
@@ -373,23 +373,21 @@ void UCraftInventoryComponent::SetCraftProcess()
 	UEventSubSystem* EventSystem = UEventSubSystem::Get(this);
 	if (!EventSystem) return;
 
-	if (MAxCraftCost <= 0.f) return;
-
-	const float DeltaCost = CraftSpeedPerSecond * CraftRate;
+	if (MaxCraftCost <= 0.f) return;
 
 	CurrentCraftCost = FMath::Clamp(
-		CurrentCraftCost + DeltaCost,
+		CurrentCraftCost + CraftRate * 10,
 		0.0f,
-		MAxCraftCost
+		MaxCraftCost
 	);
 
 	// UI 갱신 (0~1)
 	EventSystem->Status.OnCurrentCraftCostChanged.Broadcast(
-		CurrentCraftCost / MAxCraftCost
+		CurrentCraftCost / MaxCraftCost
 	);
 
 	// 완료 체크
-	if (CurrentCraftCost >= MAxCraftCost)
+	if (CurrentCraftCost >= MaxCraftCost)
 	{
 		FinishCraft();
 	}
