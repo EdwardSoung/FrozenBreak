@@ -40,6 +40,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Prop|Widget")
 	TObjectPtr<class UWidgetComponent> DurabilityWidget = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Data")
+	float FatigueCostPerWork = -50.0f;
+
 	const ECollisionChannel InteractableActorChannel = ECollisionChannel::ECC_GameTraceChannel1;
 public:
 	void RockAction();
@@ -50,9 +53,6 @@ public:
 	void OnSelect_Implementation(bool bIsStart) override;
 
 private:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Data")
-	float FatigueCostPerWork = -50.0f;
-
 	float ToolAtkPower = 0.f;
 
 	float MaxDurability = 0.0f;
