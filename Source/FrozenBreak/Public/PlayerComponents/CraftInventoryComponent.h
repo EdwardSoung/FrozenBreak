@@ -77,14 +77,8 @@ private:
 	// 결과 타입으로 UInventoryItem 확보(없으면 생성)
 	UInventoryItem* GetOrCreateCraftableItem(EItemType ResultType);
 
-	// 요리 입력 기반으로 가능한 레시피(요리) 재계산
-	void RecomputeCookingFromInputs();
-
 	// 요리 입력에서 특정 아이템 보유량 조회
 	int32 GetHaveCookingInput(EItemType Type) const;
-
-	// 요리 입력 초기화
-	void ClearCookingInputs();
 
 	void SetCraftProcess();
 	void FinishCraft();

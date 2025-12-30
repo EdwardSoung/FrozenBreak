@@ -255,11 +255,9 @@ UInventoryItem* UCraftInventoryComponent::GetItem(EItemType Type)
 }
 
 void UCraftInventoryComponent::StartCrafting(UInventoryItem* ItemToCraft)
-{
-	UE_LOG(LogTemp, Log, TEXT("StartCrafting : %d"), ItemToCraft->GetData()->ItemType);
-	
+{	
+	if (!ItemToCraft || !ItemToCraft->GetData()) return;
 	MAxCraftCost = ItemToCraft->GetData()->CraftCost;
-	UE_LOG(LogTemp, Log, TEXT("StartCrafting cost : %.2f"), MAxCraftCost);
 
 	if (MAxCraftCost > 0)
 	{
@@ -296,12 +294,8 @@ void UCraftInventoryComponent::StartCooking(UInventoryItem* InIngredient)
 	const FCraftingRecipeRow* FirstRecipe = FindFirstCookableRecipeFromInputs();
 	if (!FirstRecipe)
 	{
-		UE_LOG(LogTemp, Log, TEXT("[Cooking] No cookable recipe yet."));
 		return;
 	}
-
-	UE_LOG(LogTemp, Log, TEXT("[Cooking] First cookable recipe found. Result=%d"),
-		(int32)FirstRecipe->ResultItemType);
 
 	// 결과 아이템을 만들어서 StartCrafting으로 넘긴다
 	if (UInventoryItem* ResultItem = GetOrCreateCraftableItem(FirstRecipe->ResultItemType))
@@ -368,62 +362,6 @@ UInventoryItem* UCraftInventoryComponent::GetOrCreateCraftableItem(EItemType Res
 	return nullptr;
 }
 
-void UCraftInventoryComponent::RecomputeCookingFromInputs()
-{
-	// 새로 계산한 요리 가능 맵
-	TMap<EItemType, int32> NewCookingTimes;
-	NewCookingTimes.Reserve(32);
-
-	for (const FCraftingRecipeRow& SingleRecipe : Recipes)
-	{
-		if (SingleRecipe.Category != ERecipeCategory::Cooking) continue;
-		if (SingleRecipe.ResultItemType == EItemType::None) continue;
-
-		int32 Times = INT32_MAX;
-
-		for (const FRecipeIngredient& Req : SingleRecipe.Required)
-		{
-			if (Req.Count <= 0) continue;
-			const int32 Have = GetHaveCookingInput(Req.ItemType);
-			Times = FMath::Min(Times, Have / Req.Count);
-		}
-
-		if (Times == INT32_MAX) Times = 0;
-
-		if (Times > 0)
-		{
-			// 같은 결과 아이템을 만드는 레시피가 여러 개면 "최대 가능 횟수"
-			int32& Cur = NewCookingTimes.FindOrAdd(SingleRecipe.ResultItemType);
-			Cur = FMath::Max(Cur, Times);
-		}
-	}
-
-	// 요리쪽만 변경 여부 판단
-	const bool bCookingChanged = !AreMapsEqual(NewCookingTimes, LastCraftableTimesCooking);
-	if (!bCookingChanged) return;
-
-	// 캐시 갱신
-	CraftableTimesCooking = MoveTemp(NewCookingTimes);
-	LastCraftableTimesCooking = CraftableTimesCooking;
-
-	// UI 반영 (요리 결과만 Set)
-	for (const auto& SingleValue : CraftableTimesCooking)
-	{
-		SetCraftableItemCount(SingleValue.Key, SingleValue.Value);
-	}
-
-	//“요리 가능 목록”에 없는 애들은 UI에서 제거하고 싶다면
-	// (주의: 지금 RemoveNonCraftablesFromUI는 Crafting+Cooking 합집합 기준으로 제거하므로,
-	// Crafting도 함께 유지되는 구조면 그대로 호출해도 OK)
-	RemoveNonCraftablesFromUI();
-}
-
-void UCraftInventoryComponent::ClearCookingInputs()
-{
-	CookingInputCounts.Reset();
-	RecomputeCookingFromInputs();
-}
-
 void UCraftInventoryComponent::SetCraftProcess()
 {
 	UEventSubSystem* EventSystem = UEventSubSystem::Get(this);
@@ -444,9 +382,6 @@ void UCraftInventoryComponent::SetCraftProcess()
 		CurrentCraftCost / MAxCraftCost
 	);
 
-	UE_LOG(LogTemp, Verbose, TEXT("Crafting... %.2f / %.2f"),
-		CurrentCraftCost, MAxCraftCost);
-
 	// 완료 체크
 	if (CurrentCraftCost >= MAxCraftCost)
 	{
@@ -458,8 +393,6 @@ void UCraftInventoryComponent::FinishCraft()
 {
 	UEventSubSystem* EventSystem = UEventSubSystem::Get(this);
 	if (!EventSystem) return;
-
-	UE_LOG(LogTemp, Log, TEXT("제작 완료!"));
 
 	if (CurrentItemToCraft.IsValid() && CurrentItemToCraft->GetData())
 	{
