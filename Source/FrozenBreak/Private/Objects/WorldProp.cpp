@@ -398,7 +398,7 @@ void AWorldProp::BedActionWidgetMid()
 	if (EventSystem)
 	{
 		// 플레이어 피로도 회복
-		EventSystem->Status.OnSetFatigue.Broadcast(FatigueRecoveryAmount);
+		EventSystem->Status.OnSetFatigue.Broadcast(FatigueCostPerWork);
 
 		// 플레이어가 배고파짐
 		EventSystem->Status.OnSetHunger.Broadcast(HungerReductionAmount);

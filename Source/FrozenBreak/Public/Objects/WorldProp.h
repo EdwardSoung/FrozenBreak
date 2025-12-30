@@ -103,9 +103,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Data")
 	float FatigueCostPerWork = -0.5f;
 
-	// 침대 사용시 회복시킬 피로도 (최대치)
-	const float FatigueRecoveryAmount = 100.f;
-
 	// 침대 사용시 감소시킬 배고픔
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Data")
 	float HungerReductionAmount = -30.f;
