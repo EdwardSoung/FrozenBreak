@@ -24,4 +24,6 @@ public:
 protected:
 	UFUNCTION()
 	void OnGameStateChanged(EGameState InState);
+
+	FString TimeToText();
 };

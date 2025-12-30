@@ -34,7 +34,7 @@ protected:
 
 public:
 
-	void UpdateRecord(int32 InDay, int32 InHour, int32 InMin);
+	void UpdateRecord(FString InRecordString);
 
 	UPlayResultWidget* SetResult(bool IsClear);
 };

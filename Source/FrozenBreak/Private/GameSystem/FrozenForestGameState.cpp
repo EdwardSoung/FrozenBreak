@@ -54,14 +54,7 @@ void AFrozenForestGameState::OnGameStateChanged(EGameState InState)
 
 			auto Result = Cast<UPlayResultWidget>(UISystem->ShowWidget(EWidgetType::PlayResult));
 
-			auto TimeSystem = GetWorld()->GetSubsystem<UTimeOfDaySubSystem>();
-			float TimeNormalized = TimeSystem->GetTimeNormalized();
-			int32 RemainDay = TimeSystem->GetDay();
-			const int32 TotalMinutes = FMath::FloorToInt(TimeNormalized * 24.0f * 60.0f);
-			const int32 Hour = (TotalMinutes / 60) % 24;
-			const int32 Minute = TotalMinutes % 60;
-
-			Result->SetResult(true)->UpdateRecord(RemainDay - 1, Hour - 12, Minute);
+			Result->SetResult(true)->UpdateRecord(TimeToText());
 		}
 		break;
 	case EGameState::Fail:
@@ -71,17 +64,33 @@ void AFrozenForestGameState::OnGameStateChanged(EGameState InState)
 			UISystem->HideAllWiget();
 
 			auto Result = Cast<UPlayResultWidget>(UISystem->ShowWidget(EWidgetType::PlayResult));
-
-			auto TimeSystem = GetWorld()->GetSubsystem<UTimeOfDaySubSystem>();
-			float TimeNormalized = TimeSystem->GetTimeNormalized();
-			int32 RemainDay = TimeSystem->GetDay();
-			const int32 TotalMinutes = FMath::FloorToInt(TimeNormalized * 24.0f * 60.0f);
-			const int32 Hour = (TotalMinutes / 60) % 24;
-			const int32 Minute = TotalMinutes % 60;
-
-			Result->SetResult(false)->UpdateRecord(RemainDay - 1, Hour - 12, Minute);
+					
+			Result->SetResult(false)->UpdateRecord(TimeToText());
 		}
 		//재시작 UI
 		break;
 	}
+}
+
+FString AFrozenForestGameState::TimeToText()
+{
+	auto TimeSystem = GetWorld()->GetSubsystem<UTimeOfDaySubSystem>();
+	float TimeNormalized = TimeSystem->GetTimeNormalized();
+	int32 RemainDay = TimeSystem->GetDay() - 1;
+	const int32 TotalMinutes = FMath::FloorToInt(TimeNormalized * 24.0f * 60.0f);
+	const int32 Hour = (TotalMinutes / 60) % 24 - 12;
+	const int32 Minute = TotalMinutes % 60;
+
+	FString TimeText = TEXT("");
+	if (RemainDay > 0)
+	{
+		TimeText = FString::Printf(TEXT("%d일 "), RemainDay);
+	}
+	if (Hour > 0)
+	{
+		TimeText = FString::Printf(TEXT("%02d시간 "), Hour);
+	}
+	TimeText + FString::Printf(TEXT("%02d분"), Minute);
+
+	return TimeText;
 }

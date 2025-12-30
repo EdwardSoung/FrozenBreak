@@ -26,19 +26,9 @@ void UPlayResultWidget::NativeConstruct()
 	}
 }
 
-
-void UPlayResultWidget::UpdateRecord(int32 InDay, int32 InHour, int32 InMin)
+void UPlayResultWidget::UpdateRecord(FString InRecordString)
 {
-	FString TimeText = TEXT("");
-	if (InDay > 0)
-	{
-		TimeText = FString::Printf(TEXT("%d일 "), InDay);
-	}
-	if (InHour > 0)
-	{
-		TimeText = FString::Printf(TEXT("%02d시간 "), InHour);
-	}
-	RecordText->SetText(FText::FromString(TimeText + FString::Printf(TEXT("%02d분"), InMin)));
+	RecordText->SetText(FText::FromString(InRecordString));
 }
 
 UPlayResultWidget* UPlayResultWidget::SetResult(bool IsClear)

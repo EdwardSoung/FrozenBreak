@@ -14,23 +14,19 @@ class FROZENBREAK_API APropSpawner : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	APropSpawner();
 
 protected:
-    // 영역을 표시할 박스
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     UBoxComponent* SpawnVolume;
 
-    // 생성할 블루프린트 클래스
     UPROPERTY(EditAnywhere, Category = "Settings")
     TArray<TSubclassOf<AActor>> ActorToSpawn;
 
-    // 몇 개나 뿌릴지
     UPROPERTY(EditAnywhere, Category = "Settings")
     int32 SpawnCount = 10;
 
-    // 랜덤 회전 줄까? (제자리 뱅글뱅글)
+    //회전 주기위함
     UPROPERTY(EditAnywhere, Category = "Settings")
     bool bRandomYaw = true;
 
@@ -40,18 +36,16 @@ protected:
     float MaxScaleSize = 1.0f;
 
 public:
-    // [버튼] 에디터에서 누르면 실행됨
+    // [버튼] 생성
     UFUNCTION(CallInEditor, Category = "Editor Tools")
     void SpawnActors();
 
-    // [버튼] 잘못 뿌렸을 때 싹 지우기 (Undo 대용)
+    // [버튼] 지우기
     UFUNCTION(CallInEditor, Category = "Editor Tools")
     void ClearGeneratedActors();
 
-    UFUNCTION(CallInEditor, Category = "Editor Tools")
-    FVector GetRandomPointOnGround();
 private:
-    // 내가 만든 애들을 기억해두는 배열 (나중에 지우려고)
+    //만든 액터들 저장(삭제용)
     UPROPERTY()
     TArray<AActor*> SpawnedActors;
 
