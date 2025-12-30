@@ -15,7 +15,6 @@ void UTimeOfDaySubSystem::Initialize(FSubsystemCollectionBase& Collection)
 	Super::Initialize(Collection);
 	FindDirectionalLight();
 	EventSystem = UEventSubSystem::Get(this);
-	
 
 	if (UGameManager* GameMgr = UGameManager::Get(this))
 	{
@@ -28,12 +27,6 @@ void UTimeOfDaySubSystem::Deinitialize()
 {
 	CachedDirectionalLight.Reset();
 	Super::Deinitialize();
-}
-
-bool UTimeOfDaySubSystem::IsGameWorldSafe() const
-{
-	const UWorld* World = GetWorld();
-	return World && World->IsGameWorld();
 }
 
 void UTimeOfDaySubSystem::Tick(float DeltaTime)
@@ -56,13 +49,6 @@ void UTimeOfDaySubSystem::Tick(float DeltaTime)
 		TimeNormalized = FMath::Fmod(TimeNormalized, 1.0f);
 	}
 
-	UpdateDirectionalLight();
-	BroadcastTimeIfMinuteChanged();
-}
-
-void UTimeOfDaySubSystem::SetTimeNormalized(float InNormalized)
-{
-	TimeNormalized = FMath::Clamp(InNormalized, 0.0f, 1.0f);
 	UpdateDirectionalLight();
 	BroadcastTimeIfMinuteChanged();
 }

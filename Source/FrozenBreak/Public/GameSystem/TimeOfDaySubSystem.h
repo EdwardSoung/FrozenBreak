@@ -24,13 +24,9 @@ public:
 
 	// Tick
 	virtual void Tick(float DeltaTime) override;
-	virtual bool IsTickable() const override { return bEnableTimeFlow && IsGameWorldSafe(); }
 	virtual TStatId GetStatId() const override { RETURN_QUICK_DECLARE_CYCLE_STAT(UInGameTimeSubsystem, STATGROUP_Tickables); }
 
 	int32 GetDay() { return Day; }
-
-	UFUNCTION(BlueprintCallable)
-	void SetTimeNormalized(float InNormalized);
 
 	UFUNCTION(BlueprintCallable)
 	float GetTimeNormalized() const { return TimeNormalized; }
@@ -44,7 +40,6 @@ private:
 	void UpdateDirectionalLight();
 	void BroadcastTimeIfMinuteChanged();
 	FText MakeTimeText24H() const;
-	bool IsGameWorldSafe() const;
 	void FindDirectionalLight();
 
 protected:
