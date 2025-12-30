@@ -183,6 +183,9 @@ void UInventoryWidget::UpdateWeight(float InWeight, float InMaxWeight)
 
 void UInventoryWidget::SelectionChanged(EItemType InType)
 {
+	//캠프파이어 아이템은 떨구는 아이템이 없는 상태라 버리기 비활성
+	TrashButton->SetVisibility(InType == EItemType::Campfire ? ESlateVisibility::Collapsed : ESlateVisibility::Visible);
+
 	switch (InType)
 	{
 	case EItemType::Axe:
@@ -202,8 +205,8 @@ void UInventoryWidget::SelectionChanged(EItemType InType)
 		break;
 	default:
 		UseButtonText->SetText(FText::FromString(TEXT("사용")));
-		UseButton->SetIsEnabled(false);
-		//나머지 음..버튼 비활성?
+		UseButton->SetIsEnabled(false);		
+		break;
 	}
 }
 
