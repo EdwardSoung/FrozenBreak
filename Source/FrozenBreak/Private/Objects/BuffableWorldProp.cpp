@@ -74,9 +74,9 @@ void ABuffableWorldProp::BeginBuff(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	if (PropType == EPropType::Campfire && CampfireBuffValues)
+	if (PropType == EPropType::Campfire)
 	{
-		GiveCampFireBuff();
+		if (CampfireBuffValues) GiveCampFireBuff();
 		ReadyToCook();
 	}
 }
