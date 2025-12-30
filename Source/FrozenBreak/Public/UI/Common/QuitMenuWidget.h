@@ -20,12 +20,19 @@ protected:
 	UFUNCTION()
 	void OnResumeClicked();
 	UFUNCTION()
+	void OnRecipeClicked();
+	UFUNCTION()
+	void OnLobbyClicked();
+	UFUNCTION()
 	void OnQuitClicked();
+
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UButton> ResumeButton = nullptr;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UButton> RecipeButton = nullptr;
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UButton> LobbyButton = nullptr;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UButton> QuitButton = nullptr;
 };

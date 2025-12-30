@@ -41,8 +41,6 @@ protected:
 	void EquipHandItemUsed();
 
 	UFUNCTION()
-	void SendCurrentFatigue();
-
 	void RefreshEquipments();
 
 	void SendCurrentFatigue();

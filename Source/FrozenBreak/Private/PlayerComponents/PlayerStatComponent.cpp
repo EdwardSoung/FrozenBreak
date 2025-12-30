@@ -151,15 +151,6 @@ void UPlayerStatComponent::EquipHandItemUsed()
 	}
 }
 
-
-void UPlayerStatComponent::SendCurrentFatigue()
-{
-	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
-	{
-		EventSystem->Character.OnFatigueChecked.Broadcast(CurrentFatigue);
-	}
-}
-
 void UPlayerStatComponent::RefreshEquipments()
 {
 	if (HandEquip || BodyEquip)
