@@ -1270,20 +1270,15 @@ void AActionCharacter::OnToolHit() // 지금 들고있는 무기에 맞춰 행�
 	if (CurrentHeldItemType == EItemType::Axe)
 	{
 		OnHarvestHit();
-		if (UEventSubSystem* Event = UEventSubSystem::Get(this))
-		{
-			Event->Character.OnEquipHandItemUsed.Broadcast();
-		}
 	}
 	else if (CurrentHeldItemType == EItemType::Pickaxe)
 	{
-		OnPickaxeHit();
-		if (UEventSubSystem* Event = UEventSubSystem::Get(this))
-		{
-			Event->Character.OnEquipHandItemUsed.Broadcast();
-		}
+		OnPickaxeHit();		
 	}
-
+	if (UEventSubSystem* Event = UEventSubSystem::Get(this))
+	{
+		Event->Character.OnEquipHandItemUsed.Broadcast();
+	}
 	//무기 내구도 감소
 	//PlayerStatComponent로 보내고 거기서 감소시키고 내구도 없으면 여기도 null로 보내기
 	
