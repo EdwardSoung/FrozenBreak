@@ -93,6 +93,18 @@ private:
 	bool CanConsumeRecipeOnce(const FCraftingRecipeRow& R) const;
 	void ConsumeRecipeOnce(const FCraftingRecipeRow& R);
 
+	UFUNCTION()
+	void SetCurrentFatigue(float InValue);
+
+	inline bool HasEnoughFatigue() 
+	{
+		return MAxCraftCost <= CurrentFatigue;
+	}
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float FatigueUse = -1.0f;
+
 private:
 	// ===== 레시피 =====
 	TArray<FCraftingRecipeRow> Recipes;
@@ -142,4 +154,6 @@ private:
 	TWeakObjectPtr<UInventoryItem> CurrentItemToCraft = nullptr;
 	// 작업 완료 시 아이템 수량(현재 시나리오에서는 무조건 1)
 	int32 CraftResultCount = 1;
+
+	float CurrentFatigue = 0.0f;
 };

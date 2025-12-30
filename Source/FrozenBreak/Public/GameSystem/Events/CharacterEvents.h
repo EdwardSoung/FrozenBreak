@@ -47,6 +47,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSendRawMeet, TArray<UInventoryIte
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCraftRequested, UInventoryItem*, InItem); // 제작 버튼을 누를 시 날리는 델리게이트
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCookRequested, UInventoryItem*, InItem); // 요리 버튼을 누를 시 날리는 델리게이트
 
+// 활동력에 따른 제작 가능 여부 확인
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRequesetFatigueCheck);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFatigueChecked, float, InFatigue);
+
 USTRUCT(BlueprintType)
 struct FCharacterEvents
 {
@@ -113,4 +117,7 @@ struct FCharacterEvents
 
 	UPROPERTY(BlueprintAssignable)
 	FOnCookRequested OnCookRequested;
+
+	FOnRequesetFatigueCheck OnRequesetFatigueCheck;
+	FOnFatigueChecked OnFatigueChecked;
 };
