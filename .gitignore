@@ -42,6 +42,12 @@
 *.VC.opendb
 .vsconfig
 
+# zip files
+*.zip
+*.7z
+*.alz
+*.egg
+
 # Precompiled Assets
 SourceArt/**/*.png
 SourceArt/**/*.tga
