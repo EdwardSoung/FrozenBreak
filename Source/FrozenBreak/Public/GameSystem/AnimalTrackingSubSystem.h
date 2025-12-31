@@ -22,7 +22,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	inline int32 GetCurrentAnimalNumber(EAnimalType InType)
 	{
-		UE_LOG(LogTemp, Log, TEXT("current animal number : %d"), AnimalCountMap[InType]);
 		return AnimalCountMap[InType];
 	}
 
