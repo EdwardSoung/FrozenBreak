@@ -266,7 +266,7 @@ void UInteractionComponent::ProcessInteractableTarget()
 			HitActorInteractableToolType = Prop->GetInteractableToolType();
 
 			// 바라보고 있는 액터의 Data->InteractableToolType 이 None 아면
-			if (HitActorInteractableToolType == EItemType::None || HitActorInteractableToolType == EItemType::Campfire)
+			if (HitActorInteractableToolType == EItemType::None || HitActorInteractableToolType == EItemType::Campfire || Prop->GetPropType() == EPropType::Bed)
 			{
 				// 바라보고 있는 액터에게 "너 지금 바라봐지고 있어" 라고 알림
 				IInteractable::Execute_OnSelect(CurrentInteractionActor, true);

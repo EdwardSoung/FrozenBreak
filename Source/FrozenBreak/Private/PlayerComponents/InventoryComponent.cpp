@@ -133,9 +133,6 @@ void UInventoryComponent::UseInventoryItem(UInventoryItem* InItem)
 			EventSystem->Character.OnEquipBodyItem.Broadcast(InItem);
 		}
 		break;
-	case EItemType::CookedMeat:
-	case EItemType::Fruit:
-		break;
 	case EItemType::Campfire:
 		SpawnCampfire();
 		break;
@@ -253,7 +250,6 @@ void UInventoryComponent::SpawnCampfire()
 	}
 }
 
-//우선은...중복 허용하지 않음
 void UInventoryComponent::AddItem(EItemType InType, int32 InAmount, float InDurability)
 {	
 	if (CurrentWeight >= InventoryMaxWeight)
