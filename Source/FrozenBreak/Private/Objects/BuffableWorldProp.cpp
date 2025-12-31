@@ -74,7 +74,7 @@ void ABuffableWorldProp::BeginBuff(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	if (OtherActor != GetOwner()) return;
+	if (OtherActor != GetOwner() && !IsFurnace) return;
 
 	if (PropType == EPropType::Campfire)
 	{

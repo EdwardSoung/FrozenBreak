@@ -69,6 +69,9 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<class UPropDurabilityWidget> CampfireLifeBar = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool IsFurnace = false;
 private:
 	class UStatusCalculationSubSystem* StatusCalculater;
 	EPropType PropType = EPropType::None;
