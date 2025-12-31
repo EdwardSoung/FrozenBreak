@@ -157,12 +157,14 @@ void UInventoryWidget::UseItem()
 	{
 		UInventoryItem* selectedItem = Cast<UInventoryItem>(Selected);
 
-		//그냥 InventoryComponent로 사용을 알림		
-
-		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		//그냥 InventoryComponent로 사용을 알림	
+		if (selectedItem)
 		{
-			EventSystem->Character.OnUseItem.Broadcast(selectedItem);
-			selectedItem->QuickSlotNum = 0;
+			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+			{
+				EventSystem->Character.OnUseItem.Broadcast(selectedItem);
+				selectedItem->QuickSlotNum = 0;
+			}
 		}
 	}
 }

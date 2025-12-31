@@ -45,6 +45,12 @@ void UInventoryComponent::BeginPlay()
 			InventoryMaxWeight = BagData->Stats[EItemStatType::Weight];
 		}
 	}
+
+	//최초 아이템 제공
+	AddItem(EItemType::Axe, 1, 0);
+	AddItem(EItemType::Axe, 1, 0);
+	AddItem(EItemType::Pickaxe, 1, 0);
+	AddItem(EItemType::Knife, 1, 0);
 }
 
 void UInventoryComponent::SendInventoryItems()
@@ -103,6 +109,11 @@ void UInventoryComponent::SendRawMeetData()
 
 void UInventoryComponent::UseInventoryItem(UInventoryItem* InItem)
 {
+	if (!InItem)
+	{
+		return;
+	}
+
 	EItemType InType = InItem->GetType();
 	
 	switch (InType)
