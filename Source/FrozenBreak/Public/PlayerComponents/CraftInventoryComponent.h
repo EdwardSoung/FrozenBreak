@@ -49,15 +49,13 @@ private:
 	void RecomputeAllFromItemCounts();
 
 	int32 GetHave(EItemType Type) const;
-	int32 CalcCraftableTimesForRecipe(const FCraftingRecipeRow& R);
+	//int32 CalcCraftableTimesForRecipe(const FCraftingRecipeRow& R);
 
 	// ===== UI 갱신 =====
-	void RebuildCraftableCachesAndBroadcastIfChanged();
-	void SetCraftableItemCount(EItemType Type, int32 NewCount);
+	void RebuildCraftableUIIfChanged();
+	void EnsureCraftableItemExists(EItemType Type);
 	void RemoveNonCraftablesFromUI();
 
-	// util
-	bool AreMapsEqual(const TMap<EItemType, int32>& A, const TMap<EItemType, int32>& B);
 	UInventoryItem* GetItem(EItemType Type);
 
 	// 제작 시작
@@ -83,9 +81,7 @@ private:
 	void SetCraftProcess();
 	void FinishCraft();
 
-	const FCraftingRecipeRow* FindBestRecipeForResult(EItemType ResultType, ERecipeCategory Category) const;
-	bool CanConsumeRecipeOnce(const FCraftingRecipeRow& R) const;
-	void ConsumeRecipeOnce(const FCraftingRecipeRow& R);
+	const FCraftingRecipeRow* FindRecipeForResult(EItemType ResultType, ERecipeCategory Category) const;
 
 	UFUNCTION()
 	void SetCurrentFatigue(float InValue);
@@ -121,10 +117,13 @@ private:
 	TSet<EItemType> CraftingSet;
 	TSet<EItemType> CookingSet;
 
-	TMap<EItemType, int32> CraftableTimesCrafting;
-	TMap<EItemType, int32> CraftableTimesCooking;
-	TMap<EItemType, int32> LastCraftableTimesCrafting;
-	TMap<EItemType, int32> LastCraftableTimesCooking;
+	// 현재 만들 수 있는 결과 아이템 타입들
+	TSet<EItemType> CraftableResultsCrafting;
+	TSet<EItemType> CraftableResultsCooking;
+
+	// 직전 프레임(직전 계산) 캐시 — 변경 감지용
+	TSet<EItemType> LastCraftableResultsCrafting;
+	TSet<EItemType> LastCraftableResultsCooking;
 
 	// UI용 아이템
 	TArray<UInventoryItem*> CraftableItems;

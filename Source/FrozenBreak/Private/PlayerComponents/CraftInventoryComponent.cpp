@@ -2,9 +2,9 @@
 #include "Objects/InventoryItem.h"
 #include "GameSystem/EventSubSystem.h"
 #include "GameSystem/ItemFactorySubSystem.h"
+#include "GameSystem/UISubSystem.h"
+#include "GameSystem/StatusCalculationSubSystem.h"
 #include "Data/ItemDataList.h"
-#include <GameSystem/UISubSystem.h>
-#include <GameSystem/StatusCalculationSubSystem.h>
 
 UCraftInventoryComponent::UCraftInventoryComponent()
 {
@@ -15,16 +15,15 @@ void UCraftInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	LoadRecipesFromTable();
-	BuildRecipeIndex();
+	LoadRecipesFromTable(); // 레시피 로드만
 
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
 		EventSystem->Character.OnSendInventoryData.AddDynamic(this, &UCraftInventoryComponent::OnReceiveInventoryData);
 		EventSystem->Character.OnCraftRequested.AddDynamic(this, &UCraftInventoryComponent::StartCrafting);
 		EventSystem->Character.OnCookRequested.AddDynamic(this, &UCraftInventoryComponent::StartCooking);
-		EventSystem->Character.OnFatigueChecked.AddDynamic(this, &UCraftInventoryComponent::SetCurrentFatigue);
 
+		EventSystem->Character.OnFatigueChecked.AddDynamic(this, &UCraftInventoryComponent::SetCurrentFatigue);
 		EventSystem->Character.OnRequesetFatigueCheck.Broadcast();
 	}
 }
@@ -41,8 +40,8 @@ void UCraftInventoryComponent::OnReceiveInventoryData(TArray<UInventoryItem*> In
 
 		const EItemType Type = Item->GetData()->ItemType;
 		const int32 Amount = Item->GetAmount();
-
 		if (Type == EItemType::None || Amount <= 0) continue;
+
 		ItemCounts.FindOrAdd(Type) += Amount;
 	}
 
@@ -52,7 +51,7 @@ void UCraftInventoryComponent::OnReceiveInventoryData(TArray<UInventoryItem*> In
 void UCraftInventoryComponent::RecomputeAllFromItemCounts()
 {
 	InitializeRecipeStates();
-	RebuildCraftableCachesAndBroadcastIfChanged();
+	RebuildCraftableUIIfChanged();
 }
 
 // ==================== Recipes ====================
@@ -74,23 +73,10 @@ void UCraftInventoryComponent::LoadRecipesFromTable()
 	RecipeStates.SetNum(Recipes.Num());
 }
 
-void UCraftInventoryComponent::BuildRecipeIndex()
-{
-	ItemToRecipes.Reset();
-
-	for (int32 i = 0; i < Recipes.Num(); ++i)
-	{
-		for (const FRecipeIngredient& Req : Recipes[i].Required)
-		{
-			ItemToRecipes.FindOrAdd(Req.ItemType).Add(i);
-		}
-	}
-}
-
 void UCraftInventoryComponent::InitializeRecipeStates()
 {
-	CraftingSet.Reset();
-	CookingSet.Reset();
+	CraftableResultsCrafting.Reset();
+	CraftableResultsCooking.Reset();
 
 	for (int32 i = 0; i < Recipes.Num(); ++i)
 	{
@@ -98,7 +84,9 @@ void UCraftInventoryComponent::InitializeRecipeStates()
 		S.MissingKinds = 0;
 		S.MissingCount.Reset();
 
-		for (const FRecipeIngredient& Req : Recipes[i].Required)
+		const FCraftingRecipeRow& R = Recipes[i];
+
+		for (const FRecipeIngredient& Req : R.Required)
 		{
 			const int32 Have = GetHave(Req.ItemType);
 			const int32 Missing = FMath::Max(Req.Count - Have, 0);
@@ -111,15 +99,13 @@ void UCraftInventoryComponent::InitializeRecipeStates()
 
 		if (S.bCraftable)
 		{
-			if (Recipes[i].Category == ERecipeCategory::Crafting)
-				CraftingSet.Add(Recipes[i].ResultItemType);
+			if (R.Category == ERecipeCategory::Crafting)
+				CraftableResultsCrafting.Add(R.ResultItemType);
 			else
-				CookingSet.Add(Recipes[i].ResultItemType);
+				CraftableResultsCooking.Add(R.ResultItemType);
 		}
 	}
 }
-
-// ==================== Craftable 계산 ====================
 
 int32 UCraftInventoryComponent::GetHave(EItemType Type) const
 {
@@ -128,78 +114,50 @@ int32 UCraftInventoryComponent::GetHave(EItemType Type) const
 	return 0;
 }
 
-int32 UCraftInventoryComponent::CalcCraftableTimesForRecipe(const FCraftingRecipeRow& R)
-{
-	int32 Times = INT32_MAX;
-
-	for (const FRecipeIngredient& Req : R.Required)
-	{
-		if (Req.Count <= 0) continue;
-		Times = FMath::Min(Times, GetHave(Req.ItemType) / Req.Count);
-	}
-
-	return (Times == INT32_MAX) ? 0 : Times;
-}
-
 // ==================== UI 갱신 ====================
 
-void UCraftInventoryComponent::RebuildCraftableCachesAndBroadcastIfChanged()
+static bool AreSetsEqual(const TSet<EItemType>& A, const TSet<EItemType>& B)
 {
-	CraftableTimesCrafting.Reset();
-	CraftableTimesCooking.Reset();
-
-	for (int32 i = 0; i < Recipes.Num(); ++i)
+	if (A.Num() != B.Num()) return false;
+	for (const EItemType& T : A)
 	{
-		if (!RecipeStates[i].bCraftable) continue;
-
-		const FCraftingRecipeRow& R = Recipes[i];
-		const int32 Times = CalcCraftableTimesForRecipe(R);
-
-		TMap<EItemType, int32>& MapRef =
-			(R.Category == ERecipeCategory::Crafting)
-			? CraftableTimesCrafting
-			: CraftableTimesCooking;
-
-		int32& Cur = MapRef.FindOrAdd(R.ResultItemType);
-		Cur = FMath::Max(Cur, Times);
+		if (!B.Contains(T)) return false;
 	}
+	return true;
+}
 
-	const bool bCountChanged =
-		!AreMapsEqual(CraftableTimesCrafting, LastCraftableTimesCrafting) ||
-		!AreMapsEqual(CraftableTimesCooking, LastCraftableTimesCooking);
+void UCraftInventoryComponent::RebuildCraftableUIIfChanged()
+{
+	// 변경 없으면 UI 갱신 스킵
+	const bool bChanged =
+		!AreSetsEqual(CraftableResultsCrafting, LastCraftableResultsCrafting) ||
+		!AreSetsEqual(CraftableResultsCooking, LastCraftableResultsCooking);
 
-	if (!bCountChanged) return;
+	if (!bChanged) return;
 
-	LastCraftableTimesCrafting = CraftableTimesCrafting;
-	LastCraftableTimesCooking = CraftableTimesCooking;
+	LastCraftableResultsCrafting = CraftableResultsCrafting;
+	LastCraftableResultsCooking = CraftableResultsCooking;
 
-	for (const auto& KVP : CraftableTimesCrafting)
+	// Crafting 결과들 UI에 존재 보장
+	for (const EItemType Type : CraftableResultsCrafting)
 	{
-		SetCraftableItemCount(KVP.Key, KVP.Value);
+		EnsureCraftableItemExists(Type);
 	}
 
 	RemoveNonCraftablesFromUI();
 }
 
-void UCraftInventoryComponent::SetCraftableItemCount(EItemType Type, int32 NewCount)
+void UCraftInventoryComponent::EnsureCraftableItemExists(EItemType Type)
 {
-	if (NewCount < 0) NewCount = 0;
-
-	if (UInventoryItem* Item = GetItem(Type))
-	{
-		Item->SetAmount(NewCount);
-		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
-		{
-			EventSystem->Character.OnUpdateCraftItem.Broadcast(Type);
-		}
-		return;
-	}
+	if (Type == EItemType::None) return;
+	if (GetItem(Type)) return;
 
 	if (!DataList) return;
 
 	if (UItemFactorySubSystem* ItemFactory = UItemFactorySubSystem::Get(this))
 	{
 		UInventoryItem* NewItem = ItemFactory->Spawn(Type);
+		if (!NewItem) return;
 
 		CraftableItems.Add(NewItem);
 
@@ -207,19 +165,18 @@ void UCraftInventoryComponent::SetCraftableItemCount(EItemType Type, int32 NewCo
 		{
 			EventSystem->Character.OnAddItemToCraftInventoryUI.Broadcast(NewItem);
 		}
-	}	
+	}
 }
 
 void UCraftInventoryComponent::RemoveNonCraftablesFromUI()
 {
-	TSet<EItemType> ValidTypes;
-	for (const auto& KVP : CraftableTimesCrafting) if (KVP.Value > 0) ValidTypes.Add(KVP.Key);
-	for (const auto& KVP : CraftableTimesCooking)  if (KVP.Value > 0) ValidTypes.Add(KVP.Key);
+	TSet<EItemType> ValidTypes = CraftableResultsCrafting;
+	ValidTypes.Append(CraftableResultsCooking);
 
 	for (int32 i = CraftableItems.Num() - 1; i >= 0; --i)
 	{
 		UInventoryItem* Item = CraftableItems[i];
-		if (!Item || !ValidTypes.Contains(Item->GetData()->ItemType))
+		if (!Item || !Item->GetData() || !ValidTypes.Contains(Item->GetData()->ItemType))
 		{
 			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 			{
@@ -232,161 +189,83 @@ void UCraftInventoryComponent::RemoveNonCraftablesFromUI()
 
 // ==================== Utils ====================
 
-bool UCraftInventoryComponent::AreMapsEqual(const TMap<EItemType, int32>& A, const TMap<EItemType, int32>& B)
-{
-	if (A.Num() != B.Num()) return false;
-	for (const auto& KVP : A)
-	{
-		const int32* Found = B.Find(KVP.Key);
-		if (!Found || *Found != KVP.Value) return false;
-	}
-	return true;
-}
-
 UInventoryItem* UCraftInventoryComponent::GetItem(EItemType Type)
 {
-	if (!CraftableItems.IsEmpty())
+	for (UInventoryItem* Item : CraftableItems)
 	{
-		for (UInventoryItem* Item : CraftableItems)
+		if (Item && Item->GetData() && Item->GetData()->ItemType == Type)
+			return Item;
+	}
+	return nullptr;
+}
+
+const FCraftingRecipeRow* UCraftInventoryComponent::FindRecipeForResult(EItemType ResultType, ERecipeCategory Category) const
+{
+	for (const FCraftingRecipeRow& R : Recipes)
+	{
+		if (R.Category == Category && R.ResultItemType == ResultType)
+			return &R;
+	}
+	return nullptr;
+}
+
+// ==================== Craft ====================
+
+void UCraftInventoryComponent::StartCrafting(UInventoryItem* ItemToCraft)
+{
+	if (!ItemToCraft || !ItemToCraft->GetData()) return;
+
+	MaxCraftCost = ItemToCraft->GetData()->CraftCost;
+	if (MaxCraftCost <= 0.f) return;
+	if (!HasEnoughFatigue()) return;
+
+	const EItemType ResultType = ItemToCraft->GetData()->ItemType;
+	
+
+	CurrentItemToCraft = ItemToCraft;
+	CurrentCraftCost = 0.0f;
+	GetWorld()->GetTimerManager().ClearTimer(CraftHandle);
+
+	if (const FCraftingRecipeRow* Recipe = FindRecipeForResult(ResultType, ERecipeCategory::Crafting))
+	{
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
-			if (Item && Item->GetData())
+			for (const FRecipeIngredient& Req : Recipe->Required)
 			{
-				if (Item->GetData()->ItemType == Type) return Item;
+				EventSystem->Character.OnGetPickupItem.Broadcast(Req.ItemType, -Req.Count, 0);
 			}
 		}
 	}
-	return nullptr;
-}
 
-void UCraftInventoryComponent::StartCrafting(UInventoryItem* ItemToCraft)
-{	
-	if (!ItemToCraft || !ItemToCraft->GetData()) return;
-	MaxCraftCost = ItemToCraft->GetData()->CraftCost;
-
-	if (MaxCraftCost > 0 && HasEnoughFatigue())
+	if (UStatusCalculationSubSystem* StatusSS = GetWorld()->GetSubsystem<UStatusCalculationSubSystem>())
 	{
-		CurrentItemToCraft = ItemToCraft;
-		GetWorld()->GetTimerManager().ClearTimer(CraftHandle);
-
-		if (UUISubSystem* UISystem = UUISubSystem::Get(this))
-		{
-			UISystem->ShowWidget(EWidgetType::CraftProcessBar);
-		}
-
-		GetWorld()->GetSubsystem<UStatusCalculationSubSystem>()->DecreaseFatigue(FatigueUse);
-
-		GetWorld()->GetTimerManager().SetTimer(
-			CraftHandle,
-			this,
-			&UCraftInventoryComponent::SetCraftProcess,
-			CraftRate,
-			true
-		);
-	}
-}
-
-void UCraftInventoryComponent::StartCooking(UInventoryItem* InIngredient)
-{
-	if (!InIngredient || !InIngredient->GetData() || InIngredient->GetAmount() <= 0 ) return;
-
-	const EItemType Type = InIngredient->GetData()->ItemType;
-	const int32 Amount = InIngredient->GetAmount();
-	if (Type == EItemType::None || Amount <= 0) return;
-
-	// 요리 입력 재료 누적
-	CookingInputCounts.FindOrAdd(Type) += Amount;
-
-	// 첫 번째 가능한 요리 레시피가 생겼는지 체크
-	const FCraftingRecipeRow* FirstRecipe = FindFirstCookableRecipeFromInputs();
-	if (!FirstRecipe)
-	{
-		return;
+		StatusSS->DecreaseFatigue(FatigueUse);
 	}
 
-	// 결과 아이템을 만들어서 StartCrafting으로 넘긴다
-	if (UInventoryItem* ResultItem = GetOrCreateCraftableItem(FirstRecipe->ResultItemType))
+	if (UUISubSystem* UISystem = UUISubSystem::Get(this))
 	{
-		//InIngredient->AddAmount(-1);
-		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
-		{
-			EventSystem->Character.OnGetPickupItem.Broadcast(InIngredient->GetData()->ItemType, -1, 0);
-		}
-		StartCrafting(ResultItem);
-	}
-}
-
-int32 UCraftInventoryComponent::GetHaveCookingInput(EItemType Type) const
-{
-	if (const int32* Found = CookingInputCounts.Find(Type))
-		return *Found;
-	return 0;
-}
-
-const FCraftingRecipeRow* UCraftInventoryComponent::FindFirstCookableRecipeFromInputs() const
-{
-	for (const FCraftingRecipeRow& SingleRecipe : Recipes)
-	{
-		if (SingleRecipe.Category != ERecipeCategory::Cooking) continue;
-		if (SingleRecipe.ResultItemType == EItemType::None) continue;
-
-		int32 Times = INT32_MAX;
-
-		for (const FRecipeIngredient& Req : SingleRecipe.Required)
-		{
-			if (Req.Count <= 0) continue;
-			const int32 Have = GetHaveCookingInput(Req.ItemType);
-			Times = FMath::Min(Times, Have / Req.Count);
-		}
-
-		if (Times == INT32_MAX) Times = 0;
-
-		if (Times > 0)
-		{
-			return &SingleRecipe; // 첫 번째 매칭 레시피
-		}
-	}
-	return nullptr;
-}
-
-UInventoryItem* UCraftInventoryComponent::GetOrCreateCraftableItem(EItemType ResultType)
-{
-	if (UInventoryItem* Existing = GetItem(ResultType))
-		return Existing;
-
-	if (!DataList) return nullptr;
-
-
-	if (UItemFactorySubSystem* ItemFactory = UItemFactorySubSystem::Get(this))
-	{
-		UInventoryItem* NewItem = ItemFactory->Spawn(ResultType);
-
-		CraftableItems.Add(NewItem);
-
-		return NewItem;
+		UISystem->ShowWidget(EWidgetType::CraftProcessBar);
 	}
 
-	return nullptr;
+	GetWorld()->GetTimerManager().SetTimer(
+		CraftHandle,
+		this,
+		&UCraftInventoryComponent::SetCraftProcess,
+		CraftRate,
+		true
+	);
 }
 
 void UCraftInventoryComponent::SetCraftProcess()
 {
 	UEventSubSystem* EventSystem = UEventSubSystem::Get(this);
 	if (!EventSystem) return;
-
 	if (MaxCraftCost <= 0.f) return;
 
-	CurrentCraftCost = FMath::Clamp(
-		CurrentCraftCost + CraftRate * 10,
-		0.0f,
-		MaxCraftCost
-	);
+	CurrentCraftCost = FMath::Clamp(CurrentCraftCost + CraftRate * CraftAmount, 0.0f, MaxCraftCost);
 
-	// UI 갱신 (0~1)
-	EventSystem->Status.OnCurrentCraftCostChanged.Broadcast(
-		CurrentCraftCost / MaxCraftCost
-	);
+	EventSystem->Status.OnCurrentCraftCostChanged.Broadcast(CurrentCraftCost / MaxCraftCost);
 
-	// 완료 체크
 	if (CurrentCraftCost >= MaxCraftCost)
 	{
 		FinishCraft();
@@ -400,84 +279,95 @@ void UCraftInventoryComponent::FinishCraft()
 
 	if (CurrentItemToCraft.IsValid() && CurrentItemToCraft->GetData())
 	{
-		const EItemType ResultType = CurrentItemToCraft->GetData()->ItemType;
-		const FCraftingRecipeRow* Recipe =
-			FindBestRecipeForResult(ResultType, ERecipeCategory::Crafting);
-
-		if (Recipe)
-		{
-			for (const FRecipeIngredient& Req : Recipe->Required)
-			{
-				EventSystem->Character.OnGetPickupItem.Broadcast(
-					Req.ItemType, -Req.Count, 0
-				);
-			}
-		}
-
-		// 초기화
-		CurrentCraftCost = 0.0f;
-		CurrentItemToCraft = nullptr;
-
-		EventSystem->Character.OnGetPickupItem.Broadcast(ResultType, CraftResultCount, 0);
-		EventSystem->Status.OnCurrentCraftCostChanged.Broadcast(CurrentCraftCost);
+		EventSystem->Character.OnGetPickupItem.Broadcast(CurrentItemToCraft->GetData()->ItemType, CraftResultCount, 0);
 
 		if (UUISubSystem* UISystem = UUISubSystem::Get(this))
 		{
 			UISystem->HideWidget(EWidgetType::CraftProcessBar);
 		}
 	}
-	GetWorld()->GetSubsystem<UStatusCalculationSubSystem>()->IncreaseFatigue(FatigueUse);
+
+	// 초기화
+	CurrentCraftCost = 0.0f;
+	CurrentItemToCraft = nullptr;
+
+	if (UStatusCalculationSubSystem* StatusSS = GetWorld()->GetSubsystem<UStatusCalculationSubSystem>())
+	{
+		StatusSS->IncreaseFatigue(FatigueUse);
+	}
+
 	GetWorld()->GetTimerManager().ClearTimer(CraftHandle);
 	EventSystem->Character.OnRequesetFatigueCheck.Broadcast();
 }
 
-bool UCraftInventoryComponent::CanConsumeRecipeOnce(const FCraftingRecipeRow& R) const
+// ==================== Cooking ====================
+
+void UCraftInventoryComponent::StartCooking(UInventoryItem* InIngredient)
 {
-	for (const FRecipeIngredient& Req : R.Required)
+	if (!InIngredient || !InIngredient->GetData() || InIngredient->GetAmount() <= 0) return;
+
+	const EItemType Type = InIngredient->GetData()->ItemType;
+	if (Type == EItemType::None) return;
+
+	CookingInputCounts.FindOrAdd(Type) += 1;
+
+	const FCraftingRecipeRow* FirstRecipe = FindFirstCookableRecipeFromInputs();
+	if (!FirstRecipe) return;
+
+	if (UInventoryItem* ResultItem = GetOrCreateCraftableItem(FirstRecipe->ResultItemType))
 	{
-		if (GetHave(Req.ItemType) < Req.Count)
-			return false;
+		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		{
+			EventSystem->Character.OnGetPickupItem.Broadcast(Type, -1, 0);
+		}
+		UE_LOG(LogTemp, Log, TEXT("StartCrafting : %d"), ResultItem->GetData()->ItemType);
+		StartCrafting(ResultItem);
 	}
-	return true;
 }
 
-// 현재 인벤에서 제작 가능 횟수가 가장 큰 레시피를 선택
-const FCraftingRecipeRow* UCraftInventoryComponent::FindBestRecipeForResult(EItemType ResultType, ERecipeCategory Category) const
+int32 UCraftInventoryComponent::GetHaveCookingInput(EItemType Type) const
 {
-	const FCraftingRecipeRow* Best = nullptr;
-	int32 BestTimes = -1;
+	if (const int32* Found = CookingInputCounts.Find(Type))
+		return *Found;
+	return 0;
+}
 
+const FCraftingRecipeRow* UCraftInventoryComponent::FindFirstCookableRecipeFromInputs() const
+{
 	for (const FCraftingRecipeRow& R : Recipes)
 	{
-		if (R.Category != Category) continue;
-		if (R.ResultItemType != ResultType) continue;
+		if (R.Category != ERecipeCategory::Cooking) continue;
+		if (R.ResultItemType == EItemType::None) continue;
 
-		// 이 레시피 기준 가능 횟수
 		int32 Times = INT32_MAX;
 		for (const FRecipeIngredient& Req : R.Required)
 		{
 			if (Req.Count <= 0) continue;
-			const int32 Have = GetHave(Req.ItemType);
-			Times = FMath::Min(Times, Have / Req.Count);
+			Times = FMath::Min(Times, GetHaveCookingInput(Req.ItemType) / Req.Count);
 		}
 		if (Times == INT32_MAX) Times = 0;
 
-		if (Times > BestTimes)
-		{
-			BestTimes = Times;
-			Best = &R;
-		}
+		if (Times > 0) return &R;
 	}
-	return Best;
+	return nullptr;
 }
 
-void UCraftInventoryComponent::ConsumeRecipeOnce(const FCraftingRecipeRow& R)
+UInventoryItem* UCraftInventoryComponent::GetOrCreateCraftableItem(EItemType ResultType)
 {
-	for (const FRecipeIngredient& Req : R.Required)
+	if (UInventoryItem* Existing = GetItem(ResultType))
+		return Existing;
+
+	if (!DataList) return nullptr;
+
+	if (UItemFactorySubSystem* ItemFactory = UItemFactorySubSystem::Get(this))
 	{
-		int32& Count = ItemCounts.FindOrAdd(Req.ItemType);
-		Count = FMath::Max(0, Count - Req.Count);
+		UInventoryItem* NewItem = ItemFactory->Spawn(ResultType);
+		if (!NewItem) return nullptr;
+
+		CraftableItems.Add(NewItem);
+		return NewItem;
 	}
+	return nullptr;
 }
 
 void UCraftInventoryComponent::SetCurrentFatigue(float InValue)
