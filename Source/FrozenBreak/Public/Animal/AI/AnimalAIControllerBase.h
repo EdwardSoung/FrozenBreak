@@ -14,5 +14,10 @@ class FROZENBREAK_API AAnimalAIControllerBase : public AAIController
 {
 	GENERATED_BODY()
 	
+protected:
+	virtual void OnPossess(APawn* InPawn) override;
 
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animal|Controller")
+	TObjectPtr <class UBehaviorTree> BehaviorTreeAsset = nullptr;
 };
