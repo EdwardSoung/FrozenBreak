@@ -74,9 +74,16 @@ void UPlayerStatusWidget::SetHandEquipment(UInventoryItem* InHandItem)
 
 void UPlayerStatusWidget::SetBodyEquipment(UInventoryItem* InBodyItem)
 {
+	if (!InBodyItem)
+		return;
+
 	switch (InBodyItem->GetType())
 	{
 	case EItemType::Jaket:
+		if (auto regist = InBodyItem->GetData()->Stats.Find(EItemStatType::ColdResistance))
+		{
+			SetTemperatureDefence(FText::AsNumber(*regist));
+		}
 		break;
 	default:
 		return;
