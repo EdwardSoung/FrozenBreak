@@ -203,7 +203,7 @@ void UInventoryComponent::SpawnCampfire()
 	if (CampfireClass)
 	{
 		AActor* OwnerActor = GetOwner();
-		if (!OwnerActor || !CampfireClass) return;
+		if (!OwnerActor) return;
 
 		const float SpawnDistance = 150.f;
 
