@@ -38,5 +38,5 @@ protected:
 	int32 MaxAnimalNumber = 3;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawner|Range")
-	float SpawnRangeRadius = 1000.0f;
+	float SpawnRangeRadius = 10000.0f;
 };
