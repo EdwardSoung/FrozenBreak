@@ -316,11 +316,11 @@ void UCraftInventoryComponent::StartCooking(UInventoryItem* InIngredient)
 
 	if (UInventoryItem* ResultItem = GetOrCreateCraftableItem(FirstRecipe->ResultItemType))
 	{
+		if (ResultItem->GetData()->CraftCost > CurrentFatigue) return;
 		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 		{
 			EventSystem->Character.OnGetPickupItem.Broadcast(Type, -1, 0);
 		}
-		UE_LOG(LogTemp, Log, TEXT("StartCrafting : %d"), ResultItem->GetData()->ItemType);
 		StartCrafting(ResultItem);
 	}
 }
