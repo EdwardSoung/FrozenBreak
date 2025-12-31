@@ -74,6 +74,8 @@ void ABuffableWorldProp::BeginBuff(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
+	if (OtherActor != GetOwner()) return;
+
 	if (PropType == EPropType::Campfire)
 	{
 		if (CampfireBuffValues) GiveCampFireBuff();
@@ -87,6 +89,8 @@ void ABuffableWorldProp::EndBuff(
 	UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex)
 {
+	if (OtherActor != GetOwner()) return;
+
 	if (PropType == EPropType::Campfire && CampfireBuffValues)
 	{
 		FinishCamFireBuff();
