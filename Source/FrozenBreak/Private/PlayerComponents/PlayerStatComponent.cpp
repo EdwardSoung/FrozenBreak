@@ -57,7 +57,7 @@ void UPlayerStatComponent::BindStatSettingEvents()
 		EventSystem->Character.OnUseItem.AddDynamic(this, &UPlayerStatComponent::ItemUsed);
 		EventSystem->Character.OnEquipHandItemUsed.AddDynamic(this, &UPlayerStatComponent::EquipHandItemUsed);
 
-		EventSystem->Character.OnRequestStatusInit.AddDynamic(this, &UPlayerStatComponent::RefreshEquipments);
+		EventSystem->Character.OnRequestStatusInit.AddDynamic(this, &UPlayerStatComponent::RefreshUI);
 	}
 }
 
@@ -151,14 +151,20 @@ void UPlayerStatComponent::EquipHandItemUsed()
 	}
 }
 
-void UPlayerStatComponent::RefreshEquipments()
+void UPlayerStatComponent::RefreshUI()
 {
-	if (HandEquip || BodyEquip)
+	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
-		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		if (HandEquip || BodyEquip)
 		{
 			EventSystem->Character.OnEquipRefresh.Broadcast(HandEquip, BodyEquip);
 		}
+
+		//수치 갱신
+		EventSystem->Status.OnTemperaturePointChanged.Broadcast(CurrentTemperature / MaxTemperature);
+		EventSystem->Status.OnFatiguePointChanged.Broadcast(CurrentFatigue / MaxFatigue);
+		EventSystem->Status.OnHungerPointChanged.Broadcast(CurrentHunger / MaxHunger);
+		EventSystem->Status.OnSetHealth.Broadcast(0);
 	}
 }
 

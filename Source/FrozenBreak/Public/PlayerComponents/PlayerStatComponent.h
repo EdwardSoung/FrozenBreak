@@ -41,7 +41,7 @@ protected:
 	void EquipHandItemUsed();
 
 	UFUNCTION()
-	void RefreshEquipments();
+	void RefreshUI();
 
 	UFUNCTION()
 	void SendCurrentFatigue();
