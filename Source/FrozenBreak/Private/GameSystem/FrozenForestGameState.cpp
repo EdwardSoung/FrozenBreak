@@ -44,7 +44,10 @@ void AFrozenForestGameState::OnGameStateChanged(EGameState InState)
 			UISystem->HideWidget(EWidgetType::Lobby);
 		}
 
-		UGameplayStatics::OpenLevel(this, "FrozenForest", true);
+		if (UGameManager* Manager = UGameManager::Get(this))
+		{
+			UGameplayStatics::OpenLevelBySoftObjectPtr(this, Manager->PlayMap);
+		}
 		//레벨 전환
 		break;
 	case EGameState::Success:

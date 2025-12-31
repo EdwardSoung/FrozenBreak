@@ -36,6 +36,10 @@ public:
 
 	void SetState(EGameState InState);
 	inline EGameState GetGameState() { return CurrentState; }
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GameData")
+	TSoftObjectPtr<UWorld> PlayMap;
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
@@ -56,6 +60,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GameData")
 	EGameState CurrentState;
+
 
 private:
 	uint32 CurrentUID = 1;
