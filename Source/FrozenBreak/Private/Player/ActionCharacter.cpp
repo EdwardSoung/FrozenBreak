@@ -761,6 +761,7 @@ void AActionCharacter::OnHarvestStarted()
 		CurrentTools ? *CurrentTools->GetName() : TEXT("None")
 	);
 	*/
+	if (PlayerStatComponent->GetCurrentFatigue() < 20.0f) return;
 
 	if (GetCharacterMovement()->IsFalling())
 	{
@@ -864,7 +865,8 @@ void AActionCharacter::OnHarvestHit()
 
 void AActionCharacter::OnPickaxeStarted() // 곡괭이 전용
 {
-	
+	if (PlayerStatComponent->GetCurrentFatigue() < 20.0f) return;
+
 	// 공중이면 채굴 금지
 	if (GetCharacterMovement() && GetCharacterMovement()->IsFalling())
 	{

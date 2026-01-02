@@ -68,6 +68,14 @@ private:
 	// BedActionWidget 애니메이션이 끝났을 때
 	UFUNCTION()
 	void BedActionWidgetFinished();
+
+	UFUNCTION()
+	void SetCurrentFatigueForWorldProp(float InValue);
+
+	inline bool HasEnoughFatigue()
+	{
+		return -FatigueCostPerWork <= CurrentFatigue;
+	}
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Stat")
 	TObjectPtr<class UStatComponent> StatComponent;
@@ -123,4 +131,6 @@ protected:
 
 	// BedActionWidget에 보낼 n일차 텍스트
 	int32 DayCount = 0;
+
+	float CurrentFatigue = 0.0f;
 };

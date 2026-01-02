@@ -27,6 +27,14 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void SetCurrentFatigueForEscapeRock(float InValue);
+
+	inline bool HasEnoughFatigue()
+	{
+		return -FatigueCostPerWork <= CurrentFatigue;
+	}
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<class UStaticMeshComponent> MeshComponent = nullptr;
@@ -59,5 +67,7 @@ private:
 
 	float MaxDurability = 0.0f;
 	float CurrentDurability = 0.0f;
+
+	float CurrentFatigue = 0.0f;
 
 };

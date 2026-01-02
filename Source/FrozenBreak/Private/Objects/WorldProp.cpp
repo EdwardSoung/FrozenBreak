@@ -64,9 +64,10 @@ void AWorldProp::BeginPlay()
 	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	EventSystem = UEventSubSystem::Get(this);
-	if (!EventSystem)
+	if (EventSystem)
 	{
-		UE_LOG(LogTemp, Log, TEXT("EventSystem이 설정되어 있지 않다."));
+		EventSystem->Character.OnFatigueChecked.AddDynamic(this, &AWorldProp::SetCurrentFatigueForWorldProp);
+		EventSystem->Character.OnRequesetFatigueCheck.Broadcast();
 	}
 
 	if (Data)
@@ -84,12 +85,16 @@ void AWorldProp::DoAction_Implementation()
 	{
 		if (Data->PropType == EPropType::Tree)
 		{
+			if (!HasEnoughFatigue()) return;
+
 			TreeAction();
 			return;
 
 		}
 		if (Data->PropType == EPropType::Rock)
 		{
+			if (!HasEnoughFatigue()) return;
+
 			RockAction();
 			return;
 		}
@@ -430,6 +435,11 @@ void AWorldProp::BedActionWidgetFinished()
 			Player->EnableInput(PlayerController);
 		}
 	}
+}
+
+void AWorldProp::SetCurrentFatigueForWorldProp(float InValue)
+{
+	CurrentFatigue = InValue;
 }
 
 EItemType AWorldProp::GetInteractableToolType() const

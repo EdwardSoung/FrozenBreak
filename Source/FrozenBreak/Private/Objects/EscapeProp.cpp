@@ -55,10 +55,21 @@ void AEscapeProp::BeginPlay()
 		MaxDurability = Data->Durability;
 		CurrentDurability = MaxDurability;
 	}
+	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+	{
+		EventSystem->Character.OnFatigueChecked.AddDynamic(this, &AEscapeProp::SetCurrentFatigueForEscapeRock);
+		EventSystem->Character.OnRequesetFatigueCheck.Broadcast();
+	}
+}
+
+void AEscapeProp::SetCurrentFatigueForEscapeRock(float InValue)
+{
+	CurrentFatigue = InValue;
 }
 
 void AEscapeProp::RockAction()
 {
+	if (!HasEnoughFatigue()) return;
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
 		if (AActionCharacter* Player = Cast<AActionCharacter>(UGameplayStatics::GetPlayerPawn(this, 0)))
