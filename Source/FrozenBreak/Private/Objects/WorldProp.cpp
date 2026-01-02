@@ -376,10 +376,10 @@ void AWorldProp::IsBedTime()
 	const int32 Hour = (TotalMinutes / 60) % 24;
 
 	// 24시간제 사용
-	// 이 시간부터 잘 수 있다. (테스트용 임시값)
+	// 이 시간부터 잘 수 있다.
 	const int32 BedTimeStart = 18;
 
-	// 이 시간부터 잘 수 없다. (테스트용 임시값)
+	// 이 시간부터 잘 수 없다.
 	const int32 BedTimeEnd = 6;
 	UE_LOG(LogTemp, Log, TEXT("Current Time : %d"), Hour);
 	// BedTimeStart와 BedTimeEnd 사이의 시간이여야만 잘 수 있다.
