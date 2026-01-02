@@ -29,6 +29,8 @@ protected:
 	virtual void BeginPlay() override;
 	UFUNCTION()
 	void AddItem(EItemType InType, int32 InAmount, float InDurability);
+	UFUNCTION()
+	void MoveItem(UInventoryItem* InItem);
 
 	UFUNCTION()
 	void DropItem(UInventoryItem* InItem);

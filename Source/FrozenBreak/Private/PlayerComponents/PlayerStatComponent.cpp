@@ -76,7 +76,7 @@ void UPlayerStatComponent::ItemUsed(UInventoryItem* InItem)
 			{
 				//아이템 사용 차감을 동일하게 가져가고, 여기를 우선 다시 세팅..
 				HandEquip->SetAmount(1);
-				EventSystem->Character.OnAddItemToInventoryUI.Broadcast(HandEquip);
+				EventSystem->Character.OnMoveItemToInventory.Broadcast(HandEquip);
 			}
 		}
 		HandEquip = InItem;
@@ -89,7 +89,7 @@ void UPlayerStatComponent::ItemUsed(UInventoryItem* InItem)
 			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 			{
 				BodyEquip->SetAmount(1);
-				EventSystem->Character.OnAddItemToInventoryUI.Broadcast(BodyEquip);
+				EventSystem->Character.OnMoveItemToInventory.Broadcast(BodyEquip);
 			}
 		}
 		BodyEquip = InItem;

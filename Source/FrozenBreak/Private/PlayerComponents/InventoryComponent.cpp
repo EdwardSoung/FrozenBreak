@@ -25,6 +25,7 @@ void UInventoryComponent::BeginPlay()
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
 		EventSystem->Character.OnGetPickupItem.AddDynamic(this, &UInventoryComponent::AddItem);
+		EventSystem->Character.OnMoveItemToInventory.AddDynamic(this, &UInventoryComponent::MoveItem);
 		EventSystem->Character.OnRequestInventoryInit.AddDynamic(this, &UInventoryComponent::InitInventoryUI);
 		EventSystem->Character.OnRequestIventoryItems.AddDynamic(this, &UInventoryComponent::SendInventoryItems);
 		EventSystem->Character.OnUpdateItem.AddDynamic(this, &UInventoryComponent::UpdateItem);
@@ -279,6 +280,17 @@ void UInventoryComponent::AddItem(EItemType InType, int32 InAmount, float InDura
 				EventSystem->Character.OnAddItemToInventoryUI.Broadcast(NewItem);
 			}
 		}
+	}
+	RefreshWeight();
+}
+
+void UInventoryComponent::MoveItem(UInventoryItem* InItem)
+{
+	Items.Add(InItem);
+
+	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+	{
+		EventSystem->Character.OnAddItemToInventoryUI.Broadcast(InItem);
 	}
 	RefreshWeight();
 }

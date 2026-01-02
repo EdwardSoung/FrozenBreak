@@ -14,6 +14,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerSleep);
 
 //Inventory
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnGetPickupItem, EItemType, InType, int32, InAmount, float, InDurability);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMoveItemToInventory, UInventoryItem*, InItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInitInventoryUI, TArray<UInventoryItem*>, InData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAddItemToInventoryUI, UInventoryItem*, InItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUpdateInventoryItem, EItemType, InType);
@@ -72,6 +73,7 @@ struct FCharacterEvents
 
 	UPROPERTY(BlueprintCallable)
 	FOnGetPickupItem OnGetPickupItem;
+	FOnMoveItemToInventory OnMoveItemToInventory;
 	FOnInitInventoryUI OnInitInventoryUI;
 	FOnAddItemToInventoryUI OnAddItemToInventoryUI;
 	FOnUpdateInventoryItem OnUpdateInventoryItem;
