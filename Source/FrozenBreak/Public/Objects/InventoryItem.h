@@ -29,6 +29,7 @@ public:
 private:
 	uint32 UID = 0;
 
+	UPROPERTY()
 	TObjectPtr<UItemData> Data;
 	int32 Amount = 0;
 	

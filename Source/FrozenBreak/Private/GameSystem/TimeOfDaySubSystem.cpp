@@ -74,6 +74,10 @@ void UTimeOfDaySubSystem::SkipTimeByHours(float Hours)
 
 	// 즉시 점프
 	TimeNormalized = TimeNormalized + DeltaNormalized;
+
+	if (TimeNormalized > 1.0f)
+		Day++;
+
 	TimeNormalized = FMath::Fmod(TimeNormalized, 1.0f);
 	if (TimeNormalized < 0.0f) TimeNormalized += 1.0f;
 

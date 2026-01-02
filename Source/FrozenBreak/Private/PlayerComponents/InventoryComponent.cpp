@@ -52,6 +52,7 @@ void UInventoryComponent::BeginPlay()
 	AddItem(EItemType::Axe, 1, 0);
 	AddItem(EItemType::Pickaxe, 1, 0);
 	AddItem(EItemType::Knife, 1, 0);
+	AddItem(EItemType::RawMeat, 10, 0);
 }
 
 void UInventoryComponent::SendInventoryItems()
@@ -96,7 +97,7 @@ void UInventoryComponent::SendRawMeetData()
 		TArray<UInventoryItem*> Meets;
 		for (auto& SingleItem : Items)
 		{
-			if (SingleItem->GetData()->ItemType == EItemType::RawMeat)
+			if (SingleItem->GetData() && SingleItem->GetData()->ItemType == EItemType::RawMeat)
 			{
 				Meets.Add(SingleItem);
 			}

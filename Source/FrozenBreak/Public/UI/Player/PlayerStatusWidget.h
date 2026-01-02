@@ -19,6 +19,7 @@ class FROZENBREAK_API UPlayerStatusWidget : public UUserWidget, public IOpenable
 
 protected:
 	virtual void NativeConstruct() override;
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	
 	UFUNCTION()
 	void SetInGameTime(FText InTimeValue);

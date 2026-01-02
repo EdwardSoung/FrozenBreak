@@ -13,6 +13,7 @@
 void UInventoryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();	
+	bIsFocusable = true;
 
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
@@ -73,6 +74,13 @@ FReply UInventoryWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKey
 	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
 }
 
+FReply UInventoryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+
+	return FReply::Handled().SetUserFocus(this->TakeWidget(), EFocusCause::Mouse);
+}
+
 void UInventoryWidget::UpdateItemByType(EItemType InType)
 {
 	for (auto Item : ItemDataList)
@@ -113,13 +121,15 @@ void UInventoryWidget::UpdateItem(UInventoryItem* InItem)
 	}
 	else
 	{
-		for (auto data : ItemDataList)
+		/*for (auto data : ItemDataList)
 		{
 			if (data->GetUID() == InItem->GetUID())
 			{
 				data = InItem;
+				break;
 			}
-		}
+		}*/
+		InventoryList->RegenerateAllEntries();
 	}	
 }
 

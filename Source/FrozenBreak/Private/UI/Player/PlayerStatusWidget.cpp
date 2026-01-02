@@ -14,6 +14,7 @@ void UPlayerStatusWidget::NativeConstruct()
 {
 	SetInGameTime(DefaultGameTime);
 	SetTemperatureDefence(DefaultTemperatureDefence);
+	bIsFocusable = true;
 
 	if (UEventSubSystem* statusEvent = UEventSubSystem::Get(this))
 	{
@@ -27,6 +28,13 @@ void UPlayerStatusWidget::NativeConstruct()
 		statusEvent->Character.OnRequestStatusInit.Broadcast();
 	}
 	CloseStatButton->OnClicked.AddDynamic(this, &UPlayerStatusWidget::HideWidget);
+}
+
+FReply UPlayerStatusWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+
+	return FReply::Handled().SetUserFocus(this->TakeWidget(), EFocusCause::Mouse);
 }
 
 void UPlayerStatusWidget::SetInGameTime(FText InTimeValue)
