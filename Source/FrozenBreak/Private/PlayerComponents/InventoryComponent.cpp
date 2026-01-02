@@ -259,7 +259,7 @@ void UInventoryComponent::AddItem(EItemType InType, int32 InAmount, float InDura
 		return;
 	}
 	UInventoryItem* TargetItem = GetItem(InType);
-	if (TargetItem && TargetItem->GetData()->IsStackable)
+	if (TargetItem && TargetItem->GetData() && TargetItem->GetData()->IsStackable)
 	{
 		//누적가능한 아이템이면 개수 증가
 		TargetItem->AddAmount(InAmount);
@@ -322,7 +322,7 @@ UInventoryItem* UInventoryComponent::GetItem(EItemType Type)
 {
 	for (auto Item : Items)
 	{
-		if (Item->GetData()->ItemType == Type)
+		if (Item->GetData() && Item->GetData()->ItemType == Type)
 		{
 			return Item;
 		}
