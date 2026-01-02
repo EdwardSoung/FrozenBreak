@@ -291,6 +291,8 @@ void UCraftInventoryComponent::FinishCraft()
 	CurrentCraftCost = 0.0f;
 	CurrentItemToCraft = nullptr;
 
+	EventSystem->Status.OnCurrentCraftCostChanged.Broadcast(CurrentCraftCost);
+
 	if (UStatusCalculationSubSystem* StatusSS = GetWorld()->GetSubsystem<UStatusCalculationSubSystem>())
 	{
 		StatusSS->IncreaseFatigue(FatigueUse);
