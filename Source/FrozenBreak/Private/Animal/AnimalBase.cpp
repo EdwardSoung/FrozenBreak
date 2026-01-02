@@ -72,6 +72,8 @@ void AAnimalBase::OnTakeDamage(
 
 void AAnimalBase::StartHealthBarTimer()
 {
+	if (!HealthBarWidgetComponent) return;
+
 	HealthBarWidgetComponent->SetVisibility(true);
 
 	GetWorldTimerManager().SetTimer(
@@ -145,5 +147,6 @@ void AAnimalBase::DestroyAnimal()
 	{
 		GetWorld()->GetSubsystem<UAnimalTrackingSubSystem>()->DecreaseCurrentAnimalNumber(AnimalType);
 	}
+	GetWorldTimerManager().ClearTimer(HealthBarTimerHandle);
 	Destroy();
 }
