@@ -28,6 +28,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Status|Hunger")
 	void SetPlayerHunger(float InHungerValue);
 
+	float GetCurrentFatigue() { return CurrentFatigue; }
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

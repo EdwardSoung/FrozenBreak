@@ -11,6 +11,7 @@
 #include "GameSystem/UISubSystem.h"
 
 #include "CommonComponents/StatComponent.h"
+#include "PlayerComponents/PlayerStatComponent.h"
 #include "Components/SceneComponent.h"
 #include "Components/WidgetComponent.h"
 
@@ -158,6 +159,11 @@ void AWorldProp::TreeAction()
 	{
 		if (AActionCharacter* Player = Cast<AActionCharacter>(UGameplayStatics::GetPlayerPawn(this, 0)))
 		{
+			if (Player->PlayerStatComponent->GetCurrentFatigue() < FMath::Abs(FatigueCostPerWork))
+			{
+				return;
+			}
+
 			if (auto Durability = Cast<UPropDurabilityWidget>(DurabilityWidget->GetUserWidgetObject()))
 			{
 				if (Player->GetCurrentTool() != nullptr)
@@ -227,6 +233,11 @@ void AWorldProp::RockAction()
 	{
 		if (AActionCharacter* Player = Cast<AActionCharacter>(UGameplayStatics::GetPlayerPawn(this, 0)))
 		{
+			if (Player->PlayerStatComponent->GetCurrentFatigue() < FMath::Abs(FatigueCostPerWork))
+			{
+				return;
+			}
+
 			if (auto Durability = Cast<UPropDurabilityWidget>(DurabilityWidget->GetUserWidgetObject()))
 			{
 				if (Player->GetCurrentTool() != nullptr)

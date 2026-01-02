@@ -49,6 +49,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnSelect_Implementation(bool bIsStart) override;
 
+	inline float GetWorkFatigue() { return FatigueCostPerWork; }
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Prop|Data")
 	float FatigueCostPerWork = -50.0f;

@@ -21,15 +21,12 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	
+public:		
 	UFUNCTION(BlueprintCallable)
 	virtual void DoAction_Implementation(/*동작 타입을 입력받아도 좋을 것 같음...*/) override;
 	//예시 : 공격인지(벌목등 포함), 획득인지, 작업인지..
 	UFUNCTION(BlueprintCallable)
 	virtual void OnSelect_Implementation(bool bIsStarted) override;
-
-	void InitStat(float InAttack, float InHealth);
 
 	UFUNCTION(BlueprintPure, Category = "Prop|Data")
 	EItemType GetInteractableToolType() const;
@@ -38,6 +35,8 @@ public:
 	EPropType GetPropType() const;
 
 	virtual void CampfireAction() {};
+
+	inline float GetWorkFatigue() { return FatigueCostPerWork; }
 private:
 	const ECollisionChannel InteractableActorChannel = ECollisionChannel::ECC_GameTraceChannel1;
 	const float BedUsageHours = 4.0f;
