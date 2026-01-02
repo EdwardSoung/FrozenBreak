@@ -148,4 +148,7 @@ private:
 	int32 CraftResultCount = 1;
 
 	float CurrentFatigue = 0.0f;
+
+	bool IsCrafting = false;
+	bool IsCooking = false;
 };

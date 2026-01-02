@@ -213,11 +213,12 @@ const FCraftingRecipeRow* UCraftInventoryComponent::FindRecipeForResult(EItemTyp
 
 void UCraftInventoryComponent::StartCrafting(UInventoryItem* ItemToCraft)
 {
-	if (!ItemToCraft || !ItemToCraft->GetData()) return;
+	if (!ItemToCraft || !ItemToCraft->GetData() || IsCrafting) return;
 
 	MaxCraftCost = ItemToCraft->GetData()->CraftCost;
 	if (MaxCraftCost <= 0.f) return;
 	if (!HasEnoughFatigue()) return;
+	
 
 	const EItemType ResultType = ItemToCraft->GetData()->ItemType;
 	
@@ -247,6 +248,7 @@ void UCraftInventoryComponent::StartCrafting(UInventoryItem* ItemToCraft)
 		UISystem->ShowWidget(EWidgetType::CraftProcessBar);
 	}
 
+	IsCrafting = true;
 	GetWorld()->GetTimerManager().SetTimer(
 		CraftHandle,
 		this,
@@ -297,6 +299,14 @@ void UCraftInventoryComponent::FinishCraft()
 	{
 		StatusSS->IncreaseFatigue(FatigueUse);
 	}
+	if (IsCooking)
+	{
+		IsCooking = false;
+	}
+	if (IsCrafting)
+	{
+		IsCrafting = false;
+	}
 
 	GetWorld()->GetTimerManager().ClearTimer(CraftHandle);
 	EventSystem->Character.OnRequesetFatigueCheck.Broadcast();
@@ -316,14 +326,18 @@ void UCraftInventoryComponent::StartCooking(UInventoryItem* InIngredient)
 	const FCraftingRecipeRow* FirstRecipe = FindFirstCookableRecipeFromInputs();
 	if (!FirstRecipe) return;
 
-	if (UInventoryItem* ResultItem = GetOrCreateCraftableItem(FirstRecipe->ResultItemType))
+	if (!IsCooking)
 	{
-		if (ResultItem->GetData()->CraftCost > CurrentFatigue) return;
-		if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+		if (UInventoryItem* ResultItem = GetOrCreateCraftableItem(FirstRecipe->ResultItemType))
 		{
-			EventSystem->Character.OnGetPickupItem.Broadcast(Type, -1, 0);
+			if (ResultItem->GetData()->CraftCost > CurrentFatigue) return;
+			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
+			{
+				EventSystem->Character.OnGetPickupItem.Broadcast(Type, -1, 0);
+			}
+			IsCooking = true;
+			StartCrafting(ResultItem);
 		}
-		StartCrafting(ResultItem);
 	}
 }
 
