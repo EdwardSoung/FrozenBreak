@@ -39,7 +39,7 @@ public:
 	inline float GetWorkFatigue() { return FatigueCostPerWork; }
 private:
 	const ECollisionChannel InteractableActorChannel = ECollisionChannel::ECC_GameTraceChannel1;
-	const float BedUsageHours = 4.0f;
+	const float BedUsageHours = 12.0f;
 
 private:
 	// 플레이어가 나무와 상호작용 시

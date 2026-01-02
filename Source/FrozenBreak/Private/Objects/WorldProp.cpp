@@ -377,13 +377,13 @@ void AWorldProp::IsBedTime()
 
 	// 24시간제 사용
 	// 이 시간부터 잘 수 있다. (테스트용 임시값)
-	const int32 BedTimeStart = 12;
+	const int32 BedTimeStart = 18;
 
 	// 이 시간부터 잘 수 없다. (테스트용 임시값)
-	const int32 BedTimeEnd = 13;
-
+	const int32 BedTimeEnd = 6;
+	UE_LOG(LogTemp, Log, TEXT("Current Time : %d"), Hour);
 	// BedTimeStart와 BedTimeEnd 사이의 시간이여야만 잘 수 있다.
-	bIsBedTime = (Hour >= BedTimeStart) && (Hour < BedTimeEnd);
+	bIsBedTime = (Hour >= BedTimeStart) || (Hour < BedTimeEnd);
 }
 
 float AWorldProp::GetDurabilityRadio() const
