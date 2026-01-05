@@ -10,10 +10,6 @@ void UInventoryItem::Initialize(uint32 InUID, UItemData* InData, float InDurabil
 	Data = InData;
 	Amount = 0;
 	MaxDurability = Data->Durability;
-	if (Data->Durability < 0)
-	{
-		Data->UseDurability = 0;
-	}
 	Durability = InDurability > 0 ? InDurability : MaxDurability;
 	QuickSlotNum = 0;
 }
@@ -35,6 +31,10 @@ void UInventoryItem::SetAmount(int32 InAmount)
 
 void UInventoryItem::ItemUsed()
 {
+	//내구도 음수이면 무제한
+	if (MaxDurability < 0)
+		return;
+
 	Durability -= Data->UseDurability;
 	if (Durability < 0)
 	{

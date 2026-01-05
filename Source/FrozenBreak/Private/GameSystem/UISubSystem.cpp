@@ -137,3 +137,14 @@ void UUISubSystem::HideAllWiget()
 		HideWidget(opened.Key);
 	}
 }
+
+void UUISubSystem::ClearAllWidgets()
+{
+	for (auto& exists : CreatedWidgets)
+	{
+		if(exists.Key != EWidgetType::Lobby)
+			exists.Value->RemoveFromParent();
+	}
+	CreatedWidgets.Empty();
+	OpenedWidgets.Empty();
+}

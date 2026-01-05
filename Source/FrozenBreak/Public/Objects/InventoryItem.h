@@ -30,7 +30,7 @@ private:
 	uint32 UID = 0;
 
 	UPROPERTY()
-	TObjectPtr<UItemData> Data;
+	TObjectPtr<UItemData> Data = nullptr;
 	int32 Amount = 0;
 	
 	float Durability = 0.0f;

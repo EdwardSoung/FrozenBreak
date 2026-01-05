@@ -13,6 +13,8 @@ void ALobbyController::BeginPlay()
 
 	if (UUISubSystem* UISystem = UUISubSystem::Get(this))
 	{
+		UISystem->ClearAllWidgets();
+
 		UISystem->ShowWidget(EWidgetType::Lobby);
 	}
 }

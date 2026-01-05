@@ -18,6 +18,13 @@ class FROZENBREAK_API UEventSubSystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 public:
 	static UEventSubSystem* Get(const UObject* WorldContextObject);
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	virtual void Deinitialize() override;
+
+	void ResetSystem();
+
+private:
+	void OnLevelLoaded(UWorld* World);
 
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "Events")

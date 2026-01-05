@@ -30,6 +30,7 @@ public:
 	bool IsOpenedWidget(EWidgetType InWidgetType);
 	
 	void HideAllWiget();
+	void ClearAllWidgets();
 private:
 	UPROPERTY()
 	TMap<EWidgetType, UUserWidget*> CreatedWidgets;

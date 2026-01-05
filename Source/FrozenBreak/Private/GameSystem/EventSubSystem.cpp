@@ -18,3 +18,24 @@ UEventSubSystem* UEventSubSystem::Get(const UObject* WorldContextObject)
     }
     return nullptr;
 }
+
+void UEventSubSystem::Initialize(FSubsystemCollectionBase& Collection)
+{
+    Super::Initialize(Collection);
+    FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UEventSubSystem::OnLevelLoaded);
+}
+
+void UEventSubSystem::ResetSystem()
+{
+
+}
+void UEventSubSystem::Deinitialize()
+{
+    FCoreUObjectDelegates::PostLoadMapWithWorld.RemoveAll(this);
+    Super::Deinitialize();
+}
+
+void UEventSubSystem::OnLevelLoaded(UWorld* World)
+{
+    ResetSystem();
+}

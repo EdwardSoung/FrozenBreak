@@ -13,7 +13,7 @@ UInventoryComponent::UInventoryComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
-
+	bWantsInitializeComponent = true;
 	// ...
 }
 
@@ -22,6 +22,10 @@ void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+}
+
+void UInventoryComponent::InitializeComponent()
+{
 	if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 	{
 		EventSystem->Character.OnGetPickupItem.AddDynamic(this, &UInventoryComponent::AddItem);
@@ -47,6 +51,7 @@ void UInventoryComponent::BeginPlay()
 		}
 	}
 
+	Items.Empty();
 	//최초 아이템 제공
 	AddItem(EItemType::Axe, 1, 0);
 	AddItem(EItemType::Axe, 1, 0);

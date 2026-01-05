@@ -31,10 +31,10 @@ void AFrozenForestGameState::OnGameStateChanged(EGameState InState)
 	switch (InState)
 	{
 	case EGameState::Lobby:
-		if (UUISubSystem* UISystem = UUISubSystem::Get(this))
-		{
-			UISystem->HideAllWiget();
-		}
+		//if (UUISubSystem* UISystem = UUISubSystem::Get(this))
+		//{
+		//	UISystem->HideAllWiget();
+		//}
 
 		UGameplayStatics::OpenLevel(this, "Lobby", true);
 		break;

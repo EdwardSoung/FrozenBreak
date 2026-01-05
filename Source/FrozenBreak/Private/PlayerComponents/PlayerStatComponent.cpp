@@ -13,7 +13,7 @@ UPlayerStatComponent::UPlayerStatComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
-
+	bWantsInitializeComponent = true;
 	// ...
 }
 
@@ -132,14 +132,14 @@ void UPlayerStatComponent::EquipHandItemUsed()
 	{
 		HandEquip->ItemUsed();
 
-		if (HandEquip->GetDurability() <= 0)
+		/*if (HandEquip->GetDurability() == 0)
 		{
 			HandEquip = nullptr;
 			if (UEventSubSystem* EventSystem = UEventSubSystem::Get(this))
 			{
 				EventSystem->Character.OnEquipHandItem.Broadcast(nullptr);
 			}
-		}
+		}*/
 	}
 	else
 	{

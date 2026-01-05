@@ -27,6 +27,7 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	virtual void InitializeComponent() override;
 	UFUNCTION()
 	void AddItem(EItemType InType, int32 InAmount, float InDurability);
 	UFUNCTION()
